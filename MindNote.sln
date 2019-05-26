@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Data", "src\MindNo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Data.Providers.SqlServer", "src\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj", "{3523A875-3AA7-4B8D-8CB5-6E20A6629991}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Unit", "test\Test.Unit\Test.Unit.csproj", "{12F390EF-2763-4A20-B61B-2AB91F0CA005}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3523A875-3AA7-4B8D-8CB5-6E20A6629991}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3523A875-3AA7-4B8D-8CB5-6E20A6629991}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3523A875-3AA7-4B8D-8CB5-6E20A6629991}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12F390EF-2763-4A20-B61B-2AB91F0CA005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12F390EF-2763-4A20-B61B-2AB91F0CA005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12F390EF-2763-4A20-B61B-2AB91F0CA005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12F390EF-2763-4A20-B61B-2AB91F0CA005}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

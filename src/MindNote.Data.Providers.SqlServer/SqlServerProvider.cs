@@ -19,7 +19,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int> Create(Node data)
         {
-            data.CreationTime = DateTimeOffset.Now;
+            data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
             var raw = Models.Node.FromModel(data);
             context.Nodes.Add(raw);
             await context.SaveChangesAsync();
@@ -79,6 +79,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int> Create(Struct data)
         {
+            data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
             var raw = Models.Struct.FromModel(data);
             context.Structs.Add(raw);
             await context.SaveChangesAsync();

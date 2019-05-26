@@ -8,7 +8,7 @@ using MindNote.Data.Providers;
 
 namespace MindNote.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class NodesController : ControllerBase
     {
