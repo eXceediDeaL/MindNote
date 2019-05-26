@@ -14,37 +14,33 @@ namespace MindNote.API.Database
             if (context.Nodes.Any())
                 return;
 
-            var ns = new Node[]
+            var ns = new List<Node>();
+            for(int i = 1; i < 7; i++)
             {
-                new Node
+                Node cn = new Node
                 {
-                    Content="vivo",
-                    Name="Note 1",
-                    Tags = new string[]{"tag1", "tag2"}
-                },
-                new Node
-                {
-                    Content="oppo",
-                    Name="Note 2",
-                    Tags = new string[]{ }
-                },
-            };
+                    Name = $"Note {i}",
+                    Content = $"content {i}",
+                    CreationTime = DateTimeOffset.Now,
+                    ModificationTime = DateTimeOffset.Now,
+                    Tags = new string[] { $"tag{i / 2}" },
+                };
+                ns.Add(cn);
+            }
 
-            var ss = new Struct[]
+            var ss = new List<Struct>();
+            for (int i = 1; i < 7; i++)
             {
-                new Struct
+                Struct cn = new Struct
                 {
-                    Name="Struct 1",
-                    Tags=new string[]{ "struct" },
-                    Data = new Relation[]{ new Relation(new int[] { 1,2 })}
-                },
-                new Struct
-                {
-                    Name="Struct 2",
-                    Tags=new string[]{},
-                    Data = new Relation[]{ new Relation(new int[] { 2,1 })}
-                }
-            };
+                    Name = $"Struct {i}",
+                    Data = new Relation[] { new Relation(new int[] { Math.Max(1, i - 1), i }) },
+                    CreationTime = DateTimeOffset.Now,
+                    ModificationTime = DateTimeOffset.Now,
+                    Tags = new string[] { $"tag{i / 2}" },
+                };
+                ss.Add(cn);
+            }
 
             foreach (var v in ns)
                 context.Nodes.Add(Data.Providers.SqlServer.Models.Node.FromModel(v));
