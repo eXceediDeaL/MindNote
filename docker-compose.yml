@@ -14,5 +14,3 @@ services:
     environment:
       - SA_PASSWORD=MNdb_passw00d
       - ACCEPT_EULA=Y
-    ports:
-      - "1433:1433"

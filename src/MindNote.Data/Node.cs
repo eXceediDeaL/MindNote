@@ -11,5 +11,9 @@ namespace MindNote.Data
         public string Content { get; set; }
 
         public string[] Tags { get; set; }
+
+        public DateTimeOffset CreationTime { get; set; }
+
+        public DateTimeOffset ModificationTime { get; set; }
     }
 }

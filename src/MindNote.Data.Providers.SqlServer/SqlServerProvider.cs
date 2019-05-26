@@ -19,6 +19,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int> Create(Node data)
         {
+            data.CreationTime = DateTimeOffset.Now;
             var raw = Models.Node.FromModel(data);
             context.Nodes.Add(raw);
             await context.SaveChangesAsync();
@@ -57,9 +58,9 @@ namespace MindNote.Data.Providers.SqlServer
             var item = await context.Nodes.FindAsync(id);
             if (item != null)
             {
-                var raw = Models.Node.FromModel(data);
-                raw.Id = id;
-                context.Nodes.Update(raw);
+                data.ModificationTime = DateTimeOffset.Now;
+                data.Id = id;
+                context.Nodes.Update(Models.Node.FromModel(data));
                 await context.SaveChangesAsync();
                 return data.Id;
             }
@@ -116,9 +117,9 @@ namespace MindNote.Data.Providers.SqlServer
             var item = await context.Structs.FindAsync(id);
             if (item != null)
             {
-                var raw = Models.Struct.FromModel(data);
-                raw.Id = id;
-                context.Structs.Update(raw);
+                data.ModificationTime = DateTimeOffset.Now;
+                data.Id = id;
+                context.Structs.Update(Models.Struct.FromModel(data));
                 await context.SaveChangesAsync();
                 return data.Id;
             }
