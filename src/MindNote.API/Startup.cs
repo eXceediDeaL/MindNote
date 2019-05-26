@@ -35,7 +35,7 @@ namespace MindNote.API
             // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSwaggerDocument(config =>
+            services.AddOpenApiDocument(config =>
             {
                 config.PostProcess = document =>
                 {
@@ -62,7 +62,7 @@ namespace MindNote.API
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
-            {   
+            {
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -73,6 +73,7 @@ namespace MindNote.API
 
             app.UseSwagger();
             app.UseSwaggerUi3();
+            app.UseReDoc();
 
             app.UseHttpsRedirection();
             app.UseMvc();

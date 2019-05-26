@@ -18,19 +18,22 @@ namespace MindNote.API
         {
             var host = CreateWebHostBuilder(args).Build();
 
-            using(var scope = host.Services.CreateScope())
+            using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
 
                 try
                 {
-                    var context = services.GetRequiredService<Data.Providers.SqlServer.Models.DataContext>();
-                    if (context.Database.GetPendingMigrations().Any())
+                    using (var context = services.GetRequiredService<Data.Providers.SqlServer.Models.DataContext>())
                     {
-                        context.Database.Migrate();
+                        if (context.Database.GetPendingMigrations().Any())
+                        {
+                            context.Database.Migrate();
+                            Database.SeedData.Initialize(context);
+                        }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "An error occurred when create or migrate DB.");
