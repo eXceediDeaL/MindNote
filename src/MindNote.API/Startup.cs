@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,13 @@ namespace MindNote.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
+            string connectString = Configuration["ConnectionString"];
+
+            services.AddDbContext<Data.Providers.SqlServer.Models.DataContext>(options =>
+                options.UseSqlServer(connectString));
+
+            services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.SqlServerProvider>();
+            // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSwaggerDocument();

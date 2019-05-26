@@ -6,14 +6,14 @@ namespace MindNote.Data.Providers
 {
     public interface INodesProvider
     {
-        Task<Node> Get(Guid id);
+        Task<Node> Get(int id);
 
         Task<IEnumerable<Node>> GetAll();
 
-        Task Delete(Guid id);
+        Task Delete(int id);
 
-        Task<Guid> Update(Guid id, Node data);
+        Task<int> Update(int id, Node data);
 
-        Task<Guid> Create(Node data);
+        Task<int> Create(Node data);
     }
 }

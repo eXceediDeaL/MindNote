@@ -4,11 +4,11 @@ namespace MindNote.Data
 {
     public class Relation
     {
-        public Relation(Guid[] ids)
+        public Relation(int[] ids)
         {
             Ids = ids;
         }
 
-        public Guid[] Ids { get; set; }
+        public int[] Ids { get; set; }
     }
 }

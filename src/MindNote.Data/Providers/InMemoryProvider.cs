@@ -9,26 +9,28 @@ namespace MindNote.Data.Providers
     {
         class NodesProvider : INodesProvider
         {
-            public Dictionary<Guid, Node> Data
+            int count = 0;
+
+            public Dictionary<int, Node> Data
             {
                 get; private set;
-            } = new Dictionary<Guid, Node>();
+            } = new Dictionary<int, Node>();
 
-            public Task<Guid> Create(Node data)
+            public Task<int> Create(Node data)
             {
-                data.Id = Guid.NewGuid();
+                data.Id = ++count;
                 Data.Add(data.Id, data);
                 return Task.FromResult(data.Id);
             }
 
-            public Task Delete(Guid id)
+            public Task Delete(int id)
             {
                 if (Data.ContainsKey(id))
                     Data.Remove(id);
                 return Task.CompletedTask;
             }
 
-            public Task<Node> Get(Guid id)
+            public Task<Node> Get(int id)
             {
                 if (Data.TryGetValue(id, out var value))
                     return Task.FromResult(value);
@@ -40,7 +42,7 @@ namespace MindNote.Data.Providers
                 return Task.FromResult(from x in Data.Values select x);
             }
 
-            public Task<Guid> Update(Guid id, Node data)
+            public Task<int> Update(int id, Node data)
             {
                 if (!Data.ContainsKey(id))
                     throw new KeyNotFoundException($"Key {id.ToString()} not found.");
@@ -52,26 +54,28 @@ namespace MindNote.Data.Providers
 
         class StructsProvider : IStructsProvider
         {
-            public Dictionary<Guid, Struct> Data
+            int count = 0;
+
+            public Dictionary<int, Struct> Data
             {
                 get; private set;
-            } = new Dictionary<Guid, Struct>();
+            } = new Dictionary<int, Struct>();
 
-            public Task<Guid> Create(Struct data)
+            public Task<int> Create(Struct data)
             {
-                data.Id = Guid.NewGuid();
+                data.Id = ++count;
                 Data.Add(data.Id, data);
                 return Task.FromResult(data.Id);
             }
 
-            public Task Delete(Guid id)
+            public Task Delete(int id)
             {
                 if (Data.ContainsKey(id))
                     Data.Remove(id);
                 return Task.CompletedTask;
             }
 
-            public Task<Struct> Get(Guid id)
+            public Task<Struct> Get(int id)
             {
                 if (Data.TryGetValue(id, out var value))
                     return Task.FromResult(value);
@@ -83,7 +87,7 @@ namespace MindNote.Data.Providers
                 return Task.FromResult(from x in Data.Values select x);
             }
 
-            public Task<Guid> Update(Guid id, Struct data)
+            public Task<int> Update(int id, Struct data)
             {
                 if (!Data.ContainsKey(id))
                     throw new KeyNotFoundException($"Key {id.ToString()} not found.");
@@ -98,9 +102,9 @@ namespace MindNote.Data.Providers
 
         public InMemoryProvider()
         {
-            Guid fnid = nodes.Create(new Node { Content = "Welcome to MindNote.", Name = "First Note", Tags = new string[] { "begin" } }).Result;
+            int fnid = nodes.Create(new Node { Content = "Welcome to MindNote.", Name = "First Note", Tags = new string[] { "begin" } }).Result;
 
-            structs.Create(new Struct { Data = new Relation[] { new Relation(new Guid[] { fnid, fnid }) }, Name = "First Graph", Tags = new string[] { "begin" } });
+            structs.Create(new Struct { Data = new Relation[] { new Relation(new int[] { fnid, fnid }) }, Name = "First Graph", Tags = new string[] { "begin" } });
         }
 
         public INodesProvider GetNodesProvider() => nodes;

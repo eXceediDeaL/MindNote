@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28917.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindNote.API", "src\MindNote.API\MindNote.API.csproj", "{83937FFE-78B1-44A1-91C8-50427B2B8651}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.API", "src\MindNote.API\MindNote.API.csproj", "{83937FFE-78B1-44A1-91C8-50427B2B8651}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindNote.Data", "src\MindNote.Data\MindNote.Data.csproj", "{2D116D88-8A5C-455F-8494-8847B2516ED9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Data", "src\MindNote.Data\MindNote.Data.csproj", "{2D116D88-8A5C-455F-8494-8847B2516ED9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindNote.Data.Providers.Redis", "MindNote.Data.Providers.Redis\MindNote.Data.Providers.Redis.csproj", "{A6F1F6DC-E586-4DEE-831E-0D3513EDEC8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Data.Providers.SqlServer", "src\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj", "{3523A875-3AA7-4B8D-8CB5-6E20A6629991}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{2D116D88-8A5C-455F-8494-8847B2516ED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D116D88-8A5C-455F-8494-8847B2516ED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D116D88-8A5C-455F-8494-8847B2516ED9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A6F1F6DC-E586-4DEE-831E-0D3513EDEC8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A6F1F6DC-E586-4DEE-831E-0D3513EDEC8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A6F1F6DC-E586-4DEE-831E-0D3513EDEC8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6F1F6DC-E586-4DEE-831E-0D3513EDEC8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3523A875-3AA7-4B8D-8CB5-6E20A6629991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3523A875-3AA7-4B8D-8CB5-6E20A6629991}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3523A875-3AA7-4B8D-8CB5-6E20A6629991}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3523A875-3AA7-4B8D-8CB5-6E20A6629991}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

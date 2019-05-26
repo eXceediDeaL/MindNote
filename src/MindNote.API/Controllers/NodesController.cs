@@ -26,25 +26,25 @@ namespace MindNote.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<Node> Get(Guid id)
+        public async Task<Node> Get(int id)
         {
             return await provider.Get(id);
         }
 
         [HttpDelete("{id}")]
-        public async Task Delete(Guid id)
+        public async Task Delete(int id)
         {
             await provider.Delete(id);
         }
 
         [HttpPut("{id}")]
-        public async Task<Guid> Update(Guid id, Node data)
+        public async Task<int> Update(int id, Node data)
         {
             return await provider.Update(id, data);
         }
 
         [HttpPost]
-        public async Task<Guid> Create([FromBody] Node data)
+        public async Task<int> Create([FromBody] Node data)
         {
             return await provider.Create(data);
         }

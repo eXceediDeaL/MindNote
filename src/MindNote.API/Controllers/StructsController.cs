@@ -25,25 +25,25 @@ namespace MindNote.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<Struct> Get(Guid id)
+        public async Task<Struct> Get(int id)
         {
             return await provider.Get(id);
         }
 
         [HttpDelete("{id}")]
-        public async Task Delete(Guid id)
+        public async Task Delete(int id)
         {
             await provider.Delete(id);
         }
 
         [HttpPut("{id}")]
-        public async Task<Guid> Update(Guid id, Struct data)
+        public async Task<int> Update(int id, Struct data)
         {
             return await provider.Update(id, data);
         }
 
         [HttpPost]
-        public async Task<Guid> Create([FromBody] Struct data)
+        public async Task<int> Create([FromBody] Struct data)
         {
             return await provider.Create(data);
         }

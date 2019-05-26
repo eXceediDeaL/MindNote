@@ -1,0 +1,15 @@
+version: "3"
+services:
+  app:
+    build: .
+    environment:
+      - ConnectionString=Server=mndb;Database=master;User=sa;Password=MNdb_passw00d;
+    ports:
+      - "8085:80"
+    depends_on:
+      - mndb
+  mndb:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+      - SA_PASSWORD=MNdb_passw00d
+      - ACCEPT_EULA=Y
