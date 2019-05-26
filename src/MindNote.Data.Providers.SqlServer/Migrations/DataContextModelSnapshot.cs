@@ -50,6 +50,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<string>("Data");
 
+                    b.Property<string>("Extra");
+
                     b.Property<DateTimeOffset>("ModificationTime");
 
                     b.Property<string>("Name");

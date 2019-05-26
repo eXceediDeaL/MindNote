@@ -15,5 +15,7 @@ namespace MindNote.Data
         public DateTimeOffset CreationTime { get; set; }
 
         public DateTimeOffset ModificationTime { get; set; }
+
+        public string Extra { get; set; }
     }
 }

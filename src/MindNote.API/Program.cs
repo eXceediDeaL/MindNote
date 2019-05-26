@@ -16,9 +16,13 @@ namespace MindNote.API
     {
         public static void Main(string[] args)
         {
-
             var host = CreateWebHostBuilder(args).Build();
+            InitialDatabase(host);
+            host.Run();
+        }
 
+        public static void InitialDatabase(IWebHost host)
+        {
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -40,8 +44,6 @@ namespace MindNote.API
                     logger.LogError(ex, "An error occurred when create or migrate DB.");
                 }
             }
-
-            host.Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

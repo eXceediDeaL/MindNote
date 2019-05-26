@@ -35,7 +35,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     Data = table.Column<string>(nullable: true),
                     Tags = table.Column<string>(nullable: true),
                     CreationTime = table.Column<DateTimeOffset>(nullable: false),
-                    ModificationTime = table.Column<DateTimeOffset>(nullable: false)
+                    ModificationTime = table.Column<DateTimeOffset>(nullable: false),
+                    Extra = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

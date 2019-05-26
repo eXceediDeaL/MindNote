@@ -16,6 +16,8 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public DateTimeOffset ModificationTime { get; set; }
 
+        public string Extra { get; set; }
+
         public Data.Struct ToModel()
         {
             return new Data.Struct
@@ -26,6 +28,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(Tags),
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
+                Extra = Extra,
             };
         }
 
@@ -39,6 +42,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Tags = Newtonsoft.Json.JsonConvert.SerializeObject(data.Tags),
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,
+                Extra = data.Extra,
             };
         }
     }
