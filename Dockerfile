@@ -5,6 +5,7 @@ COPY *.sln .
 COPY ./src/MindNote.API/MindNote.API.csproj ./src/MindNote.API/MindNote.API.csproj
 COPY ./src/MindNote.Data/MindNote.Data.csproj ./src/MindNote.Data/MindNote.Data.csproj
 COPY ./src/MindNote.Data.Providers.SqlServer/MindNote.Data.Providers.SqlServer.csproj ./src/MindNote.Data.Providers.SqlServer/MindNote.Data.Providers.SqlServer.csproj
+COPY ./test/Test.Unit/Test.Unit.csproj ./test/Test.Unit/Test.Unit.csproj
 
 RUN dotnet restore
 
