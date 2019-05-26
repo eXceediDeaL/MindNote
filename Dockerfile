@@ -8,6 +8,8 @@ COPY ./src/MindNote.Data.Providers.SqlServer/MindNote.Data.Providers.SqlServer.c
 
 RUN dotnet restore
 
+COPY ./src ./src
+
 RUN cd ./src/MindNote.API && dotnet publish -c Release -o /build/out
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
