@@ -10,7 +10,7 @@ using MindNote.Data.Providers.SqlServer.Models;
 namespace MindNote.Data.Providers.SqlServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190526145317_M0")]
+    [Migration("20190526160349_M0")]
     partial class M0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,9 +50,9 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<string>("Color");
 
-                    b.Property<bool>("IsSelected");
+                    b.Property<int>("From");
 
-                    b.Property<string>("Nodes");
+                    b.Property<int>("To");
 
                     b.HasKey("Id");
 

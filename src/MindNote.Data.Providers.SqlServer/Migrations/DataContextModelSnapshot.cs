@@ -48,9 +48,9 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<string>("Color");
 
-                    b.Property<bool>("IsSelected");
+                    b.Property<int>("From");
 
-                    b.Property<string>("Nodes");
+                    b.Property<int>("To");
 
                     b.HasKey("Id");
 

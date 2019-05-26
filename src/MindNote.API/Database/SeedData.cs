@@ -44,8 +44,8 @@ namespace MindNote.API.Database
             {
                 Relation cn = new Relation
                 {
-                    IsSelected = i % 2 == 0,
-                    Nodes = new int[] { Math.Max(1, i - 1), i },
+                    From = Math.Max(1, i - 1),
+                    To = i,
                     Color = "grey",
                 };
                 rs.Add(cn);
@@ -59,6 +59,7 @@ namespace MindNote.API.Database
                     Name = $"Struct {i}",
                     CreationTime = DateTimeOffset.Now,
                     ModificationTime = DateTimeOffset.Now,
+                    Data = new int[] { i },
                     Tags = new int[] { i },
                 };
                 ss.Add(cn);

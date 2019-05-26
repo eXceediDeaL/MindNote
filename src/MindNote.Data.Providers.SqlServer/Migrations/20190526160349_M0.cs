@@ -31,9 +31,9 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Nodes = table.Column<string>(nullable: true),
-                    Color = table.Column<string>(nullable: true),
-                    IsSelected = table.Column<bool>(nullable: false)
+                    From = table.Column<int>(nullable: false),
+                    To = table.Column<int>(nullable: false),
+                    Color = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

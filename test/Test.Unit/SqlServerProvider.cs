@@ -12,28 +12,8 @@ namespace Test.Unit
     [TestClass]
     public class SqlServerProvider
     {
-
         [TestMethod]
-        public void Node()
-        {
-            var tn = Helper.SampleNode();
-
-            var ctn = MindNote.Data.Providers.SqlServer.Models.Node.FromModel(tn).ToModel();
-
-            Helper.NodeEqual(tn, ctn);
-        }
-
-        [TestMethod]
-        public void Struct()
-        {
-            var tn = Helper.SampleStruct();
-            var ctn = MindNote.Data.Providers.SqlServer.Models.Struct.FromModel(tn).ToModel();
-
-            Helper.StructEqual(tn, ctn);
-        }
-
-        [TestMethod]
-        public void NodeData()
+        public void Nodes()
         {
             var builder = new DbContextOptionsBuilder<MindNote.Data.Providers.SqlServer.Models.DataContext>();
             builder.UseInMemoryDatabase("db_node");
@@ -70,7 +50,7 @@ namespace Test.Unit
         }
 
         [TestMethod]
-        public void StructData()
+        public void Structs()
         {
             var builder = new DbContextOptionsBuilder<MindNote.Data.Providers.SqlServer.Models.DataContext>();
             builder.UseInMemoryDatabase("db_struct");
@@ -95,6 +75,80 @@ namespace Test.Unit
                 tn.Name = "updated";
                 Assert.AreEqual(id, controller.Update(id, tn).Result);
                 Helper.StructEqual(tn, controller.Get(id).Result);
+
+                Assert.AreEqual(-1, controller.Update(0, null).Result);
+
+                controller.Delete(id).Wait();
+
+                Assert.AreEqual(0, controller.GetAll().Result.Count());
+
+                controller.Delete(0).Wait();
+            }
+        }
+
+        [TestMethod]
+        public void Tags()
+        {
+            var builder = new DbContextOptionsBuilder<MindNote.Data.Providers.SqlServer.Models.DataContext>();
+            builder.UseInMemoryDatabase("db_tag");
+            var options = builder.Options;
+
+            var tn = Helper.SampleTag();
+
+            using (var context = new MindNote.Data.Providers.SqlServer.Models.DataContext(options))
+            {
+                var controller = new MindNote.Data.Providers.SqlServer.SqlServerProvider(context).GetTagsProvider();
+                Assert.AreEqual(0, controller.GetAll().Result.Count());
+
+                int id = controller.Create(tn).Result;
+
+                Assert.IsTrue(id > 0);
+
+                Helper.TagEqual(tn, controller.Get(id).Result);
+
+                Assert.AreEqual(1, controller.GetAll().Result.Count());
+                Helper.TagEqual(tn, controller.GetAll().Result.First(), true);
+
+                tn.Name = "updated";
+                Assert.AreEqual(id, controller.Update(id, tn).Result);
+                Helper.TagEqual(tn, controller.Get(id).Result);
+
+                Assert.AreEqual(-1, controller.Update(0, null).Result);
+
+                controller.Delete(id).Wait();
+
+                Assert.AreEqual(0, controller.GetAll().Result.Count());
+
+                controller.Delete(0).Wait();
+            }
+        }
+
+        [TestMethod]
+        public void Relations()
+        {
+            var builder = new DbContextOptionsBuilder<MindNote.Data.Providers.SqlServer.Models.DataContext>();
+            builder.UseInMemoryDatabase("db_relation");
+            var options = builder.Options;
+
+            var tn = Helper.SampleRelation();
+
+            using (var context = new MindNote.Data.Providers.SqlServer.Models.DataContext(options))
+            {
+                var controller = new MindNote.Data.Providers.SqlServer.SqlServerProvider(context).GetRelationsProvider();
+                Assert.AreEqual(0, controller.GetAll().Result.Count());
+
+                int id = controller.Create(tn).Result;
+
+                Assert.IsTrue(id > 0);
+
+                Helper.RelationEqual(tn, controller.Get(id).Result);
+
+                Assert.AreEqual(1, controller.GetAll().Result.Count());
+                Helper.RelationEqual(tn, controller.GetAll().Result.First(), true);
+
+                tn.Color = "whilte";
+                Assert.AreEqual(id, controller.Update(id, tn).Result);
+                Helper.RelationEqual(tn, controller.Get(id).Result);
 
                 Assert.AreEqual(-1, controller.Update(0, null).Result);
 

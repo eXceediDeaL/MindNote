@@ -39,5 +39,23 @@ namespace Test.Unit
                 Assert.AreNotEqual("[]", client.GetStringAsync("/api/Structs/All").Result);
             }
         }
+
+        [TestMethod]
+        public void Tags()
+        {
+            using (var client = testServer.CreateClient())
+            {
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Tags/All").Result);
+            }
+        }
+
+        [TestMethod]
+        public void Relations()
+        {
+            using (var client = testServer.CreateClient())
+            {
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Relations/All").Result);
+            }
+        }
     }
 }

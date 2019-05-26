@@ -54,8 +54,8 @@ namespace MindNote.Data.Providers.SqlServer
             {
                 var td = Models.Relation.FromModel(data);
 
-                item.IsSelected = td.IsSelected;
-                item.Nodes = td.Nodes;
+                item.From = data.From;
+                item.To = data.To;
                 item.Color = td.Color;
 
                 context.Relations.Update(item);

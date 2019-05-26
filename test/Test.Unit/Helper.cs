@@ -37,6 +37,30 @@ namespace Test.Unit
             };
         }
 
+        internal static Tag SampleTag()
+        {
+            int id = 100;
+            string name = "testname";
+            return new Tag
+            {
+                Id = id,
+                Name = name,
+                Color = "black",
+            };
+        }
+
+        internal static Relation SampleRelation()
+        {
+            int id = 100;
+            return new Relation
+            {
+                Id = id,
+                From = id,
+                To = id + 1,
+                Color = "black",
+            };
+        }
+
         internal static void NodeEqual(Node expected, Node real, bool ignore = false)
         {
             Assert.AreEqual(expected.Id, real.Id);
@@ -51,6 +75,21 @@ namespace Test.Unit
             {
                 Assert.AreEqual(expected.Tags[i], real.Tags[i]);
             }
+        }
+
+        internal static void RelationEqual(Relation expected, Relation real, bool ignore = false)
+        {
+            Assert.AreEqual(expected.Id, real.Id);
+            Assert.AreEqual(expected.Color, real.Color);
+            Assert.AreEqual(expected.From, real.From);
+            Assert.AreEqual(expected.To, real.To);
+        }
+
+        internal static void TagEqual(Tag expected, Tag real, bool ignore = false)
+        {
+            Assert.AreEqual(expected.Id, real.Id);
+            Assert.AreEqual(expected.Color, real.Color);
+            Assert.AreEqual(expected.Name, real.Name);
         }
 
         internal static void StructEqual(Struct expected, Struct real, bool ignore = false)

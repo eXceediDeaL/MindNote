@@ -30,6 +30,24 @@ namespace MindNote.API.Controllers
             return await provider.Get(id);
         }
 
+        [HttpGet("{id}/Nodes")]
+        public async Task<IEnumerable<Node>> GetNodes(int id)
+        {
+            return await provider.GetNodes(id);
+        }
+
+        [HttpGet("{id}/Relations")]
+        public async Task<IEnumerable<Relation>> GetRelations(int id)
+        {
+            return await provider.GetRelations(id);
+        }
+
+        [HttpPut("{id}/Relations")]
+        public async Task<int> SetRelations(int id, [FromBody] IEnumerable<Relation> data)
+        {
+            return await provider.SetRelations(id, data);
+        }
+
         [HttpDelete("{id}")]
         public async Task Delete(int id)
         {

@@ -4,20 +4,20 @@
     {
         public int Id { get; set; }
 
-        public string Nodes { get; set; }
+        public int From { get; set; }
+
+        public int To { get; set; }
 
         public string Color { get; set; }
-
-        public bool IsSelected { get; set; }
 
         public Data.Relation ToModel()
         {
             return new Data.Relation
             {
                 Id = Id,
-                Nodes = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(Nodes),
                 Color = Color,
-                IsSelected = IsSelected,
+                From = From,
+                To = To,
             };
         }
 
@@ -26,9 +26,9 @@
             return new Relation
             {
                 Id = data.Id,
-                Nodes = Newtonsoft.Json.JsonConvert.SerializeObject(data.Nodes),
+                From = data.From,
+                To = data.To,
                 Color = data.Color,
-                IsSelected = data.IsSelected,
             };
         }
     }

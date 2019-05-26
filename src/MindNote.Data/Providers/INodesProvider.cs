@@ -21,6 +21,10 @@ namespace MindNote.Data.Providers
 
     public interface IStructsProvider : IItemsProvider<Struct>
     {
+        Task<IEnumerable<Relation>> GetRelations(int id);
 
+        Task<IEnumerable<Node>> GetNodes(int id);
+
+        Task<int> SetRelations(int id, IEnumerable<Relation> data);
     }
 }
