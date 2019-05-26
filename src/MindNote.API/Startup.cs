@@ -71,8 +71,14 @@ namespace MindNote.API
                 app.UseHsts();
             }
 
-            app.UseSwagger();
-            app.UseSwaggerUi3();
+            app.UseSwagger(config => {
+                config.Path = "/api/swagger/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUi3(config=>
+            {
+                config.DocumentPath = "/api/swagger/{documentName}/swagger.json";
+                config.Path = "/api/swagger";
+            });
             app.UseReDoc();
 
             app.UseHttpsRedirection();
