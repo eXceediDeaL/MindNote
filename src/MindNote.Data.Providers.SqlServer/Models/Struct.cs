@@ -24,8 +24,8 @@ namespace MindNote.Data.Providers.SqlServer.Models
             {
                 Id = Id,
                 Name = Name,
-                Data = Newtonsoft.Json.JsonConvert.DeserializeObject<Relation[]>(Data),
-                Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(Tags),
+                Data = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(Data),
+                Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(Tags),
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
                 Extra = Extra,

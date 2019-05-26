@@ -26,7 +26,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = Id,
                 Name = Name,
                 Content = Content,
-                Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(Tags),
+                Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(Tags),
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
             };
@@ -42,6 +42,35 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Tags = Newtonsoft.Json.JsonConvert.SerializeObject(data.Tags),
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,
+            };
+        }
+    }
+
+    public class Tag
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Color { get; set; }
+
+        public Data.Tag ToModel()
+        {
+            return new Data.Tag
+            {
+                Id = Id,
+                Name = Name,
+                Color = Color,
+            };
+        }
+
+        public static Tag FromModel(Data.Tag data)
+        {
+            return new Tag
+            {
+                Id = data.Id,
+                Name = data.Name,
+                Color = data.Color,
             };
         }
     }

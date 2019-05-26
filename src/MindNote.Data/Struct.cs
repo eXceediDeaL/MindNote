@@ -8,9 +8,9 @@ namespace MindNote.Data
 
         public string Name { get; set; }
 
-        public Relation[] Data { get; set; }
+        public int[] Data { get; set; }
 
-        public string[] Tags { get; set; }
+        public int[] Tags { get; set; }
 
         public DateTimeOffset CreationTime { get; set; }
 

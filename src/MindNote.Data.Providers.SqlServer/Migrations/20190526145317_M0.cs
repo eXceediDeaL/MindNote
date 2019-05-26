@@ -26,6 +26,21 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Relations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Nodes = table.Column<string>(nullable: true),
+                    Color = table.Column<string>(nullable: true),
+                    IsSelected = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Relations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Structs",
                 columns: table => new
                 {
@@ -42,6 +57,20 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                 {
                     table.PrimaryKey("PK_Structs", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true),
+                    Color = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
+                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -50,7 +79,13 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                 name: "Nodes");
 
             migrationBuilder.DropTable(
+                name: "Relations");
+
+            migrationBuilder.DropTable(
                 name: "Structs");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
         }
     }
 }

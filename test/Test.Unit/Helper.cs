@@ -13,7 +13,6 @@ namespace Test.Unit
             int id = 100;
             string name = "testname", content = "testcontent";
             DateTimeOffset ct = DateTimeOffset.Now, mt = DateTimeOffset.Now;
-            string[] tags = new string[] { name };
             return new Node
             {
                 Id = id,
@@ -21,7 +20,6 @@ namespace Test.Unit
                 Content = content,
                 CreationTime = ct,
                 ModificationTime = mt,
-                Tags = tags,
             };
         }
 
@@ -30,20 +28,12 @@ namespace Test.Unit
             int id = 100;
             string name = "testname";
             DateTimeOffset ct = DateTimeOffset.Now, mt = DateTimeOffset.Now;
-            string[] tags = new string[] { name };
-            Relation[] rs = new Relation[]
-            {
-                new Relation(new int[]{1,2,3}),
-                new Relation(new int[]{4,5,6})
-            };
             return new Struct
             {
                 Id = id,
                 Name = name,
-                Data = rs,
                 CreationTime = ct,
                 ModificationTime = mt,
-                Tags = tags,
             };
         }
 
@@ -78,11 +68,7 @@ namespace Test.Unit
                 Assert.AreEqual(expected.Data?.Length, real.Data?.Length);
                 for (int i = 0; i < expected.Data?.Length; i++)
                 {
-                    Assert.AreEqual(expected.Data[i].Ids?.Length, real.Data[i].Ids?.Length);
-                    for (int j = 0; j < expected.Data[i].Ids?.Length; j++)
-                    {
-                        Assert.AreEqual(expected.Data[i].Ids[j], real.Data[i].Ids[j]);
-                    }
+                    Assert.AreEqual(expected.Data[i], real.Data[i]);
                 }
             }
         }

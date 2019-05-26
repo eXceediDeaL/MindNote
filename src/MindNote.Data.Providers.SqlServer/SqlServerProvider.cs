@@ -9,16 +9,24 @@ namespace MindNote.Data.Providers.SqlServer
     {
         NodesProvider nodes;
         StructsProvider structs;
+        TagsProvider tags;
+        RelationsProvider relations;
 
         public SqlServerProvider(DataContext context)
         {
             nodes = new NodesProvider(context);
             structs = new StructsProvider(context);
+            tags = new TagsProvider(context);
+            relations = new RelationsProvider(context);
         }
 
         public INodesProvider GetNodesProvider() => nodes;
 
+        public IRelationsProvider GetRelationsProvider() => relations;
+
         public IStructsProvider GetStructsProvider() => structs;
+
+        public ITagsProvider GetTagsProvider() => tags;
     }
 
     public class DataContextFactory : IDesignTimeDbContextFactory<DataContext>

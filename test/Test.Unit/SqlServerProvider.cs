@@ -12,43 +12,6 @@ namespace Test.Unit
     [TestClass]
     public class SqlServerProvider
     {
-        
-
-        void NodeEqual(Node expected, Node real, bool ignore = false)
-        {
-            Assert.AreEqual(expected.Id, real.Id);
-            Assert.AreEqual(expected.Name, real.Name);
-            if (!ignore) Assert.AreEqual(expected.Content, real.Content);
-
-            Assert.AreEqual(expected.Tags?.Length, real.Tags?.Length);
-            for (int i = 0; i < expected.Tags?.Length; i++)
-            {
-                Assert.AreEqual(expected.Tags[i], real.Tags[i]);
-            }
-        }
-
-        void StructEqual(Struct expected, Struct real, bool ignore = false)
-        {
-            Assert.AreEqual(expected.Id, real.Id);
-            Assert.AreEqual(expected.Name, real.Name);
-            Assert.AreEqual(expected.Tags?.Length, real.Tags?.Length);
-            for (int i = 0; i < expected.Tags?.Length; i++)
-            {
-                Assert.AreEqual(expected.Tags[i], real.Tags[i]);
-            }
-            if (!ignore)
-            {
-                Assert.AreEqual(expected.Data?.Length, real.Data?.Length);
-                for (int i = 0; i < expected.Data?.Length; i++)
-                {
-                    Assert.AreEqual(expected.Data[i].Ids?.Length, real.Data[i].Ids?.Length);
-                    for (int j = 0; j < expected.Data[i].Ids?.Length; j++)
-                    {
-                        Assert.AreEqual(expected.Data[i].Ids[j], real.Data[i].Ids[j]);
-                    }
-                }
-            }
-        }
 
         [TestMethod]
         public void Node()
@@ -57,7 +20,7 @@ namespace Test.Unit
 
             var ctn = MindNote.Data.Providers.SqlServer.Models.Node.FromModel(tn).ToModel();
 
-            NodeEqual(tn, ctn);
+            Helper.NodeEqual(tn, ctn);
         }
 
         [TestMethod]
@@ -66,7 +29,7 @@ namespace Test.Unit
             var tn = Helper.SampleStruct();
             var ctn = MindNote.Data.Providers.SqlServer.Models.Struct.FromModel(tn).ToModel();
 
-            StructEqual(tn, ctn);
+            Helper.StructEqual(tn, ctn);
         }
 
         [TestMethod]
@@ -88,13 +51,13 @@ namespace Test.Unit
 
                 Assert.IsTrue(id > 0);
 
-                NodeEqual(tn, controller.Get(id).Result);
+                Helper.NodeEqual(tn, controller.Get(id).Result);
 
                 Assert.AreEqual(1, controller.GetAll().Result.Count());
-                NodeEqual(tn, controller.GetAll().Result.First(), true);
+                Helper.NodeEqual(tn, controller.GetAll().Result.First(), true);
                 tn.Name = "updated";
                 Assert.AreEqual(id, controller.Update(id, tn).Result);
-                NodeEqual(tn, controller.Get(id).Result);
+                Helper.NodeEqual(tn, controller.Get(id).Result);
 
                 Assert.AreEqual(-1, controller.Update(0, null).Result);
 
@@ -124,14 +87,14 @@ namespace Test.Unit
 
                 Assert.IsTrue(id > 0);
 
-                StructEqual(tn, controller.Get(id).Result);
+                Helper.StructEqual(tn, controller.Get(id).Result);
 
                 Assert.AreEqual(1, controller.GetAll().Result.Count());
-                StructEqual(tn, controller.GetAll().Result.First(), true);
+                Helper.StructEqual(tn, controller.GetAll().Result.First(), true);
 
                 tn.Name = "updated";
                 Assert.AreEqual(id, controller.Update(id, tn).Result);
-                StructEqual(tn, controller.Get(id).Result);
+                Helper.StructEqual(tn, controller.Get(id).Result);
 
                 Assert.AreEqual(-1, controller.Update(0, null).Result);
 
