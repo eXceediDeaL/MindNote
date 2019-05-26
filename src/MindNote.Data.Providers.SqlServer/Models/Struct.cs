@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace MindNote.Data.Providers.SqlServer.Models
 {
@@ -8,9 +10,15 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string Name { get; set; }
 
-        public string Data { get; set; }
+        public string RelationsData { get; set; }
 
-        public string Tags { get; set; }
+        [NotMapped]
+        public int[] Relations { get; set; }
+
+        public string TagsData { get; set; }
+
+        [NotMapped]
+        public int[] Tags { get; set; }
 
         public DateTimeOffset CreationTime { get; set; }
 
@@ -18,14 +26,26 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string Extra { get; set; }
 
+        public void Decode()
+        {
+            Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(TagsData);
+            Relations = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(RelationsData);
+        }
+
+        public void Encode()
+        {
+            TagsData = Newtonsoft.Json.JsonConvert.SerializeObject(Tags);
+            RelationsData = Newtonsoft.Json.JsonConvert.SerializeObject(Relations);
+        }
+
         public Data.Struct ToModel()
         {
             return new Data.Struct
             {
                 Id = Id,
                 Name = Name,
-                Data = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(Data),
-                Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(Tags),
+                Relations = null,
+                Tags = null,
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
                 Extra = Extra,
@@ -34,16 +54,18 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public static Struct FromModel(Data.Struct data)
         {
-            return new Struct
+            var res = new Struct
             {
                 Id = data.Id,
                 Name = data.Name,
-                Data = Newtonsoft.Json.JsonConvert.SerializeObject(data.Data),
-                Tags = Newtonsoft.Json.JsonConvert.SerializeObject(data.Tags),
+                Relations = data.Relations?.Select(x => x.Id).ToArray(),
+                Tags = data.Tags?.Select(x => x.Id).ToArray(),
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,
                 Extra = data.Extra,
             };
+            res.Encode();
+            return res;
         }
     }
 }

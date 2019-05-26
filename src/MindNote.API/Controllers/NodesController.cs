@@ -48,5 +48,17 @@ namespace MindNote.API.Controllers
         {
             return await provider.Create(data);
         }
+
+        [HttpGet("{id}/Tags")]
+        public async Task<IEnumerable<Tag>> GetTags(int id)
+        {
+            return await provider.GetTags(id);
+        }
+
+        [HttpPut("{id}/Tags")]
+        public async Task<int> SetTags(int id, [FromBody] IEnumerable<Tag> data)
+        {
+            return await provider.SetTags(id, data);
+        }
     }
 }

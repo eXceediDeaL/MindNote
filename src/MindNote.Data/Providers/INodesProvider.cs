@@ -6,7 +6,9 @@ namespace MindNote.Data.Providers
 {
     public interface INodesProvider : IItemsProvider<Node>
     {
+        Task<IEnumerable<Tag>> GetTags(int id);
 
+        Task<int> SetTags(int id, IEnumerable<Tag> data);
     }
 
     public interface IRelationsProvider : IItemsProvider<Relation>
@@ -21,6 +23,10 @@ namespace MindNote.Data.Providers
 
     public interface IStructsProvider : IItemsProvider<Struct>
     {
+        Task<IEnumerable<Tag>> GetTags(int id);
+
+        Task<int> SetTags(int id, IEnumerable<Tag> data);
+
         Task<IEnumerable<Relation>> GetRelations(int id);
 
         Task<IEnumerable<Node>> GetNodes(int id);

@@ -34,7 +34,7 @@ namespace MindNote.API.Database
                     Content = $"content {i}",
                     CreationTime = DateTimeOffset.Now,
                     ModificationTime = DateTimeOffset.Now,
-                    Tags = new int[] { i },
+                    Tags = new Tag[] { new Tag { Id = i } },
                 };
                 ns.Add(cn);
             }
@@ -59,8 +59,8 @@ namespace MindNote.API.Database
                     Name = $"Struct {i}",
                     CreationTime = DateTimeOffset.Now,
                     ModificationTime = DateTimeOffset.Now,
-                    Data = new int[] { i },
-                    Tags = new int[] { i },
+                    Relations = new Relation[] { new Relation { Id = i } },
+                    Tags = new Tag[] { new Tag { Id = i } },
                 };
                 ss.Add(cn);
             }

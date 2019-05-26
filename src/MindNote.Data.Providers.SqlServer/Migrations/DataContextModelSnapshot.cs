@@ -33,7 +33,7 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("Tags");
+                    b.Property<string>("TagsData");
 
                     b.HasKey("Id");
 
@@ -65,15 +65,15 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<DateTimeOffset>("CreationTime");
 
-                    b.Property<string>("Data");
-
                     b.Property<string>("Extra");
 
                     b.Property<DateTimeOffset>("ModificationTime");
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("Tags");
+                    b.Property<string>("RelationsData");
+
+                    b.Property<string>("TagsData");
 
                     b.HasKey("Id");
 

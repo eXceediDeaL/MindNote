@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text;
 
 namespace MindNote.Data.Providers.SqlServer.Models
@@ -13,11 +15,24 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string Content { get; set; }
 
-        public string Tags { get; set; }
+        public string TagsData { get; set; }
+
+        [NotMapped]
+        public int[] Tags { get; set; }
 
         public DateTimeOffset CreationTime { get; set; }
 
         public DateTimeOffset ModificationTime { get; set; }
+
+        public void Decode()
+        {
+            Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(TagsData);
+        }
+
+        public void Encode()
+        {
+            TagsData = Newtonsoft.Json.JsonConvert.SerializeObject(Tags);
+        }
 
         public Data.Node ToModel()
         {
@@ -26,7 +41,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = Id,
                 Name = Name,
                 Content = Content,
-                Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(Tags),
+                Tags = null,
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
             };
@@ -34,44 +49,17 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public static Node FromModel(Data.Node data)
         {
-            return new Node
+            var res = new Node
             {
                 Id = data.Id,
                 Name = data.Name,
                 Content = data.Content,
-                Tags = Newtonsoft.Json.JsonConvert.SerializeObject(data.Tags),
+                Tags = data.Tags?.Select(x => x.Id).ToArray(),
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,
             };
-        }
-    }
-
-    public class Tag
-    {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-
-        public string Color { get; set; }
-
-        public Data.Tag ToModel()
-        {
-            return new Data.Tag
-            {
-                Id = Id,
-                Name = Name,
-                Color = Color,
-            };
-        }
-
-        public static Tag FromModel(Data.Tag data)
-        {
-            return new Tag
-            {
-                Id = data.Id,
-                Name = data.Name,
-                Color = data.Color,
-            };
+            res.Encode();
+            return res;
         }
     }
 }

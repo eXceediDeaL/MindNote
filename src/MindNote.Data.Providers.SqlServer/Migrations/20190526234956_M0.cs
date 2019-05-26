@@ -16,7 +16,7 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     Content = table.Column<string>(nullable: true),
-                    Tags = table.Column<string>(nullable: true),
+                    TagsData = table.Column<string>(nullable: true),
                     CreationTime = table.Column<DateTimeOffset>(nullable: false),
                     ModificationTime = table.Column<DateTimeOffset>(nullable: false)
                 },
@@ -47,8 +47,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
-                    Data = table.Column<string>(nullable: true),
-                    Tags = table.Column<string>(nullable: true),
+                    RelationsData = table.Column<string>(nullable: true),
+                    TagsData = table.Column<string>(nullable: true),
                     CreationTime = table.Column<DateTimeOffset>(nullable: false),
                     ModificationTime = table.Column<DateTimeOffset>(nullable: false),
                     Extra = table.Column<string>(nullable: true)

@@ -39,13 +39,70 @@ namespace MindNote.Data.Providers.SqlServer
             return (await context.Structs.FindAsync(id)).ToModel();
         }
 
+        public async Task<IEnumerable<Tag>> GetTags(int id)
+        {
+            var obj = await context.Structs.FindAsync(id);
+            if (obj == null)
+                return Array.Empty<Tag>();
+            obj.Decode();
+            if (obj.Tags == null)
+                return Array.Empty<Tag>();
+
+            var res = new List<Tag>();
+            foreach (var v in obj.Tags)
+            {
+                var n = await context.Tags.FindAsync(v);
+                if (n == null) continue;
+                res.Add(n.ToModel());
+            }
+            return res;
+        }
+
+        public async Task<int> SetTags(int id, IEnumerable<Tag> data)
+        {
+            var obj = await context.Structs.FindAsync(id);
+            if (obj == null) return -1;
+            var res = new List<int>();
+            var tnew = new List<Models.Tag>();
+            foreach (var v in data)
+            {
+                var q = (from r in context.Tags where r.Name == v.Name select r).FirstOrDefault();
+                if (q == null)
+                {
+                    var raw = Models.Tag.FromModel(v);
+                    context.Tags.Add(raw);
+                    tnew.Add(raw);
+                }
+                else
+                {
+                    res.Add(q.Id);
+                }
+            }
+            if (tnew.Count > 0)
+            {
+                await context.SaveChangesAsync();
+                foreach (var v in tnew)
+                    res.Add(v.Id);
+            }
+
+            obj.Tags = res.ToArray();
+            obj.Encode();
+            context.Structs.Update(obj);
+            await context.SaveChangesAsync();
+            return id;
+        }
+
         public async Task<IEnumerable<Relation>> GetRelations(int id)
         {
-            var obj = (await context.Structs.FindAsync(id)).ToModel();
-            if (obj.Data == null)
+            var obj = await context.Structs.FindAsync(id);
+            if (obj == null)
                 return Array.Empty<Relation>();
+            obj.Decode();
+            if(obj.Relations == null)
+                return Array.Empty<Relation>();
+
             var res = new List<Relation>();
-            foreach (var v in obj.Data)
+            foreach (var v in obj.Relations)
             {
                 var n = await context.Relations.FindAsync(v);
                 if (n == null) continue;
@@ -56,13 +113,17 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<IEnumerable<Node>> GetNodes(int id)
         {
-            var res = new List<Node>();
+            var ns = new HashSet<int>();
             foreach (var v in await GetRelations(id))
             {
-                var n = await context.Nodes.FindAsync(v.From);
-                if (n == null) continue;
-                res.Add(n.ToModel());
-                n = await context.Nodes.FindAsync(v.To);
+                ns.Add(v.From);
+                ns.Add(v.To);
+            }
+
+            var res = new List<Node>();
+            foreach(var v in ns)
+            {
+                var n = await context.Nodes.FindAsync(v);
                 if (n == null) continue;
                 res.Add(n.ToModel());
             }
@@ -97,14 +158,14 @@ namespace MindNote.Data.Providers.SqlServer
                     res.Add(v.Id);
             }
 
-            var tmp = obj.ToModel();
-            tmp.Data = res.ToArray();
-
-            obj.Data = Models.Struct.FromModel(tmp).Data;
+            obj.Relations = res.ToArray();
+            obj.Encode();
             context.Structs.Update(obj);
             await context.SaveChangesAsync();
             return id;
         }
+
+    
 
         public Task<IEnumerable<Struct>> GetAll()
         {
@@ -112,7 +173,6 @@ namespace MindNote.Data.Providers.SqlServer
             foreach (var v in context.Structs)
             {
                 var item = v.ToModel();
-                item.Data = null;
                 res.Add(v.ToModel());
             }
             return Task.FromResult<IEnumerable<Struct>>(res);
@@ -125,8 +185,8 @@ namespace MindNote.Data.Providers.SqlServer
             {
                 var td = Models.Struct.FromModel(data);
                 item.Name = td.Name;
-                item.Tags = td.Tags;
-                item.Data = td.Data;
+                if (td.Tags != null) item.Tags = td.Tags;
+                if (td.Relations != null) item.Relations = td.Relations;
 
                 context.Structs.Update(item);
                 await context.SaveChangesAsync();

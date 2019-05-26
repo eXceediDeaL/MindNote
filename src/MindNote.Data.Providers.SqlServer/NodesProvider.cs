@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MindNote.Data.Providers.SqlServer.Models;
+using System.Linq;
 
 namespace MindNote.Data.Providers.SqlServer
 {
@@ -33,6 +34,59 @@ namespace MindNote.Data.Providers.SqlServer
             }
         }
 
+        public async Task<IEnumerable<Tag>> GetTags(int id)
+        {
+            var obj = await context.Nodes.FindAsync(id);
+            if (obj == null)
+                return Array.Empty<Tag>();
+            obj.Decode();
+            if (obj.Tags == null)
+                return Array.Empty<Tag>();
+
+            var res = new List<Tag>();
+            foreach (var v in obj.Tags)
+            {
+                var n = await context.Tags.FindAsync(v);
+                if (n == null) continue;
+                res.Add(n.ToModel());
+            }
+            return res;
+        }
+
+        public async Task<int> SetTags(int id, IEnumerable<Tag> data)
+        {
+            var obj = await context.Structs.FindAsync(id);
+            if (obj == null) return -1;
+            var res = new List<int>();
+            var tnew = new List<Models.Tag>();
+            foreach (var v in data)
+            {
+                var q = (from r in context.Tags where r.Name == v.Name select r).FirstOrDefault();
+                if (q == null)
+                {
+                    var raw = Models.Tag.FromModel(v);
+                    context.Tags.Add(raw);
+                    tnew.Add(raw);
+                }
+                else
+                {
+                    res.Add(q.Id);
+                }
+            }
+            if (tnew.Count > 0)
+            {
+                await context.SaveChangesAsync();
+                foreach (var v in tnew)
+                    res.Add(v.Id);
+            }
+
+            obj.Tags = res.ToArray();
+            obj.Encode();
+            context.Structs.Update(obj);
+            await context.SaveChangesAsync();
+            return id;
+        }
+
         public async Task<Node> Get(int id)
         {
             return (await context.Nodes.FindAsync(id)).ToModel();
@@ -60,8 +114,8 @@ namespace MindNote.Data.Providers.SqlServer
                 item.ModificationTime = DateTimeOffset.Now;
                 item.Content = td.Content;
                 item.Name = td.Name;
-                item.Tags = td.Tags;
-                
+                if (td.Tags != null) item.Tags = td.Tags;
+
                 context.Nodes.Update(item);
                 await context.SaveChangesAsync();
                 return data.Id;

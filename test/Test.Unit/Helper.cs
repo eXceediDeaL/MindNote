@@ -104,10 +104,10 @@ namespace Test.Unit
             if (!ignore)
             {
                 Assert.AreEqual(expected.Extra, real.Extra);
-                Assert.AreEqual(expected.Data?.Length, real.Data?.Length);
-                for (int i = 0; i < expected.Data?.Length; i++)
+                Assert.AreEqual(expected.Relations?.Length, real.Relations?.Length);
+                for (int i = 0; i < expected.Relations?.Length; i++)
                 {
-                    Assert.AreEqual(expected.Data[i], real.Data[i]);
+                    Assert.AreEqual(expected.Relations[i], real.Relations[i]);
                 }
             }
         }
