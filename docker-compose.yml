@@ -4,6 +4,7 @@ services:
     build: .
     environment:
       - ConnectionString=Server=mndb;Database=master;User=sa;Password=MNdb_passw00d;
+      - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "8085:80"
     depends_on:
@@ -13,3 +14,5 @@ services:
     environment:
       - SA_PASSWORD=MNdb_passw00d
       - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"

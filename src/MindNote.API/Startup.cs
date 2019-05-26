@@ -35,7 +35,27 @@ namespace MindNote.API
             // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSwaggerDocument();
+            services.AddSwaggerDocument(config =>
+            {
+                config.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "MindNote API";
+                    document.Info.Description = "API for MindNote";
+                    document.Info.TermsOfService = "None";
+                    document.Info.Contact = new NSwag.SwaggerContact
+                    {
+                        Name = "StardustDL",
+                        Email = string.Empty,
+                        Url = ""
+                    };
+                    /*document.Info.License = new NSwag.SwaggerLicense
+                    {
+                        Name = "Use under LICX",
+                        Url = "https://example.com/license"
+                    };*/
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

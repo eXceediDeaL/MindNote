@@ -45,7 +45,9 @@ namespace MindNote.Data.Providers.SqlServer
             List<Node> res = new List<Node>();
             foreach (var v in context.Nodes)
             {
-                res.Add(v.ToModel());
+                var item = v.ToModel();
+                item.Content = null;
+                res.Add(item);
             }
             return Task.FromResult<IEnumerable<Node>>(res);
         }
@@ -102,6 +104,8 @@ namespace MindNote.Data.Providers.SqlServer
             List<Struct> res = new List<Struct>();
             foreach (var v in context.Structs)
             {
+                var item = v.ToModel();
+                item.Data = null;
                 res.Add(v.ToModel());
             }
             return Task.FromResult<IEnumerable<Struct>>(res);
