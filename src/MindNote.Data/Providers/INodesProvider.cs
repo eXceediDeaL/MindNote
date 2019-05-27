@@ -9,6 +9,8 @@ namespace MindNote.Data.Providers
         Task<IEnumerable<Tag>> GetTags(int id);
 
         Task<int> SetTags(int id, IEnumerable<Tag> data);
+
+        Task<Node> GetFull(int id);
     }
 
     public interface IRelationsProvider : IItemsProvider<Relation>
@@ -23,6 +25,8 @@ namespace MindNote.Data.Providers
 
     public interface IStructsProvider : IItemsProvider<Struct>
     {
+        Task<Struct> GetFull(int id);
+
         Task<string> GetContent(int id);
 
         Task<IEnumerable<Tag>> GetTags(int id);

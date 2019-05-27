@@ -74,17 +74,13 @@ namespace MindNote.API.Controllers
         [HttpGet("{id}/Full")]
         public async Task<Struct> GetFull(int id)
         {
-            var res = await provider.Get(id);
-            res.Tags = (await GetTags(id)).ToArray();
-            res.Relations = (await GetRelations(id)).ToArray();
-            res.Nodes = (await GetNodes(id)).ToArray();
-            return res;
+            return await provider.GetFull(id);
         }
 
         [HttpGet("{id}/Content")]
         public async Task<string> GetContent(int id)
         {
-            return "Wait for implement";
+            return await provider.GetContent(id);
         }
 
         [HttpDelete("{id}")]

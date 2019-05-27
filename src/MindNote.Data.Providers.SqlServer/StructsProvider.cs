@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MindNote.Data.Providers.SqlServer.Models;
 using System.Linq;
+using System.Text;
 
 namespace MindNote.Data.Providers.SqlServer
 {
     class StructsProvider : IStructsProvider
     {
         DataContext context;
+        IDataProvider parent;
 
-        public StructsProvider(DataContext context)
+        public StructsProvider(DataContext context, IDataProvider dataProvider)
         {
             this.context = context;
+            parent = dataProvider;
         }
 
         public async Task<int> Create(Struct data)
@@ -41,7 +44,62 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<string> GetContent(int id)
         {
-            return "wait";
+            Dictionary<int, List<int>> g = new Dictionary<int, List<int>>();
+            Dictionary<int, int> dgree = new Dictionary<int, int>();
+            Dictionary<int, string> cons = new Dictionary<int, string>();
+
+            var nodes = await GetNodes(id);
+
+            foreach (var v in nodes)
+            {
+                g.Add(v.Id, new List<int>());
+                dgree[v.Id] = 0;
+                cons[v.Id] = v.Content;
+            }
+
+            foreach (var v in await GetRelations(id))
+            {
+                g[v.From].Add(v.To);
+                dgree[v.To]++;
+            }
+
+            List<int> topo = new List<int>();
+
+            Queue<int> q = new Queue<int>();
+
+            foreach(var k in dgree)
+            {
+                if (k.Value == 0) q.Enqueue(k.Key);
+            }
+
+            while (q.TryDequeue(out int u))
+            {
+                topo.Add(u);
+                foreach(var v in g[u])
+                {
+                    if (dgree[v] > 0)
+                    {
+                        if (--dgree[v] == 0) q.Enqueue(v);
+                    }
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+            foreach(var v in topo)
+            {
+                sb.AppendLine(cons[v]);
+                sb.AppendLine("-----");
+            }
+            return sb.ToString();
+        }
+
+        public async Task<Struct> GetFull(int id)
+        {
+            var res = await Get(id);
+            res.Tags = (await GetTags(id)).ToArray();
+            res.Relations = (await GetRelations(id)).ToArray();
+            res.Nodes = (await GetNodes(id)).ToArray();
+            return res;
         }
 
         public async Task<IEnumerable<Tag>> GetTags(int id)
@@ -126,11 +184,12 @@ namespace MindNote.Data.Providers.SqlServer
             }
 
             var res = new List<Node>();
+            var provider = parent.GetNodesProvider();
             foreach (var v in ns)
             {
-                var n = await context.Nodes.FindAsync(v);
+                var n = await provider.GetFull(v);
                 if (n == null) continue;
-                res.Add(n.ToModel());
+                res.Add(n);
             }
             return res;
         }

@@ -14,10 +14,10 @@ namespace MindNote.Data.Providers.SqlServer
 
         public SqlServerProvider(DataContext context)
         {
-            nodes = new NodesProvider(context);
-            structs = new StructsProvider(context);
-            tags = new TagsProvider(context);
-            relations = new RelationsProvider(context);
+            nodes = new NodesProvider(context, this);
+            structs = new StructsProvider(context, this);
+            tags = new TagsProvider(context, this);
+            relations = new RelationsProvider(context, this);
         }
 
         public INodesProvider GetNodesProvider() => nodes;

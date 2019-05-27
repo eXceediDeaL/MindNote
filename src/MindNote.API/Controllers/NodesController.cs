@@ -38,9 +38,7 @@ namespace MindNote.API.Controllers
         [HttpGet("{id}/Full")]
         public async Task<Node> GetFull(int id)
         {
-            var res = await provider.Get(id);
-            res.Tags = (await GetTags(id)).ToArray();
-            return res;
+            return await provider.GetFull(id);
         }
 
         [HttpGet("{id}")]

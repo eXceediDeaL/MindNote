@@ -7,10 +7,12 @@ namespace MindNote.Data.Providers.SqlServer
     class TagsProvider : ITagsProvider
     {
         DataContext context;
+        IDataProvider parent;
 
-        public TagsProvider(DataContext context)
+        public TagsProvider(DataContext context, IDataProvider dataProvider)
         {
             this.context = context;
+            parent = dataProvider;
         }
 
         public async Task<int> Create(Tag data)

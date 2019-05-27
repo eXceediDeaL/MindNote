@@ -9,10 +9,12 @@ namespace MindNote.Data.Providers.SqlServer
     class NodesProvider : INodesProvider
     {
         DataContext context;
+        IDataProvider parent;
 
-        public NodesProvider(DataContext context)
+        public NodesProvider(DataContext context, IDataProvider dataProvider)
         {
             this.context = context;
+            parent = dataProvider;
         }
 
         public async Task<int> Create(Node data)
@@ -32,6 +34,13 @@ namespace MindNote.Data.Providers.SqlServer
                 context.Nodes.Remove(item);
                 await context.SaveChangesAsync();
             }
+        }
+
+        public async Task<Node> GetFull(int id)
+        {
+            var res = await Get(id);
+            res.Tags = (await GetTags(id)).ToArray();
+            return res;
         }
 
         public async Task<IEnumerable<Tag>> GetTags(int id)

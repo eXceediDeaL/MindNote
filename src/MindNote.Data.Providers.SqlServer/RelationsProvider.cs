@@ -7,10 +7,12 @@ namespace MindNote.Data.Providers.SqlServer
     class RelationsProvider : IRelationsProvider
     {
         DataContext context;
+        IDataProvider parent;
 
-        public RelationsProvider(DataContext context)
+        public RelationsProvider(DataContext context, IDataProvider dataProvider)
         {
             this.context = context;
+            parent = dataProvider;
         }
 
         public async Task<int> Create(Relation data)
