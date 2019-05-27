@@ -91,6 +91,22 @@ namespace Test.Unit
         }
 
         [TestMethod]
+        public void Admin()
+        {
+            var builder = new DbContextOptionsBuilder<MindNote.Data.Providers.SqlServer.Models.DataContext>();
+            builder.UseInMemoryDatabase("db_admin");
+            var options = builder.Options;
+
+            var tn = Helper.SampleTag();
+
+            using (var context = new MindNote.Data.Providers.SqlServer.Models.DataContext(options))
+            {
+                var controller = new AdminController(new MindNote.Data.Providers.SqlServer.SqlServerProvider(context));
+                controller.Rebuild(new Struct[] { new Struct { Name = "a", Tags = new Tag[] { new Tag { Name = "a" } }, Nodes = new Node[] { new Node { Name = "a", Tags = new Tag[] { new Tag { Name = "a" } }, Id = 1 } }, Relations = new Relation[] { new Relation { From = 1, To = 1 } } } }).Wait();
+            }
+        }
+
+        [TestMethod]
         public void Tags()
         {
             var builder = new DbContextOptionsBuilder<MindNote.Data.Providers.SqlServer.Models.DataContext>();

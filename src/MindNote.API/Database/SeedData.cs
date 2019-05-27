@@ -48,7 +48,7 @@ namespace MindNote.API.Database
             {
                 Relation cn = new Relation
                 {
-                    From = Math.Max(1, i - 1),
+                    From = i == 1 ? 6 : i - 1,
                     To = i,
                     Color = "grey",
                 };
