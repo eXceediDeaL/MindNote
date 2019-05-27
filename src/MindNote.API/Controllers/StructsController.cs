@@ -25,6 +25,16 @@ namespace MindNote.API.Controllers
             return await provider.GetAll();
         }
 
+        [HttpGet("Full")]
+        public async Task<IEnumerable<Struct>> GetFull()
+        {
+            List<Struct> res = new List<Struct>();
+            var ds = await provider.GetAll();
+            foreach (var v in ds)
+                res.Add(await GetFull(v.Id));
+            return res;
+        }
+
         [HttpGet("{id}")]
         public async Task<Struct> Get(int id)
         {
