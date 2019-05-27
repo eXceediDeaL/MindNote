@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MindNote.Data.Providers.SqlServer.Models;
+using System.Linq;
 
 namespace MindNote.Data.Providers.SqlServer
 {
@@ -28,6 +29,21 @@ namespace MindNote.Data.Providers.SqlServer
             context.Tags.Add(raw);
             await context.SaveChangesAsync();
             return raw.Id;
+        }
+
+        public async Task<IEnumerable<int>> EnsureContains(IEnumerable<Tag> data)
+        {
+            var tp = parent.GetTagsProvider();
+            var res = new List<int>();
+            foreach (var v in data)
+            {
+                var tc = (from t in context.Tags where t.Name == v.Name select t).FirstOrDefault();
+                if (tc == null)
+                    res.Add(await tp.Create(v));
+                else
+                    res.Add(tc.Id);
+            }
+            return res;
         }
 
         public async Task Delete(int id)

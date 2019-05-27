@@ -17,11 +17,11 @@ namespace MindNote.API
         public static void Main(string[] args)
         {
             var host = CreateWebHostBuilder(args).Build();
-            InitialDatabase(host);
+            InitialDatabase(host).Wait();
             host.Run();
         }
 
-        public static void InitialDatabase(IWebHost host)
+        public static async Task InitialDatabase(IWebHost host)
         {
             using (var scope = host.Services.CreateScope())
             {
@@ -34,7 +34,7 @@ namespace MindNote.API
                         if (context.Database.GetPendingMigrations().Any())
                         {
                             context.Database.Migrate();
-                            Database.SeedData.Initialize(context);
+                            await Database.SeedData.Initialize(context);
                         }
                     }
                 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MindNote.Data;
+using MindNote.Data.Providers;
+using MindNote.Data.Providers.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,133 +12,79 @@ namespace MindNote.API.Database
 {
     public static class SeedData
     {
-        public static void Initialize(Data.Providers.SqlServer.Models.DataContext context)
+        public static async Task Initialize(Data.Providers.SqlServer.Models.DataContext context)
         {
             var rand = new Random();
 
             if (context.Nodes.Any())
                 return;
 
-            var ts = new List<Tag>();
-            for (int i = 1; i < 7; i++)
-            {
-                Tag cn = new Tag
-                {
-                    Name = $"tag{i}",
-                    Color = "black",
-                };
-                ts.Add(cn);
-            }
+            IDataProvider provider = new SqlServerProvider(context);
 
-            var ns = new List<Node>();
+            var ns = new List<int>();
             for (int i = 1; i < 7; i++)
             {
                 Node cn = new Node
                 {
                     Name = $"Note {i}",
                     Content = $"content {i}",
-                    CreationTime = DateTimeOffset.Now,
-                    ModificationTime = DateTimeOffset.Now,
-                    Tags = new Tag[] { new Tag { Id = i } },
+                    Tags = new Tag[] { new Tag { Name = $"tag{i}", Color = "grey" } },
                     Extra = Newtonsoft.Json.JsonConvert.SerializeObject(new { x = rand.Next(100), y = rand.Next(100) }),
                 };
-                ns.Add(cn);
+                ns.Add(await provider.GetNodesProvider().Create(cn));
             }
 
-            var rs = new List<Relation>();
-            for (int i = 1; i < 7; i++)
-            {
-                Relation cn = new Relation
-                {
-                    From = i == 1 ? 6 : i - 1,
-                    To = i,
-                    Color = "grey",
-                };
-                rs.Add(cn);
-            }
-
-            var ss = new List<Struct>();
             for (int i = 1; i < 7; i++)
             {
                 Struct cn = new Struct
                 {
                     Name = $"Struct {i}",
-                    CreationTime = DateTimeOffset.Now,
-                    ModificationTime = DateTimeOffset.Now,
-                    Relations = new Relation[] { new Relation { Id = i } },
-                    Tags = new Tag[] { new Tag { Id = i } },
+                    Relations = new Relation[] { new Relation { From = ns[rand.Next(ns.Count)], To = ns[rand.Next(ns.Count)] } },
+                    Tags = new Tag[] { new Tag { Name = $"tag{i}", Color = "grey" } },
                     Extra = Newtonsoft.Json.JsonConvert.SerializeObject(new { color = "blue" }),
                 };
-                ss.Add(cn);
+                await provider.GetStructsProvider().Create(cn);
             }
 
-            foreach (var v in ns)
-                context.Nodes.Add(Data.Providers.SqlServer.Models.Node.FromModel(v));
-
-            foreach (var v in ss)
-                context.Structs.Add(Data.Providers.SqlServer.Models.Struct.FromModel(v));
-
-            foreach (var v in rs)
-                context.Relations.Add(Data.Providers.SqlServer.Models.Relation.FromModel(v));
-
-            foreach (var v in ts)
-                context.Tags.Add(Data.Providers.SqlServer.Models.Tag.FromModel(v));
-
-            context.SaveChanges();
-
             {
-                var tag = Data.Providers.SqlServer.Models.Tag.FromModel(new Tag
-                {
-                    Color = "green",
-                    Name = "Python",
-                });
-                context.Tags.Add(tag);
-                context.SaveChanges();
-
-                var nds = new List<Data.Providers.SqlServer.Models.Node>();
+                var nds = new List<int>();
 
                 foreach (var v in RealNote)
                 {
-                    var nd = Data.Providers.SqlServer.Models.Node.FromModel(new Node
+                    var nd = new Node
                     {
                         Name = v.Item1,
-                        Content = System.Text.Encoding.Default.GetString(Convert.FromBase64String(v.Item2)),
-                        Tags = new Tag[] { new Tag { Id = tag.Id } },
-                        CreationTime = DateTimeOffset.Now,
+                        Content = Encoding.Default.GetString(Convert.FromBase64String(v.Item2)),
+                        Tags = new Tag[] { new Tag { Color = "green", Name = "Python" } },
                         Extra = Newtonsoft.Json.JsonConvert.SerializeObject(new { x = rand.Next(100), y = rand.Next(100) }),
-                    });
-                    nds.Add(nd);
+                    };
+                    nds.Add(await provider.GetNodesProvider().Create(nd));
                 }
-                foreach (var v in nds) context.Nodes.Add(v);
-                context.SaveChanges();
 
-                var rls = new List<Data.Providers.SqlServer.Models.Relation>();
-                rls.Add(Data.Providers.SqlServer.Models.Relation.FromModel(new Relation
-                {
-                    Color = "grey",
-                    From = nds[0].Id,
-                    To = nds[1].Id,
-                }));
-                rls.Add(Data.Providers.SqlServer.Models.Relation.FromModel(new Relation
-                {
-                    Color = "grey",
-                    From = nds[1].Id,
-                    To = nds[2].Id,
-                }));
-                foreach (var v in rls) context.Relations.Add(v);
-                context.SaveChanges();
-
-                var str = Data.Providers.SqlServer.Models.Struct.FromModel(new Struct
+                var str = new Struct
                 {
                     CreationTime = DateTimeOffset.Now,
                     ModificationTime = DateTimeOffset.Now,
                     Name = "Python 100 Days",
-                    Tags = new Tag[] { new Tag { Id = tag.Id } },
-                    Relations = rls.Select(x => new Relation { Id = x.Id }).ToArray(),
+                    Tags = new Tag[] { new Tag { Name = "Python" } },
+                    Relations = new Relation[]
+                    {
+                        new Relation
+                        {
+                            Color = "grey",
+                            From = nds[0],
+                            To = nds[1],
+                        },
+                        new Relation
+                        {
+                            Color = "grey",
+                            From = nds[1],
+                            To = nds[2],
+                        },
+                    },
                     Extra = Newtonsoft.Json.JsonConvert.SerializeObject(new { color = "orange" }),
-                });
-                context.Structs.Add(str);
-                context.SaveChanges();
+                };
+                await provider.GetStructsProvider().Create(str);
             }
         }
 

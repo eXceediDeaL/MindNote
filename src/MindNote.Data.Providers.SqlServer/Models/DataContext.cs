@@ -17,6 +17,8 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public DbSet<Tag> Tags { get; set; }
 
+        public DbSet<TagLink> TagLinks { get; set; }
+
         public DbSet<Relation> Relations { get; set; }
     }
 }

@@ -8,8 +8,8 @@ namespace MindNote.Data.Providers.SqlServer
 {
     class NodesProvider : INodesProvider
     {
-        DataContext context;
-        IDataProvider parent;
+        readonly DataContext context;
+        readonly IDataProvider parent;
 
         public NodesProvider(DataContext context, IDataProvider dataProvider)
         {
@@ -26,16 +26,12 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<int> Create(Node data)
         {
             data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
-            var tags = data.Tags;
-            data.Tags = null;
             var raw = Models.Node.FromModel(data);
             raw.Id = 0;
             context.Nodes.Add(raw);
             await context.SaveChangesAsync();
-            if (tags != null)
-            {
-                await SetTags(raw.Id, tags);
-            }
+            if (data.Tags != null)
+                await SetTags(raw.Id, data.Tags);
             return raw.Id;
         }
 
@@ -60,45 +56,18 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<IEnumerable<Tag>> GetTags(int id)
         {
             var obj = await context.Nodes.FindAsync(id);
-            if (obj == null)
-                return Array.Empty<Tag>();
-            obj.Decode();
-            if (obj.Tags == null)
-                return Array.Empty<Tag>();
+            if (obj == null) return null;
 
-            var res = new List<Tag>();
-            foreach (var v in obj.Tags)
-            {
-                var n = await context.Tags.FindAsync(v);
-                if (n == null) continue;
-                res.Add(n.ToModel());
-            }
-            return res;
+            return (await TagLink.GetTagLink(id, TagLinkClase.Node, context)).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<int> SetTags(int id, IEnumerable<Tag> data)
         {
             var obj = await context.Nodes.FindAsync(id);
             if (obj == null) return -1;
-            var res = new List<int>();
-            foreach (var v in data)
-            {
-                var q = (from r in context.Tags where r.Name == v.Name select r).FirstOrDefault();
-                if (q == null)
-                {
-                    int tid = await parent.GetTagsProvider().Create(v);
-                    res.Add(tid);
-                }
-                else
-                {
-                    res.Add(q.Id);
-                }
-            }
 
-            obj.Tags = res.ToArray();
-            obj.Encode();
-            context.Nodes.Update(obj);
-            await context.SaveChangesAsync();
+            var ids = await parent.GetTagsProvider().EnsureContains(data);
+            await TagLink.SetTagLink(id, ids, TagLinkClase.Node, context);
             return id;
         }
 
@@ -129,13 +98,11 @@ namespace MindNote.Data.Providers.SqlServer
                 item.ModificationTime = DateTimeOffset.Now;
                 item.Content = td.Content;
                 item.Name = td.Name;
-                if (td.Tags != null)
-                {
-                    item.Tags = td.Tags;
-                    await SetTags(item.Id, data.Tags);
-                }
-
                 context.Nodes.Update(item);
+
+                if (data.Tags != null)
+                    await SetTags(item.Id, data.Tags);
+                
                 await context.SaveChangesAsync();
                 return data.Id;
             }

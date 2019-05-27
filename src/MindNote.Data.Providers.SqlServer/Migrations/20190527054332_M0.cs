@@ -16,7 +16,6 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     Content = table.Column<string>(nullable: true),
-                    TagsData = table.Column<string>(nullable: true),
                     Extra = table.Column<string>(nullable: true),
                     CreationTime = table.Column<DateTimeOffset>(nullable: false),
                     ModificationTime = table.Column<DateTimeOffset>(nullable: false)
@@ -35,7 +34,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     From = table.Column<int>(nullable: false),
                     To = table.Column<int>(nullable: false),
                     Color = table.Column<string>(nullable: true),
-                    Extra = table.Column<string>(nullable: true)
+                    Extra = table.Column<string>(nullable: true),
+                    StructId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,8 +49,6 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
-                    RelationsData = table.Column<string>(nullable: true),
-                    TagsData = table.Column<string>(nullable: true),
                     CreationTime = table.Column<DateTimeOffset>(nullable: false),
                     ModificationTime = table.Column<DateTimeOffset>(nullable: false),
                     Extra = table.Column<string>(nullable: true)
@@ -58,6 +56,21 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Structs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TagLinks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ObjectId = table.Column<int>(nullable: false),
+                    TagId = table.Column<int>(nullable: false),
+                    Class = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TagLinks", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,6 +99,9 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Structs");
+
+            migrationBuilder.DropTable(
+                name: "TagLinks");
 
             migrationBuilder.DropTable(
                 name: "Tags");

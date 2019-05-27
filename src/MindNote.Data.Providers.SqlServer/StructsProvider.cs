@@ -27,22 +27,14 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<int> Create(Struct data)
         {
             data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
-            var tags = data.Tags;
-            var rels = data.Relations;
-            data.Tags = null;
-            data.Relations = null;
             var raw = Models.Struct.FromModel(data);
             raw.Id = 0;
             context.Structs.Add(raw);
             await context.SaveChangesAsync();
-            if (tags != null)
-            {
-                await SetTags(raw.Id, tags);
-            }
-            if (rels != null)
-            {
-                await SetRelations(raw.Id, rels);
-            }
+            if (data.Tags != null)
+                await SetTags(raw.Id, data.Tags);
+            if (data.Relations != null)
+                await SetRelations(raw.Id, data.Relations);
             return raw.Id;
         }
 
@@ -63,50 +55,12 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<string> GetContent(int id)
         {
-            Dictionary<int, List<int>> g = new Dictionary<int, List<int>>();
-            Dictionary<int, int> dgree = new Dictionary<int, int>();
-            Dictionary<int, string> cons = new Dictionary<int, string>();
-
             var nodes = await GetNodes(id);
-
+            if (nodes == null) return null;
+            StringBuilder sb = new StringBuilder();
             foreach (var v in nodes)
             {
-                g.Add(v.Id, new List<int>());
-                dgree[v.Id] = 0;
-                cons[v.Id] = v.Content;
-            }
-
-            foreach (var v in await GetRelations(id))
-            {
-                g[v.From].Add(v.To);
-                dgree[v.To]++;
-            }
-
-            List<int> topo = new List<int>();
-
-            Queue<int> q = new Queue<int>();
-
-            foreach (var k in dgree)
-            {
-                if (k.Value == 0) q.Enqueue(k.Key);
-            }
-
-            while (q.TryDequeue(out int u))
-            {
-                topo.Add(u);
-                foreach (var v in g[u])
-                {
-                    if (dgree[v] > 0)
-                    {
-                        if (--dgree[v] == 0) q.Enqueue(v);
-                    }
-                }
-            }
-
-            StringBuilder sb = new StringBuilder();
-            foreach (var v in topo)
-            {
-                sb.AppendLine(cons[v]);
+                sb.AppendLine(v.Content);
                 sb.AppendLine("-----");
             }
             return sb.ToString();
@@ -127,67 +81,34 @@ namespace MindNote.Data.Providers.SqlServer
             var obj = await context.Structs.FindAsync(id);
             if (obj == null)
                 return Array.Empty<Tag>();
-            obj.Decode();
-            if (obj.Tags == null)
-                return Array.Empty<Tag>();
 
-            var res = new List<Tag>();
-            foreach (var v in obj.Tags)
-            {
-                var n = await context.Tags.FindAsync(v);
-                if (n == null) continue;
-                res.Add(n.ToModel());
-            }
-            return res;
+            return (await TagLink.GetTagLink(id, TagLinkClase.Struct, context)).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<int> SetTags(int id, IEnumerable<Tag> data)
         {
             var obj = await context.Structs.FindAsync(id);
             if (obj == null) return -1;
-            var res = new List<int>();
-            foreach (var v in data)
-            {
-                var q = (from r in context.Tags where r.Name == v.Name select r).FirstOrDefault();
-                if (q == null)
-                {
-                    int tid = await parent.GetTagsProvider().Create(v);
-                    res.Add(tid);
-                }
-                else
-                {
-                    res.Add(q.Id);
-                }
-            }
 
-            obj.Tags = res.ToArray();
-            obj.Encode();
-            context.Structs.Update(obj);
-            await context.SaveChangesAsync();
+            var ids = await parent.GetTagsProvider().EnsureContains(data);
+            await TagLink.SetTagLink(id, ids, TagLinkClase.Struct, context);
             return id;
         }
 
         public async Task<IEnumerable<Relation>> GetRelations(int id)
         {
             var obj = await context.Structs.FindAsync(id);
-            if (obj == null)
-                return Array.Empty<Relation>();
-            obj.Decode();
-            if (obj.Relations == null)
-                return Array.Empty<Relation>();
+            if (obj == null) return null;
 
-            var res = new List<Relation>();
-            foreach (var v in obj.Relations)
-            {
-                var n = await context.Relations.FindAsync(v);
-                if (n == null) continue;
-                res.Add(n.ToModel());
-            }
-            return res;
+            var query = from r in context.Relations where r.StructId == id select r;
+            return query.Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<IEnumerable<Node>> GetNodes(int id)
         {
+            var obj = await context.Structs.FindAsync(id);
+            if (obj == null) return null;
+
             var ns = new HashSet<int>();
             foreach (var v in await GetRelations(id))
             {
@@ -196,12 +117,49 @@ namespace MindNote.Data.Providers.SqlServer
             }
 
             var res = new List<Node>();
+            var nodes = new List<Node>();
             var provider = parent.GetNodesProvider();
             foreach (var v in ns)
             {
                 var n = await provider.GetFull(v);
                 if (n == null) continue;
-                res.Add(n);
+                nodes.Add(n);
+            }
+
+            Dictionary<int, List<int>> g = new Dictionary<int, List<int>>();
+            Dictionary<int, int> dgree = new Dictionary<int, int>();
+            Dictionary<int, Node> cons = new Dictionary<int, Node>();
+
+            foreach (var v in nodes)
+            {
+                g.Add(v.Id, new List<int>());
+                dgree[v.Id] = 0;
+                cons[v.Id] = v;
+            }
+
+            foreach (var v in await GetRelations(id))
+            {
+                g[v.From].Add(v.To);
+                dgree[v.To]++;
+            }
+
+            Queue<int> q = new Queue<int>();
+
+            foreach (var k in dgree)
+            {
+                if (k.Value == 0) q.Enqueue(k.Key);
+            }
+
+            while (q.TryDequeue(out int u))
+            {
+                res.Add(cons[u]);
+                foreach (var v in g[u])
+                {
+                    if (dgree[v] > 0)
+                    {
+                        if (--dgree[v] == 0) q.Enqueue(v);
+                    }
+                }
             }
             return res;
         }
@@ -210,33 +168,14 @@ namespace MindNote.Data.Providers.SqlServer
         {
             var obj = await context.Structs.FindAsync(id);
             if (obj == null) return -1;
-            var dd = new List<int>();
-            var res = new List<int>();
-            var tnew = new List<Models.Relation>();
+            var query = from r in context.Relations where r.StructId == id select r;
+            context.Relations.RemoveRange(query);
             foreach (var v in data)
             {
-                var q = (from r in context.Relations where r.From == v.From && r.To == v.To select r).FirstOrDefault();
-                if (q == null)
-                {
-                    var raw = Models.Relation.FromModel(v);
-                    context.Relations.Add(raw);
-                    tnew.Add(raw);
-                }
-                else
-                {
-                    res.Add(q.Id);
-                }
+                v.StructId = id;
+                var raw = Models.Relation.FromModel(v);
+                context.Relations.Add(raw);
             }
-            if (tnew.Count > 0)
-            {
-                await context.SaveChangesAsync();
-                foreach (var v in tnew)
-                    res.Add(v.Id);
-            }
-
-            obj.Relations = res.ToArray();
-            obj.Encode();
-            context.Structs.Update(obj);
             await context.SaveChangesAsync();
             return id;
         }
@@ -259,14 +198,12 @@ namespace MindNote.Data.Providers.SqlServer
             {
                 var td = Models.Struct.FromModel(data);
                 item.Name = td.Name;
-                if (td.Tags != null)
+                if (data.Tags != null)
                 {
-                    item.Tags = td.Tags;
                     await SetTags(item.Id, data.Tags);
                 }
-                if (td.Relations != null)
+                if (data.Relations != null)
                 {
-                    item.Relations = td.Relations;
                     await SetRelations(item.Id, data.Relations);
                 }
 

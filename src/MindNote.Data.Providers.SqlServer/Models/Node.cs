@@ -15,26 +15,11 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string Content { get; set; }
 
-        public string TagsData { get; set; }
-
-        [NotMapped]
-        public int[] Tags { get; set; }
-
         public string Extra { get; set; }
 
         public DateTimeOffset CreationTime { get; set; }
 
         public DateTimeOffset ModificationTime { get; set; }
-
-        public void Decode()
-        {
-            Tags = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(TagsData);
-        }
-
-        public void Encode()
-        {
-            TagsData = Newtonsoft.Json.JsonConvert.SerializeObject(Tags);
-        }
 
         public Data.Node ToModel()
         {
@@ -58,11 +43,9 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Name = data.Name,
                 Content = data.Content,
                 Extra = data.Extra,
-                Tags = data.Tags?.Select(x => x.Id).ToArray(),
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,
             };
-            res.Encode();
             return res;
         }
     }

@@ -20,7 +20,7 @@ namespace MindNote.Data.Providers
 
     public interface ITagsProvider : IItemsProvider<Tag>
     {
-
+        Task<IEnumerable<int>> EnsureContains(IEnumerable<Tag> data);
     }
 
     public interface IStructsProvider : IItemsProvider<Struct>

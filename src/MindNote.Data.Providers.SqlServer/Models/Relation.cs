@@ -12,6 +12,8 @@
 
         public string Extra { get; set; }
 
+        public int StructId { get; set; }
+
         public Data.Relation ToModel()
         {
             return new Data.Relation
@@ -21,6 +23,7 @@
                 From = From,
                 To = To,
                 Extra = Extra,
+                StructId = StructId,
             };
         }
 
@@ -33,6 +36,7 @@
                 To = data.To,
                 Color = data.Color,
                 Extra = data.Extra,
+                StructId = data.StructId,
             };
         }
     }

@@ -10,7 +10,7 @@ using MindNote.Data.Providers.SqlServer.Models;
 namespace MindNote.Data.Providers.SqlServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190527030119_M0")]
+    [Migration("20190527054332_M0")]
     partial class M0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,8 +37,6 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("TagsData");
-
                     b.HasKey("Id");
 
                     b.ToTable("Nodes");
@@ -55,6 +53,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     b.Property<string>("Extra");
 
                     b.Property<int>("From");
+
+                    b.Property<int>("StructId");
 
                     b.Property<int>("To");
 
@@ -77,10 +77,6 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("RelationsData");
-
-                    b.Property<string>("TagsData");
-
                     b.HasKey("Id");
 
                     b.ToTable("Structs");
@@ -101,6 +97,23 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("MindNote.Data.Providers.SqlServer.Models.TagLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Class");
+
+                    b.Property<int>("ObjectId");
+
+                    b.Property<int>("TagId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TagLinks");
                 });
 #pragma warning restore 612, 618
         }

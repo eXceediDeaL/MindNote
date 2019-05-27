@@ -20,7 +20,7 @@ namespace Test.Unit
                 $"ConnectionString={MindNote.Data.Providers.SqlServer.DataContextFactory.LocalConnection}"
             }).UseStartup<MindNote.API.Startup>();
             testServer = new TestServer(host);
-            MindNote.API.Program.InitialDatabase(testServer.Host);
+            MindNote.API.Program.InitialDatabase(testServer.Host).Wait();
         }
 
         [TestMethod]

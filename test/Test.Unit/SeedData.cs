@@ -21,7 +21,7 @@ namespace Test.Unit
         [TestMethod]
         public void SeedInit()
         {
-            MindNote.API.Program.InitialDatabase(testServer.Host);
+            MindNote.API.Program.InitialDatabase(testServer.Host).Wait();
         }
     }
 }

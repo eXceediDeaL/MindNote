@@ -35,8 +35,6 @@ namespace Test.Unit
 
                 tn.Id = id;
 
-                context.Nodes.Find(id).Decode();
-
                 controller.SetTags(id, new Tag[] { new Tag { Name = "app" } });
 
                 Helper.NodeEqual(tn, controller.Get(id).Result);
@@ -76,8 +74,6 @@ namespace Test.Unit
                 Assert.IsTrue(id > 0);
 
                 tn.Id = id;
-
-                context.Structs.Find(id).Decode();
 
                 Helper.StructEqual(tn, controller.Get(id).Result);
 

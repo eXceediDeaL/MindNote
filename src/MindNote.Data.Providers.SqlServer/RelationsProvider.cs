@@ -42,7 +42,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<Relation> Get(int id)
         {
-            return (await context.Relations.FindAsync(id)).ToModel();
+            return (await context.Relations.FindAsync(id))?.ToModel();
         }
 
         public Task<IEnumerable<Relation>> GetAll()
