@@ -133,7 +133,7 @@ namespace MindNote.API.Database
                     Name = "Python 100 Days",
                     Tags = new Tag[] { new Tag { Id = tag.Id } },
                     Relations = rls.Select(x => new Relation { Id = x.Id }).ToArray(),
-                    Extra = Newtonsoft.Json.JsonConvert.SerializeObject(new { color = "yellow" }),
+                    Extra = Newtonsoft.Json.JsonConvert.SerializeObject(new { color = "orange" }),
                 });
                 context.Structs.Add(str);
                 context.SaveChanges();

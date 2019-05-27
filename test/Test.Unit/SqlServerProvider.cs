@@ -24,12 +24,20 @@ namespace Test.Unit
             using (var context = new MindNote.Data.Providers.SqlServer.Models.DataContext(options))
             {
                 var controller = new MindNote.Data.Providers.SqlServer.SqlServerProvider(context).GetNodesProvider();
-                
+
+                Assert.AreEqual(0, controller.GetTags(0).Result.Count());
+
                 Assert.AreEqual(0, controller.GetAll().Result.Count());
 
                 int id = controller.Create(tn).Result;
 
                 Assert.IsTrue(id > 0);
+
+                tn.Id = id;
+
+                context.Nodes.Find(id).Decode();
+
+                controller.SetTags(id, new Tag[] { new Tag { Name = "app" } });
 
                 Helper.NodeEqual(tn, controller.Get(id).Result);
 
@@ -67,14 +75,26 @@ namespace Test.Unit
 
                 Assert.IsTrue(id > 0);
 
+                tn.Id = id;
+
+                context.Structs.Find(id).Decode();
+
                 Helper.StructEqual(tn, controller.Get(id).Result);
 
                 Assert.AreEqual(1, controller.GetAll().Result.Count());
                 Helper.StructEqual(tn, controller.GetAll().Result.First(), true);
 
+                controller.GetFull(id).Wait();
+
+                controller.SetTags(id, new Tag[] { new Tag { Name = "app" } });
+
+                controller.SetRelations(id, new Relation[] { new Relation { From = 1, To = 1 } });
+
                 tn.Name = "updated";
                 Assert.AreEqual(id, controller.Update(id, tn).Result);
                 Helper.StructEqual(tn, controller.Get(id).Result);
+
+                controller.GetContent(id);
 
                 Assert.AreEqual(-1, controller.Update(0, null).Result);
 
@@ -103,6 +123,8 @@ namespace Test.Unit
                 int id = controller.Create(tn).Result;
 
                 Assert.IsTrue(id > 0);
+
+                tn.Id = id;
 
                 Helper.TagEqual(tn, controller.Get(id).Result);
 
@@ -140,6 +162,8 @@ namespace Test.Unit
                 int id = controller.Create(tn).Result;
 
                 Assert.IsTrue(id > 0);
+
+                tn.Id = id;
 
                 Helper.RelationEqual(tn, controller.Get(id).Result);
 

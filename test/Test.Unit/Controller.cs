@@ -24,12 +24,14 @@ namespace Test.Unit
             using (var context = new MindNote.Data.Providers.SqlServer.Models.DataContext(options))
             {
                 var controller = new NodesController(new MindNote.Data.Providers.SqlServer.SqlServerProvider(context));
-                
+
                 Assert.AreEqual(0, controller.GetAll().Result.Count());
 
                 int id = controller.Create(tn).Result;
 
                 Assert.IsTrue(id > 0);
+
+                tn.Id = id;
 
                 Helper.NodeEqual(tn, controller.Get(id).Result);
 
@@ -66,6 +68,8 @@ namespace Test.Unit
                 int id = controller.Create(tn).Result;
 
                 Assert.IsTrue(id > 0);
+
+                tn.Id = id;
 
                 Helper.StructEqual(tn, controller.Get(id).Result);
 
@@ -104,6 +108,8 @@ namespace Test.Unit
 
                 Assert.IsTrue(id > 0);
 
+                tn.Id = id;
+
                 Helper.TagEqual(tn, controller.Get(id).Result);
 
                 Assert.AreEqual(1, controller.GetAll().Result.Count());
@@ -140,6 +146,8 @@ namespace Test.Unit
                 int id = controller.Create(tn).Result;
 
                 Assert.IsTrue(id > 0);
+
+                tn.Id = id;
 
                 Helper.RelationEqual(tn, controller.Get(id).Result);
 

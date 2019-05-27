@@ -27,7 +27,9 @@ namespace Test.Unit
         {
             using (var client = testServer.CreateClient())
             {
-                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/All").Result);
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/Full").Result);
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/1/Full").Result);
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/1/Tags").Result);
             }
         }
 
@@ -36,7 +38,9 @@ namespace Test.Unit
         {
             using (var client = testServer.CreateClient())
             {
-                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Structs/All").Result);
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Structs/Full").Result);
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/1/Full").Result);
+                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Structs/1/Tags").Result);
             }
         }
 

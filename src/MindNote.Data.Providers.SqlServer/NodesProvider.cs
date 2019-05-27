@@ -17,12 +17,23 @@ namespace MindNote.Data.Providers.SqlServer
             parent = dataProvider;
         }
 
+        public async Task Clear()
+        {
+            context.Nodes.RemoveRange(context.Nodes);
+            await context.SaveChangesAsync();
+        }
+
         public async Task<int> Create(Node data)
         {
             data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
             var raw = Models.Node.FromModel(data);
+            raw.Id = 0;
             context.Nodes.Add(raw);
             await context.SaveChangesAsync();
+            if (data.Tags != null)
+            {
+                await SetTags(raw.Id, data.Tags);
+            }
             return raw.Id;
         }
 
@@ -64,7 +75,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int> SetTags(int id, IEnumerable<Tag> data)
         {
-            var obj = await context.Structs.FindAsync(id);
+            var obj = await context.Nodes.FindAsync(id);
             if (obj == null) return -1;
             var res = new List<int>();
             var tnew = new List<Models.Tag>();
@@ -91,7 +102,7 @@ namespace MindNote.Data.Providers.SqlServer
 
             obj.Tags = res.ToArray();
             obj.Encode();
-            context.Structs.Update(obj);
+            context.Nodes.Update(obj);
             await context.SaveChangesAsync();
             return id;
         }

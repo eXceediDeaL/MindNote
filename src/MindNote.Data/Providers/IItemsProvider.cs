@@ -14,5 +14,7 @@ namespace MindNote.Data.Providers
         Task<int> Update(int id, T data);
 
         Task<int> Create(T data);
+
+        Task Clear();
     }
 }

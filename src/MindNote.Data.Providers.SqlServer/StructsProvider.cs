@@ -18,12 +18,27 @@ namespace MindNote.Data.Providers.SqlServer
             parent = dataProvider;
         }
 
+        public async Task Clear()
+        {
+            context.Structs.RemoveRange(context.Structs);
+            await context.SaveChangesAsync();
+        }
+
         public async Task<int> Create(Struct data)
         {
             data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
             var raw = Models.Struct.FromModel(data);
+            raw.Id = 0;
             context.Structs.Add(raw);
             await context.SaveChangesAsync();
+            if (data.Tags != null)
+            {
+                await SetTags(raw.Id, data.Tags);
+            }
+            if (data.Relations != null)
+            {
+                await SetRelations(raw.Id, data.Relations);
+            }
             return raw.Id;
         }
 
@@ -67,7 +82,7 @@ namespace MindNote.Data.Providers.SqlServer
 
             Queue<int> q = new Queue<int>();
 
-            foreach(var k in dgree)
+            foreach (var k in dgree)
             {
                 if (k.Value == 0) q.Enqueue(k.Key);
             }
@@ -75,7 +90,7 @@ namespace MindNote.Data.Providers.SqlServer
             while (q.TryDequeue(out int u))
             {
                 topo.Add(u);
-                foreach(var v in g[u])
+                foreach (var v in g[u])
                 {
                     if (dgree[v] > 0)
                     {
@@ -85,7 +100,7 @@ namespace MindNote.Data.Providers.SqlServer
             }
 
             StringBuilder sb = new StringBuilder();
-            foreach(var v in topo)
+            foreach (var v in topo)
             {
                 sb.AppendLine(cons[v]);
                 sb.AppendLine("-----");

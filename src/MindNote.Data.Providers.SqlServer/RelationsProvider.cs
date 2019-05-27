@@ -15,9 +15,16 @@ namespace MindNote.Data.Providers.SqlServer
             parent = dataProvider;
         }
 
+        public async Task Clear()
+        {
+            context.Relations.RemoveRange(context.Relations);
+            await context.SaveChangesAsync();
+        }
+
         public async Task<int> Create(Relation data)
         {
             var raw = Models.Relation.FromModel(data);
+            raw.Id = 0;
             context.Relations.Add(raw);
             await context.SaveChangesAsync();
             return raw.Id;
