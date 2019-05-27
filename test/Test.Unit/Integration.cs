@@ -29,7 +29,7 @@ namespace Test.Unit
             {
                 Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/Full").Result);
                 Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/1/Full").Result);
-                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/1/Tags").Result);
+                Assert.AreEqual("[]", client.GetStringAsync("/api/Nodes/1/Tags").Result);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Test.Unit
             {
                 Assert.AreNotEqual("[]", client.GetStringAsync("/api/Structs/Full").Result);
                 Assert.AreNotEqual("[]", client.GetStringAsync("/api/Nodes/1/Full").Result);
-                Assert.AreNotEqual("[]", client.GetStringAsync("/api/Structs/1/Tags").Result);
+                Assert.AreEqual("[]", client.GetStringAsync("/api/Structs/1/Tags").Result);
             }
         }
 

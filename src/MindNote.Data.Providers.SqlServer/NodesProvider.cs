@@ -26,13 +26,15 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<int> Create(Node data)
         {
             data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
+            var tags = data.Tags;
+            data.Tags = null;
             var raw = Models.Node.FromModel(data);
             raw.Id = 0;
             context.Nodes.Add(raw);
             await context.SaveChangesAsync();
-            if (data.Tags != null)
+            if (tags != null)
             {
-                await SetTags(raw.Id, data.Tags);
+                await SetTags(raw.Id, tags);
             }
             return raw.Id;
         }
@@ -50,6 +52,7 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<Node> GetFull(int id)
         {
             var res = await Get(id);
+            if (res == null) return null;
             res.Tags = (await GetTags(id)).ToArray();
             return res;
         }
@@ -78,26 +81,18 @@ namespace MindNote.Data.Providers.SqlServer
             var obj = await context.Nodes.FindAsync(id);
             if (obj == null) return -1;
             var res = new List<int>();
-            var tnew = new List<Models.Tag>();
             foreach (var v in data)
             {
                 var q = (from r in context.Tags where r.Name == v.Name select r).FirstOrDefault();
                 if (q == null)
                 {
-                    var raw = Models.Tag.FromModel(v);
-                    context.Tags.Add(raw);
-                    tnew.Add(raw);
+                    int tid = await parent.GetTagsProvider().Create(v);
+                    res.Add(tid);
                 }
                 else
                 {
                     res.Add(q.Id);
                 }
-            }
-            if (tnew.Count > 0)
-            {
-                await context.SaveChangesAsync();
-                foreach (var v in tnew)
-                    res.Add(v.Id);
             }
 
             obj.Tags = res.ToArray();
@@ -109,7 +104,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<Node> Get(int id)
         {
-            return (await context.Nodes.FindAsync(id)).ToModel();
+            return (await context.Nodes.FindAsync(id))?.ToModel();
         }
 
         public Task<IEnumerable<Node>> GetAll()

@@ -27,17 +27,21 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<int> Create(Struct data)
         {
             data.CreationTime = data.ModificationTime = DateTimeOffset.Now;
+            var tags = data.Tags;
+            var rels = data.Relations;
+            data.Tags = null;
+            data.Relations = null;
             var raw = Models.Struct.FromModel(data);
             raw.Id = 0;
             context.Structs.Add(raw);
             await context.SaveChangesAsync();
-            if (data.Tags != null)
+            if (tags != null)
             {
-                await SetTags(raw.Id, data.Tags);
+                await SetTags(raw.Id, tags);
             }
-            if (data.Relations != null)
+            if (rels != null)
             {
-                await SetRelations(raw.Id, data.Relations);
+                await SetRelations(raw.Id, rels);
             }
             return raw.Id;
         }
@@ -54,7 +58,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<Struct> Get(int id)
         {
-            return (await context.Structs.FindAsync(id)).ToModel();
+            return (await context.Structs.FindAsync(id))?.ToModel();
         }
 
         public async Task<string> GetContent(int id)
@@ -111,6 +115,7 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<Struct> GetFull(int id)
         {
             var res = await Get(id);
+            if (res == null) return null;
             res.Tags = (await GetTags(id)).ToArray();
             res.Relations = (await GetRelations(id)).ToArray();
             res.Nodes = (await GetNodes(id)).ToArray();
@@ -141,26 +146,18 @@ namespace MindNote.Data.Providers.SqlServer
             var obj = await context.Structs.FindAsync(id);
             if (obj == null) return -1;
             var res = new List<int>();
-            var tnew = new List<Models.Tag>();
             foreach (var v in data)
             {
                 var q = (from r in context.Tags where r.Name == v.Name select r).FirstOrDefault();
                 if (q == null)
                 {
-                    var raw = Models.Tag.FromModel(v);
-                    context.Tags.Add(raw);
-                    tnew.Add(raw);
+                    int tid = await parent.GetTagsProvider().Create(v);
+                    res.Add(tid);
                 }
                 else
                 {
                     res.Add(q.Id);
                 }
-            }
-            if (tnew.Count > 0)
-            {
-                await context.SaveChangesAsync();
-                foreach (var v in tnew)
-                    res.Add(v.Id);
             }
 
             obj.Tags = res.ToArray();

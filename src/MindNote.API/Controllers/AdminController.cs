@@ -20,6 +20,11 @@ namespace MindNote.API.Controllers
         [HttpPut]
         public async Task Rebuild([FromBody] IEnumerable<Struct> data)
         {
+            await provider.GetNodesProvider().Clear();
+            await provider.GetStructsProvider().Clear();
+            await provider.GetTagsProvider().Clear();
+            await provider.GetRelationsProvider().Clear();
+
             Dictionary<string, int> nodes = new Dictionary<string, int>();
 
             foreach (var v in data)
@@ -27,8 +32,10 @@ namespace MindNote.API.Controllers
                 Dictionary<int, string> iname = new Dictionary<int, string>();
                 foreach (var n in v.Nodes)
                 {
-                    int cn = await provider.GetNodesProvider().Create(n);
                     iname.Add(n.Id, n.Name);
+
+                    if (nodes.ContainsKey(n.Name)) continue;
+                    int cn = await provider.GetNodesProvider().Create(n);
                     nodes.Add(n.Name, cn);
                 }
                 List<Relation> rs = new List<Relation>();
