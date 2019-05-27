@@ -10,7 +10,7 @@ using MindNote.Data.Providers.SqlServer.Models;
 namespace MindNote.Data.Providers.SqlServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190527002051_M0")]
+    [Migration("20190527002519_M0")]
     partial class M0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
