@@ -77,6 +77,7 @@ namespace MindNote.API.Controllers
             var res = await provider.Get(id);
             res.Tags = (await GetTags(id)).ToArray();
             res.Relations = (await GetRelations(id)).ToArray();
+            res.Nodes = (await GetNodes(id)).ToArray();
             return res;
         }
 

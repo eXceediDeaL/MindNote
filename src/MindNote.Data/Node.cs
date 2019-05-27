@@ -10,6 +10,8 @@ namespace MindNote.Data
 
         public string Content { get; set; }
 
+        public string Extra { get; set; }
+
         public Tag[] Tags { get; set; }
 
         public DateTimeOffset CreationTime { get; set; }

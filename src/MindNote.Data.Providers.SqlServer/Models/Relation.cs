@@ -10,6 +10,8 @@
 
         public string Color { get; set; }
 
+        public string Extra { get; set; }
+
         public Data.Relation ToModel()
         {
             return new Data.Relation
@@ -18,6 +20,7 @@
                 Color = Color,
                 From = From,
                 To = To,
+                Extra = Extra,
             };
         }
 
@@ -29,6 +32,7 @@
                 From = data.From,
                 To = data.To,
                 Color = data.Color,
+                Extra = data.Extra,
             };
         }
     }

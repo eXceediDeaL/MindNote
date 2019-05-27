@@ -11,5 +11,7 @@ namespace MindNote.Data
         public int To { get; set; }
 
         public string Color { get; set; }
+
+        public string Extra { get; set; }
     }
 }

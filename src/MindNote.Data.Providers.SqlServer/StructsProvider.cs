@@ -39,6 +39,11 @@ namespace MindNote.Data.Providers.SqlServer
             return (await context.Structs.FindAsync(id)).ToModel();
         }
 
+        public async Task<string> GetContent(int id)
+        {
+            return "wait";
+        }
+
         public async Task<IEnumerable<Tag>> GetTags(int id)
         {
             var obj = await context.Structs.FindAsync(id);
@@ -98,7 +103,7 @@ namespace MindNote.Data.Providers.SqlServer
             if (obj == null)
                 return Array.Empty<Relation>();
             obj.Decode();
-            if(obj.Relations == null)
+            if (obj.Relations == null)
                 return Array.Empty<Relation>();
 
             var res = new List<Relation>();
@@ -121,7 +126,7 @@ namespace MindNote.Data.Providers.SqlServer
             }
 
             var res = new List<Node>();
-            foreach(var v in ns)
+            foreach (var v in ns)
             {
                 var n = await context.Nodes.FindAsync(v);
                 if (n == null) continue;
@@ -165,8 +170,6 @@ namespace MindNote.Data.Providers.SqlServer
             return id;
         }
 
-    
-
         public Task<IEnumerable<Struct>> GetAll()
         {
             List<Struct> res = new List<Struct>();
@@ -185,8 +188,16 @@ namespace MindNote.Data.Providers.SqlServer
             {
                 var td = Models.Struct.FromModel(data);
                 item.Name = td.Name;
-                if (td.Tags != null) item.Tags = td.Tags;
-                if (td.Relations != null) item.Relations = td.Relations;
+                if (td.Tags != null)
+                {
+                    item.Tags = td.Tags;
+                    await SetTags(item.Id, data.Tags);
+                }
+                if (td.Relations != null)
+                {
+                    item.Relations = td.Relations;
+                    await SetRelations(item.Id, data.Relations);
+                }
 
                 context.Structs.Update(item);
                 await context.SaveChangesAsync();

@@ -20,6 +20,8 @@ namespace MindNote.Data.Providers.SqlServer.Models
         [NotMapped]
         public int[] Tags { get; set; }
 
+        public string Extra { get; set; }
+
         public DateTimeOffset CreationTime { get; set; }
 
         public DateTimeOffset ModificationTime { get; set; }
@@ -42,6 +44,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Name = Name,
                 Content = Content,
                 Tags = null,
+                Extra = Extra,
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
             };
@@ -54,6 +57,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = data.Id,
                 Name = data.Name,
                 Content = data.Content,
+                Extra = data.Extra,
                 Tags = data.Tags?.Select(x => x.Id).ToArray(),
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,

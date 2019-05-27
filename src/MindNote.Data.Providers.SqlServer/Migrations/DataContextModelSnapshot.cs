@@ -29,6 +29,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<DateTimeOffset>("CreationTime");
 
+                    b.Property<string>("Extra");
+
                     b.Property<DateTimeOffset>("ModificationTime");
 
                     b.Property<string>("Name");
@@ -47,6 +49,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Color");
+
+                    b.Property<string>("Extra");
 
                     b.Property<int>("From");
 
@@ -87,6 +91,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Color");
+
+                    b.Property<string>("Extra");
 
                     b.Property<string>("Name");
 

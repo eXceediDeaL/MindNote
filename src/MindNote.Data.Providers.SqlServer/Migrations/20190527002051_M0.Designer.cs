@@ -10,7 +10,7 @@ using MindNote.Data.Providers.SqlServer.Models;
 namespace MindNote.Data.Providers.SqlServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190526234956_M0")]
+    [Migration("20190527002051_M0")]
     partial class M0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
 
                     b.Property<DateTimeOffset>("CreationTime");
 
+                    b.Property<string>("Extra");
+
                     b.Property<DateTimeOffset>("ModificationTime");
 
                     b.Property<string>("Name");
@@ -49,6 +51,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Color");
+
+                    b.Property<string>("Extra");
 
                     b.Property<int>("From");
 
@@ -89,6 +93,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Color");
+
+                    b.Property<string>("Extra");
 
                     b.Property<string>("Name");
 

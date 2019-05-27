@@ -17,6 +17,7 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     Name = table.Column<string>(nullable: true),
                     Content = table.Column<string>(nullable: true),
                     TagsData = table.Column<string>(nullable: true),
+                    Extra = table.Column<string>(nullable: true),
                     CreationTime = table.Column<DateTimeOffset>(nullable: false),
                     ModificationTime = table.Column<DateTimeOffset>(nullable: false)
                 },
@@ -33,7 +34,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     From = table.Column<int>(nullable: false),
                     To = table.Column<int>(nullable: false),
-                    Color = table.Column<string>(nullable: true)
+                    Color = table.Column<string>(nullable: true),
+                    Extra = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -65,7 +67,8 @@ namespace MindNote.Data.Providers.SqlServer.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
-                    Color = table.Column<string>(nullable: true)
+                    Color = table.Column<string>(nullable: true),
+                    Extra = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

@@ -23,6 +23,8 @@ namespace MindNote.Data.Providers
 
     public interface IStructsProvider : IItemsProvider<Struct>
     {
+        Task<string> GetContent(int id);
+
         Task<IEnumerable<Tag>> GetTags(int id);
 
         Task<int> SetTags(int id, IEnumerable<Tag> data);

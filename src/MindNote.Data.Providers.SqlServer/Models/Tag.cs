@@ -8,6 +8,8 @@
 
         public string Color { get; set; }
 
+        public string Extra { get; set; }
+
         public Data.Tag ToModel()
         {
             return new Data.Tag
@@ -15,6 +17,7 @@
                 Id = Id,
                 Name = Name,
                 Color = Color,
+                Extra = Extra,
             };
         }
 
@@ -25,6 +28,7 @@
                 Id = data.Id,
                 Name = data.Name,
                 Color = data.Color,
+                Extra = data.Extra,
             };
         }
     }

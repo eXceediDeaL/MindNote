@@ -114,7 +114,11 @@ namespace MindNote.Data.Providers.SqlServer
                 item.ModificationTime = DateTimeOffset.Now;
                 item.Content = td.Content;
                 item.Name = td.Name;
-                if (td.Tags != null) item.Tags = td.Tags;
+                if (td.Tags != null)
+                {
+                    item.Tags = td.Tags;
+                    await SetTags(item.Id, data.Tags);
+                }
 
                 context.Nodes.Update(item);
                 await context.SaveChangesAsync();
