@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Test.Unit
 {
-    [TestClass]
+    /*[TestClass]
     public class Integration
     {
         TestServer testServer;
@@ -71,5 +71,5 @@ namespace Test.Unit
                 Assert.AreNotEqual("[]", client.GetStringAsync("/api/Relations/All").Result);
             }
         }
-    }
+    }*/
 }

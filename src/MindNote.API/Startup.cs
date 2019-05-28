@@ -27,9 +27,18 @@ namespace MindNote.API
         public void ConfigureServices(IServiceCollection services)
         {
             string connectString = Configuration["ConnectionString"];
-
+            string dbType = Configuration["DBType"];
             services.AddDbContext<Data.Providers.SqlServer.Models.DataContext>(options =>
-                options.UseSqlServer(connectString));
+            {
+                if (dbType == "MySQL")
+                {
+                    options.UseMySql(connectString);
+                }
+                else
+                {
+                    options.UseSqlServer(connectString);
+                }
+            });
 
             services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.SqlServerProvider>();
             // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();

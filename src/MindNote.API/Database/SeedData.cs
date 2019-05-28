@@ -20,7 +20,6 @@ namespace MindNote.API.Database
                 return;
 
             IDataProvider provider = new SqlServerProvider(context);
-
             var ns = new List<int>();
             for (int i = 1; i < 7; i++)
             {

@@ -1,16 +1,24 @@
 version: "3"
 services:
-  app:
-    build: .
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api/Dockerfile
     environment:
-      - ConnectionString=Server=mndb;Database=master;User=sa;Password=MNdb_passw00d;
+      # - ConnectionString=Server=mndb;Database=master;User=sa;Password=MNdb_passw00d;
+      - ConnectionString=server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "8085:80"
     depends_on:
       - mndb
   mndb:
-    image: "mcr.microsoft.com/mssql/server"
+    image: mysql
+    # ports:
+      # - "3306:3306"
     environment:
-      - SA_PASSWORD=MNdb_passw00d
-      - ACCEPT_EULA=Y
+      - MYSQL_ROOT_PASSWORD=MNdb_passw00d
+  #   image: "mcr.microsoft.com/mssql/server"
+  #   environment:
+  #     - SA_PASSWORD=MNdb_passw00d
+  #     - ACCEPT_EULA=Y

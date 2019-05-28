@@ -25,9 +25,9 @@ namespace Test.Unit
             {
                 var controller = new MindNote.Data.Providers.SqlServer.SqlServerProvider(context).GetNodesProvider();
 
-                Assert.AreEqual(0, controller.GetTags(0).Result.Count());
+                Assert.AreEqual(null, controller.GetTags(0).Result);
 
-                Assert.AreEqual(0, controller.GetAll().Result.Count());
+                Assert.AreEqual(0, controller.GetAll().Result?.Count());
 
                 int id = controller.Create(tn).Result;
 

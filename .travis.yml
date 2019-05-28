@@ -1,0 +1,26 @@
+jobs:
+  include:
+    - os: windows
+      language: bash
+      before_install: powershell -c "Set-ExecutionPolicy Bypass -Scope CurrentUser -Force"
+      install: powershell -c ci/windows/test/install.ps1
+      script: 
+        - powershell -c ci/windows/test/script.ps1
+        - export TRAVIS=true && export CI=true && codecov -f coverage.xml
+    - os: linux
+      dist: xenial
+      language: csharp
+      mono: none
+      sudo: required
+      install: sudo chmod +x ci/linux/test/install.sh && ./ci/linux/test/install.sh
+      script: sudo chmod +x ci/linux/test/script.sh && ./ci/linux/test/script.sh
+    - stage: Docker
+      os: linux
+      dist: xenial
+      language: csharp
+      mono: none
+      sudo: required
+      services:
+        docker
+      install: sudo chmod +x ci/linux/docker/install.sh && ./ci/linux/docker/install.sh
+      script: sudo chmod +x ci/linux/docker/script.sh && ./ci/linux/docker/script.sh
