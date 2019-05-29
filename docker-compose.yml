@@ -6,7 +6,7 @@ services:
       dockerfile: ./docker/host/Dockerfile
     environment:
       # - ConnectionString=Server=mndb;Database=master;User=sa;Password=MNdb_passw00d;
-      - API_SERVER=https://api:5123
+      - API_SERVER=http://api:5123
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "8085:80"
@@ -21,7 +21,9 @@ services:
       - ConnectionString=server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;
       - DBType=MySQL
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS="https://*:5123"
+      - ASPNETCORE_URLS=http://*:5123
+    ports:
+      - "5123"
     depends_on:
       - mndb
   mndb:
