@@ -1,9 +1,7 @@
 version: "3"
 services:
   host:
-    build:
-      context: .
-      dockerfile: ./docker/host/Dockerfile
+    image: stardustdl/mindnote:host
     environment:
       - API_SERVER=http://api:5123
       - ASPNETCORE_ENVIRONMENT=Development
@@ -12,9 +10,7 @@ services:
     depends_on:
       - api
   api:
-    build:
-      context: .
-      dockerfile: ./docker/api/Dockerfile
+    image: stardustdl/mindnote:api
     environment:
       - ConnectionString=server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;
       - DBType=MySQL

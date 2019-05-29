@@ -29,7 +29,7 @@ jobs:
       script:
         - dotnet build
         - dotnet test
-    - stage: Docker
+    - stage: Docker Test
       os: linux
       dist: xenial
       language: csharp
@@ -40,6 +40,17 @@ jobs:
       script:
         - docker-compose build
         - docker-compose up -d
+        - sleep 60
         - curl http://localhost:8085
         - docker-compose stop
         - docker-compose logs
+    - stage: Docker Deploy
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker build -t mindnote:api -f ./docker/api/Dockerfile .
+      - docker build -t mindnote:host -f ./docker/host/Dockerfile .
+      - docker images
+      - docker tag mindnote:api $DOCKER_USERNAME/mindnote:api
+      - docker push $DOCKER_USERNAME/mindnote:api
+      - docker tag mindnote:host $DOCKER_USERNAME/mindnote:host
+      - docker push $DOCKER_USERNAME/mindnote:host
