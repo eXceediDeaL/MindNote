@@ -8,22 +8,13 @@
 
         public int To { get; set; }
 
-        public string Color { get; set; }
-
-        public string Extra { get; set; }
-
-        public int StructId { get; set; }
-
         public Data.Relation ToModel()
         {
             return new Data.Relation
             {
                 Id = Id,
-                Color = Color,
                 From = From,
                 To = To,
-                Extra = Extra,
-                StructId = StructId,
             };
         }
 
@@ -34,9 +25,6 @@
                 Id = data.Id,
                 From = data.From,
                 To = data.To,
-                Color = data.Color,
-                Extra = data.Extra,
-                StructId = data.StructId,
             };
         }
     }

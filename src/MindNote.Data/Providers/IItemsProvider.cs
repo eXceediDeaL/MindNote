@@ -11,10 +11,14 @@ namespace MindNote.Data.Providers
 
         Task Delete(int id);
 
-        Task<int> Update(int id, T data);
+        Task<int?> Update(int id, T data);
 
-        Task<int> Create(T data);
+        Task<int?> Create(T data);
 
         Task Clear();
     }
+
+    public interface INodesProvider : IItemsProvider<Node> { }
+
+    public interface IRelationsProvider : IItemsProvider<Relation> { }
 }
