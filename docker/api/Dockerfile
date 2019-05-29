@@ -19,4 +19,4 @@ COPY --from=build /build/out ./
 
 EXPOSE 80/tcp
 
-ENTRYPOINT sleep 5 && dotnet MindNote.API.dll
+ENTRYPOINT sleep 20 && dotnet MindNote.API.dll
