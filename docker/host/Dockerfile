@@ -12,7 +12,7 @@ RUN dotnet restore
 
 COPY ./src ./src
 
-RUN cd ./src/MindNote.API && dotnet publish -c Release -o /build/out
+RUN cd ./src/MindNote.Host && dotnet publish -c Release -o /build/out
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 WORKDIR /app
@@ -20,4 +20,4 @@ COPY --from=build /build/out ./
 
 EXPOSE 80/tcp
 
-ENTRYPOINT sleep 20 && dotnet MindNote.API.dll
+ENTRYPOINT sleep 20 && dotnet MindNote.Host.dll
