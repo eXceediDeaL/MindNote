@@ -2,18 +2,33 @@ jobs:
   include:
     - os: windows
       language: bash
-      before_install: powershell -c "Set-ExecutionPolicy Bypass -Scope CurrentUser -Force"
-      install: powershell -c ci/windows/test/install.ps1
+      install:
+        - choco install dotnetcore-sdk
+        - choco install opencover.portable
+        - dotnet --version
       script: 
-        - powershell -c ci/windows/test/script.ps1
-        - export TRAVIS=true && export CI=true && codecov -f coverage.xml
+        - dotnet restore -s https://api.nuget.org/v3/index.json
+        - dotnet build
+        - dotnet test
+        - OpenCover.Console.exe -register:user -target:"dotnet.exe" -targetargs:"test" -output:coverage.xml -filter:"+[*]* -[*Moq]* -[xunit*]*" -oldstyle
+        - curl -s https://codecov.io/bash > codecov
+        - chmod +x codecov
+        - ./codecov -f "coverage.xml"
     - os: linux
       dist: xenial
       language: csharp
       mono: none
       sudo: required
-      install: sudo chmod +x ci/linux/test/install.sh && ./ci/linux/test/install.sh
-      script: sudo chmod +x ci/linux/test/script.sh && ./ci/linux/test/script.sh
+      install:
+        - wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+        - sudo dpkg -i packages-microsoft-prod.deb
+        - sudo apt-get install apt-transport-https
+        - sudo apt-get update
+        - sudo apt-get install dotnet-sdk-2.2
+        - dotnet --version
+      script:
+        - dotnet build
+        - dotnet test
     - stage: Docker
       os: linux
       dist: xenial
@@ -22,5 +37,5 @@ jobs:
       sudo: required
       services:
         docker
-      install: sudo chmod +x ci/linux/docker/install.sh && ./ci/linux/docker/install.sh
-      script: sudo chmod +x ci/linux/docker/script.sh && ./ci/linux/docker/script.sh
+      script:
+        - docker-compose build
