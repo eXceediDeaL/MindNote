@@ -15,7 +15,7 @@ services:
       - DBType=MySQL
       - ASPNETCORE_URLS=http://*:5123
     ports:
-      - "5123"
+      - "8090:5123"
     depends_on:
       - mndb
   mndb:

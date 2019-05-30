@@ -1,0 +1,46 @@
+﻿@page
+@model MindNote.Server.Host.Pages.Nodes.IndexModel
+@{
+    ViewData["Title"] = "Nodes";
+    ViewData["Id"] = "Nodes";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+</ul>
+
+
+
+<table class="table table-hover" style="margin-top:10px">
+    <thead>
+        <tr>
+            <th style="width:6%">
+                @Html.DisplayNameFor(model => model.Nodes[0].Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nodes[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nodes[0].Content)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Nodes)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Content)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

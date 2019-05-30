@@ -21,10 +21,11 @@ Project Status:
 - Use the commands below to create containers:
 
 ```sh
-curl https://raw.githubusercontent.com/StardustDL/MindNote/dev/docker/docker-compose.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-compose.yml > docker-compose.yml
 docker-compose up
 ```
 
 It will create a MySQL container, an API server container, and a host server container.
 
 The host server listens to the port `8085`.
+The API server listens to the port `8090`. You can visit `api/swagger` to see the all APIs.

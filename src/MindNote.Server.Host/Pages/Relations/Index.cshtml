@@ -1,0 +1,29 @@
+﻿@page
+@model MindNote.Server.Host.Pages.Relations.IndexModel
+@{
+    ViewData["Title"] = "Relations";
+    ViewData["Id"] = "Relations";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+</ul>
+<div style="text-align:center">
+    <svg height="600" width="1000" preserveAspectRatio="xMidYMid meet" style="border: 1px solid"></svg>
+</div>
+
+
+@section Scripts {
+<script src="https://d3js.org/d3.v5.js"></script>
+<script src="~/js/relation.js"></script>
+<script>
+    var svg = d3.select("svg");
+    graph = @Html.Raw(Model.Graph);
+
+    showSvg(svg, graph);
+</script>
+}
+
+
+
