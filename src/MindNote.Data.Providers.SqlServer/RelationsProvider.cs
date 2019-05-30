@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MindNote.Data.Providers.SqlServer.Models;
 
@@ -6,8 +7,8 @@ namespace MindNote.Data.Providers.SqlServer
 {
     class RelationsProvider : IRelationsProvider
     {
-        DataContext context;
-        IDataProvider parent;
+        readonly DataContext context;
+        readonly IDataProvider parent;
 
         public RelationsProvider(DataContext context, IDataProvider dataProvider)
         {
@@ -21,10 +22,11 @@ namespace MindNote.Data.Providers.SqlServer
             await context.SaveChangesAsync();
         }
 
-        public async Task<int> Create(Relation data)
+        public async Task<int?> Create(Relation data)
         {
+            if (await parent.NodesProvider.Get(data.From) == null || await parent.NodesProvider.Get(data.To) == null)
+                return null;
             var raw = Models.Relation.FromModel(data);
-            raw.Id = 0;
             context.Relations.Add(raw);
             await context.SaveChangesAsync();
             return raw.Id;
@@ -32,12 +34,10 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task Delete(int id)
         {
-            Models.Relation item = await context.Relations.FindAsync(id);
-            if (item != null)
-            {
-                context.Relations.Remove(item);
-                await context.SaveChangesAsync();
-            }
+            var raw = await context.Relations.FindAsync(id);
+            if (raw == null) return;
+            context.Relations.Remove(raw);
+            await context.SaveChangesAsync();
         }
 
         public async Task<Relation> Get(int id)
@@ -47,31 +47,19 @@ namespace MindNote.Data.Providers.SqlServer
 
         public Task<IEnumerable<Relation>> GetAll()
         {
-            List<Relation> res = new List<Relation>();
-            foreach (var v in context.Relations)
-            {
-                var item = v.ToModel();
-                res.Add(item);
-            }
-            return Task.FromResult<IEnumerable<Relation>>(res);
+            return Task.FromResult<IEnumerable<Relation>>(context.Relations.Select(x => x.ToModel()).ToArray());
         }
 
-        public async Task<int> Update(int id, Relation data)
+        public async Task<int?> Update(int id, Relation data)
         {
-            var item = await context.Relations.FindAsync(id);
-            if (item != null)
-            {
-                var td = Models.Relation.FromModel(data);
-
-                item.From = data.From;
-                item.To = data.To;
-                item.Color = td.Color;
-
-                context.Relations.Update(item);
-                await context.SaveChangesAsync();
-                return data.Id;
-            }
-            return -1;
+            var raw = await context.Relations.FindAsync(id);
+            if (raw == null) return null;
+            var value = Models.Relation.FromModel(data);
+            raw.From = value.From;
+            raw.To = value.To;
+            context.Relations.Update(raw);
+            await context.SaveChangesAsync();
+            return raw.Id;
         }
     }
 }

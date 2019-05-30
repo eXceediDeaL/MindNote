@@ -15,12 +15,6 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string Content { get; set; }
 
-        public string Extra { get; set; }
-
-        public DateTimeOffset CreationTime { get; set; }
-
-        public DateTimeOffset ModificationTime { get; set; }
-
         public Data.Node ToModel()
         {
             return new Data.Node
@@ -28,10 +22,6 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = Id,
                 Name = Name,
                 Content = Content,
-                Tags = null,
-                Extra = Extra,
-                CreationTime = CreationTime,
-                ModificationTime = ModificationTime,
             };
         }
 
@@ -42,9 +32,6 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = data.Id,
                 Name = data.Name,
                 Content = data.Content,
-                Extra = data.Extra,
-                CreationTime = data.CreationTime,
-                ModificationTime = data.ModificationTime,
             };
             return res;
         }

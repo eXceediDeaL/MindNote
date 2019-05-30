@@ -7,38 +7,17 @@ namespace MindNote.Data.Providers.SqlServer
 {
     public class SqlServerProvider : IDataProvider
     {
-        NodesProvider nodes;
-        StructsProvider structs;
-        TagsProvider tags;
-        RelationsProvider relations;
+        readonly NodesProvider nodes;
+        readonly RelationsProvider relations;
 
         public SqlServerProvider(DataContext context)
         {
             nodes = new NodesProvider(context, this);
-            structs = new StructsProvider(context, this);
-            tags = new TagsProvider(context, this);
             relations = new RelationsProvider(context, this);
         }
 
-        public INodesProvider GetNodesProvider() => nodes;
+        public INodesProvider NodesProvider => nodes;
 
-        public IRelationsProvider GetRelationsProvider() => relations;
-
-        public IStructsProvider GetStructsProvider() => structs;
-
-        public ITagsProvider GetTagsProvider() => tags;
-    }
-
-    public class DataContextFactory : IDesignTimeDbContextFactory<DataContext>
-    {
-        public const string LocalConnection = "Server=(localdb)\\mssqllocaldb;Database=mndb;Trusted_Connection=True;MultipleActiveResultSets=true";
-
-        public DataContext CreateDbContext(string[] args)
-        {
-            DbContextOptionsBuilder<DataContext> optionsBuilder = new DbContextOptionsBuilder<DataContext>();
-            optionsBuilder.UseSqlServer(LocalConnection);
-
-            return new DataContext(optionsBuilder.Options);
-        }
+        public IRelationsProvider RelationsProvider => relations;
     }
 }

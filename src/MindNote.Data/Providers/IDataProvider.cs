@@ -4,12 +4,8 @@ namespace MindNote.Data.Providers
 {
     public interface IDataProvider
     {
-        INodesProvider GetNodesProvider();
+        INodesProvider NodesProvider { get; }
 
-        IStructsProvider GetStructsProvider();
-
-        ITagsProvider GetTagsProvider();
-
-        IRelationsProvider GetRelationsProvider();
+        IRelationsProvider RelationsProvider { get; }
     }
 }

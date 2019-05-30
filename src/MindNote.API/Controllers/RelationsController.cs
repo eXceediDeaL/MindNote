@@ -10,11 +10,11 @@ namespace MindNote.API.Controllers
     [ApiController]
     public class RelationsController : ControllerBase
     {
-        IRelationsProvider provider;
+        readonly IRelationsProvider provider;
 
         public RelationsController(IDataProvider provider)
         {
-            this.provider = provider.GetRelationsProvider();
+            this.provider = provider.RelationsProvider;
         }
 
         [HttpGet("All")]
@@ -36,13 +36,13 @@ namespace MindNote.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<int> Update(int id, Relation data)
+        public async Task<int?> Update(int id, Relation data)
         {
             return await provider.Update(id, data);
         }
 
         [HttpPost]
-        public async Task<int> Create([FromBody] Relation data)
+        public async Task<int?> Create([FromBody] Relation data)
         {
             return await provider.Create(data);
         }
