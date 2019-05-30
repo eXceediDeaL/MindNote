@@ -40,6 +40,18 @@ namespace MindNote.Server.API
                 }
             });
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+                    .AllowCredentials();
+                });
+            });
+
             services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.SqlServerProvider>();
             // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
 
@@ -90,6 +102,8 @@ namespace MindNote.Server.API
                 config.Path = "/api/swagger";
             });
             app.UseReDoc();
+
+            app.UseCors();
 
             app.UseHttpsRedirection();
             app.UseMvc();

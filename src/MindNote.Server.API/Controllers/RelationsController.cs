@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MindNote.Data;
 using MindNote.Data.Providers;
@@ -8,6 +9,7 @@ namespace MindNote.Server.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class RelationsController : ControllerBase
     {
         readonly IRelationsProvider provider;
