@@ -32,7 +32,8 @@ jobs:
       script:
         - dotnet build
         - dotnet test
-    - stage: docker test
+    - stage: docker
+      name: build and run images
       os: linux
       dist: xenial
       language: csharp
@@ -47,7 +48,8 @@ jobs:
         - curl http://localhost:8085
         - docker-compose stop
         - docker-compose logs
-    - stage: docker deploy
+    - if: branch = master AND NOT (type = pull_request)
+      name: deploy master image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker-compose build
@@ -56,3 +58,13 @@ jobs:
       - docker push $DOCKER_USERNAME/mindnote:api
       - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:host
       - docker push $DOCKER_USERNAME/mindnote:host
+    - if: branch = dev AND NOT (type = pull_request)
+      name: deploy dev image
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker-compose build
+      - docker images
+      - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:dev-api
+      - docker push $DOCKER_USERNAME/mindnote:dev-api
+      - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:dev-host
+      - docker push $DOCKER_USERNAME/mindnote:dev-host
