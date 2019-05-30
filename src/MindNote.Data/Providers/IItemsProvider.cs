@@ -21,4 +21,14 @@ namespace MindNote.Data.Providers
     public interface INodesProvider : IItemsProvider<Node> { }
 
     public interface IRelationsProvider : IItemsProvider<Relation> { }
+
+    public interface IUsersProvider : IItemsProvider<Identity.User>
+    {
+        Task<Identity.User> GetByName(string normalizedName);
+    }
+
+    public interface IRolesProvider : IItemsProvider<Identity.Role>
+    {
+        Task<Identity.Role> GetByName(string normalizedName);
+    }
 }

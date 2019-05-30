@@ -40,7 +40,7 @@ namespace MindNote.Server.API
                 }
             });
 
-            services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.SqlServerProvider>();
+            services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.DataProvider>();
             // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

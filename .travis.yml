@@ -56,6 +56,8 @@ jobs:
       - docker images
       - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:api
       - docker push $DOCKER_USERNAME/mindnote:api
+      - docker tag mindnote_identity:latest $DOCKER_USERNAME/mindnote:identity
+      - docker push $DOCKER_USERNAME/mindnote:identity
       - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:host
       - docker push $DOCKER_USERNAME/mindnote:host
     - if: branch = dev AND NOT (type = pull_request)
@@ -66,5 +68,7 @@ jobs:
       - docker images
       - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:dev-api
       - docker push $DOCKER_USERNAME/mindnote:dev-api
+      - docker tag mindnote_identity:latest $DOCKER_USERNAME/mindnote:dev-identity
+      - docker push $DOCKER_USERNAME/mindnote:dev-identity
       - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:dev-host
       - docker push $DOCKER_USERNAME/mindnote:dev-host

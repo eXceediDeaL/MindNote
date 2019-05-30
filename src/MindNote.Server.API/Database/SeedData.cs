@@ -19,7 +19,7 @@ namespace MindNote.Server.API.Database
             if (context.Nodes.Any())
                 return;
 
-            IDataProvider provider = new SqlServerProvider(context);
+            IDataProvider provider = new DataProvider(context);
             var ns = new List<int>();
             for (int i = 1; i < 7; i++)
             {

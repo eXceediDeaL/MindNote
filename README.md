@@ -25,7 +25,9 @@ curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-
 docker-compose up
 ```
 
-It will create a MySQL container, an API server container, and a host server container.
+It will create a MySQL container, an API server container, an identity server container, and a host server container.
 
-The host server listens to the port `8085`.
-The API server listens to the port `8090`. You can visit `api/swagger` to see the all APIs.
+- The host server listens to the port `9000`.
+- The API server listens to the port `8000`.
+  - You can visit `api/swagger` to see the all APIs.
+- The Identity server listens to the port `8050`.

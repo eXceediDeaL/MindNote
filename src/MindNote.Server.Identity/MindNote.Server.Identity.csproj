@@ -13,4 +13,10 @@
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.0.48" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <ProjectReference Include="..\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
+    <ProjectReference Include="..\MindNote.Data\MindNote.Data.csproj" />
+  </ItemGroup>
+
 </Project>
