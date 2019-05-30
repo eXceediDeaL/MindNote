@@ -54,8 +54,8 @@ namespace MindNote.Data.Providers.SqlServer
             var raw = await context.Nodes.FindAsync(id);
             if (raw == null) return null;
             var value = Models.Node.FromModel(data);
-            raw.Name = data.Name;
-            raw.Content = data.Content;
+            raw.Name = value.Name;
+            raw.Content = value.Content;
             context.Nodes.Update(raw);
             await context.SaveChangesAsync();
             return raw.Id;

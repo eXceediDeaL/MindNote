@@ -7,8 +7,8 @@ namespace MindNote.Data.Providers.SqlServer
 {
     public class SqlServerProvider : IDataProvider
     {
-        NodesProvider nodes;
-        RelationsProvider relations;
+        readonly NodesProvider nodes;
+        readonly RelationsProvider relations;
 
         public SqlServerProvider(DataContext context)
         {

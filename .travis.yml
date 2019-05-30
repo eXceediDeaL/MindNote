@@ -1,7 +1,10 @@
 jobs:
+  allow_failures:
+    - os: windows
   include:
     - os: windows
       language: bash
+      filter_secrets: false
       install:
         - choco install dotnetcore-sdk
         - choco install opencover.portable
@@ -29,7 +32,7 @@ jobs:
       script:
         - dotnet build
         - dotnet test
-    - stage: Docker Test
+    - stage: docker test
       os: linux
       dist: xenial
       language: csharp
@@ -44,13 +47,12 @@ jobs:
         - curl http://localhost:8085
         - docker-compose stop
         - docker-compose logs
-    - stage: Docker Deploy
+    - stage: docker deploy
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - docker build -t mindnote:api -f ./docker/api/Dockerfile .
-      - docker build -t mindnote:host -f ./docker/host/Dockerfile .
+      - docker-compose build
       - docker images
-      - docker tag mindnote:api $DOCKER_USERNAME/mindnote:api
+      - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:api
       - docker push $DOCKER_USERNAME/mindnote:api
-      - docker tag mindnote:host $DOCKER_USERNAME/mindnote:host
+      - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:host
       - docker push $DOCKER_USERNAME/mindnote:host

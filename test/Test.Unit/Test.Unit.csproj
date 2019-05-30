@@ -18,4 +18,11 @@
     <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MindNote.API\MindNote.API.csproj" />
+    <ProjectReference Include="..\..\src\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\MindNote.Data\MindNote.Data.csproj" />
+    <ProjectReference Include="..\..\src\MindNote.Host\MindNote.Host.csproj" />
+  </ItemGroup>
+
 </Project>
