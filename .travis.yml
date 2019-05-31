@@ -45,7 +45,7 @@ jobs:
         - docker-compose build
         - docker-compose up -d
         - sleep 60
-        - curl http://localhost:8085
+        - curl http://localhost:9050
         - docker-compose stop
         - docker-compose logs
     - if: branch = master AND NOT (type = pull_request)

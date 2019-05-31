@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MindNote.Data;
-using MindNote.Data.Providers;
-using MindNote.Data.Providers.SqlServer;
+using MindNote.Server.Identity.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +10,9 @@ namespace MindNote.Server.Identity.Database
 {
     public static class SeedData
     {
-        public static async Task Initialize(Data.Providers.SqlServer.Models.IdentityDataContext context)
+        public static Task Initialize(ApplicationDbContext context)
         {
-            
+            return Task.CompletedTask;
         }
     }
 }

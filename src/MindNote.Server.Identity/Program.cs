@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MindNote.Server.Identity.Data;
 
 namespace MindNote.Server.Identity
 {
@@ -15,7 +16,9 @@ namespace MindNote.Server.Identity
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var host = CreateWebHostBuilder(args).Build();
+            InitialDatabase(host).Wait();
+            host.Run();
         }
 
         public static async Task InitialDatabase(IWebHost host)
@@ -26,7 +29,7 @@ namespace MindNote.Server.Identity
 
                 try
                 {
-                    using (var context = services.GetRequiredService<Data.Providers.SqlServer.Models.IdentityDataContext>())
+                    using (var context = services.GetRequiredService<ApplicationDbContext>())
                     {
                         await context.Database.EnsureCreatedAsync();
                         await Database.SeedData.Initialize(context);

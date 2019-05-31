@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MindNote.Data;
 using MindNote.Data.Providers;
@@ -20,6 +21,7 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpGet("All")]
+        [Authorize]
         public async Task<IEnumerable<Node>> GetAll()
         {
             return await provider.GetAll();

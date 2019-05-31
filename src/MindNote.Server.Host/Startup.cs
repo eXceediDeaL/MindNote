@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +28,10 @@ namespace MindNote.Server.Host
         public void ConfigureServices(IServiceCollection services)
         {
             string apiServer = Configuration["API_SERVER"];
+            string identityServer = Configuration["IDENTITY_SERVER"];
             BaseClient.Url = apiServer;
+            BaseClient.IdentityUrl = identityServer;
+            Helpers.UserHelper.RegisterUrl = $"{identityServer}/Identity/Account/Register";
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -39,11 +44,44 @@ namespace MindNote.Server.Host
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = "Cookies";
+                    options.DefaultChallengeScheme = "oidc";
+                })
+            .AddCookie("Cookies")
+            .AddOpenIdConnect("oidc", options =>
+            {
+                options.SignInScheme = "Cookies";
+                options.Authority = identityServer;
+                options.RequireHttpsMetadata = false;
+
+                options.ClientId = "server.host";
+                options.ClientSecret = "secret";
+                options.ResponseType = "code id_token";
+
+                options.SaveTokens = true;
+                options.GetClaimsFromUserInfoEndpoint = true;
+
+                options.Scope.Add("api");
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
+                options.Scope.Add("email");
+                // options.Scope.Add("offline_access");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -56,6 +94,7 @@ namespace MindNote.Server.Host
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

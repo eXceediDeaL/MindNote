@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Server.Host.APIServer;
@@ -25,6 +26,7 @@ namespace MindNote.Server.Host.Pages.Relations
         {
             var rand = new Random();
             HttpClient httpclient = clientFactory.CreateClient();
+            httpclient.SetBearerToken(await HttpContext.GetTokenAsync("access_token"));
 
             NodesClient nsclient = new NodesClient(httpclient);
             var ns = await nsclient.GetAllAsync();

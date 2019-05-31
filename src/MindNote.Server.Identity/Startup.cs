@@ -10,14 +10,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MindNote.Server.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Data.Identity;
 
 namespace MindNote.Server.Identity
 {
     public class Startup
     {
+        public static string ServerHostUrl { get; set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,9 +30,16 @@ namespace MindNote.Server.Identity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             string connectString = Configuration["ConnectionString"];
             string dbType = Configuration["DBType"];
-            services.AddDbContext<Data.Providers.SqlServer.Models.DataContext>(options =>
+            services.AddDbContext<ApplicationDbContext>(options =>
             {
                 if (dbType == "MySQL")
                 {
@@ -41,57 +50,34 @@ namespace MindNote.Server.Identity
                     options.UseSqlServer(connectString);
                 }
             });
+            string serverHostUrl = Configuration["SERVERHOST_URL"];
+            ServerHostUrl = serverHostUrl;
 
-            services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.DataProvider>();
-
-            services.Configure<CookiePolicyOptions>(options =>
+            services.AddCors(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+                    .AllowCredentials();
+                });
             });
 
-            services.AddIdentity<User, Role>().AddDefaultTokenProviders().AddUserStore<Database.UserStore>().AddRoleStore<Database.RoleStore>();
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddDefaultUI(UIFramework.Bootstrap4)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 1;
-                options.Password.RequiredUniqueChars = 1;
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential()
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryApiResources(Config.GetApiResources())
+                .AddInMemoryClients(Config.GetClients(serverHostUrl))
+                .AddAspNetIdentity<IdentityUser>();
 
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
-
-                options.User.AllowedUserNameCharacters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = false;
-            });
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                // Cookie settings
-                options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-                options.LoginPath = "/Identity/Login";
-                options.AccessDeniedPath = "/Identity/AccessDenied";
-                options.SlidingExpiration = true;
-            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            /*
-            
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(Authorizations.Administrator, policy => policy.RequireUserName("Admin"));
-            });
-
-            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -109,11 +95,15 @@ namespace MindNote.Server.Identity
                 app.UseHsts();
             }
 
+            app.UseCors();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            app.UseAuthentication();
+            // app.UseAuthentication();
+
+            app.UseIdentityServer();
 
             app.UseMvc();
         }

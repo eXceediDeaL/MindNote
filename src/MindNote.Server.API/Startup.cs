@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NSwag;
+using NSwag.SwaggerGeneration.Processors.Security;
+using IdentityModel.Client;
 
 namespace MindNote.Server.API
 {
@@ -27,6 +32,7 @@ namespace MindNote.Server.API
         public void ConfigureServices(IServiceCollection services)
         {
             string connectString = Configuration["ConnectionString"];
+            string identityServer = Configuration["IDENTITY_SERVER"];
             string dbType = Configuration["DBType"];
             services.AddDbContext<Data.Providers.SqlServer.Models.DataContext>(options =>
             {
@@ -44,32 +50,72 @@ namespace MindNote.Server.API
             // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAuthorization();
+
+            services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
+            {
+                options.Authority = identityServer;
+                options.RequireHttpsMetadata = false;
+
+                options.Audience = "api";
+            });
+
+            DiscoveryResponse disco = null;
+            using (var client = new HttpClient())
+                disco = client.GetDiscoveryDocumentAsync(identityServer).Result;
+
             services.AddOpenApiDocument(config =>
             {
-                config.PostProcess = document =>
+                config.AddSecurity("bearer", Enumerable.Empty<string>(), new SwaggerSecurityScheme
                 {
-                    document.Info.Version = "v1";
-                    document.Info.Title = "MindNote API";
-                    document.Info.Description = "API for MindNote";
-                    document.Info.TermsOfService = "None";
-                    document.Info.Contact = new NSwag.SwaggerContact
+                    Type = SwaggerSecuritySchemeType.OAuth2,
+                    Description = "MindNote Identity",
+                    Flows = new OpenApiOAuthFlows()
                     {
-                        Name = "StardustDL",
-                        Email = string.Empty,
-                        Url = ""
+                        Password = new OpenApiOAuthFlow()
+                        {
+                            Scopes = new Dictionary<string, string>
+                            {
+                                { "api", "MindNote API" },
+                            },
+                            AuthorizationUrl = disco.IsError ? $"{identityServer}/connect/authorize" : disco.AuthorizeEndpoint,
+                            TokenUrl = disco.IsError ? $"{identityServer}/connect/token" : disco.TokenEndpoint,
+                        },
+                    }
+                });
+
+                config.OperationProcessors.Add(
+                    new AspNetCoreOperationSecurityScopeProcessor("bearer"));
+
+                config.PostProcess = document =>
+                    {
+                        document.Info.Version = "v1";
+                        document.Info.Title = "MindNote API";
+                        document.Info.Description = "API for MindNote";
+                        document.Info.TermsOfService = "None";
+                        document.Info.Contact = new NSwag.SwaggerContact
+                        {
+                            Name = "StardustDL",
+                            Email = string.Empty,
+                            Url = ""
+                        };
+                        /*document.Info.License = new NSwag.SwaggerLicense
+                        {
+                            Name = "Use under LICX",
+                            Url = "https://example.com/license"
+                        };*/
                     };
-                    /*document.Info.License = new NSwag.SwaggerLicense
-                    {
-                        Name = "Use under LICX",
-                        Url = "https://example.com/license"
-                    };*/
-                };
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -80,7 +126,10 @@ namespace MindNote.Server.API
                 app.UseHsts();
             }
 
-            app.UseSwagger(config =>
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
+
+            app.UseOpenApi(config =>
             {
                 config.Path = "/api/swagger/{documentName}/swagger.json";
             });
@@ -88,10 +137,12 @@ namespace MindNote.Server.API
             {
                 config.DocumentPath = "/api/swagger/{documentName}/swagger.json";
                 config.Path = "/api/swagger";
+                config.OAuth2Client = new NSwag.AspNetCore.OAuth2ClientSettings
+                {
+                    ClientId = "server.api",
+                };
             });
             app.UseReDoc();
-
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
