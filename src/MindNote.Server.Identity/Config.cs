@@ -1,4 +1,5 @@
-﻿using IdentityServer4;
+﻿using IdentityModel;
+using IdentityServer4;
 using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace MindNote.Server.Identity
         {
             return new List<ApiResource>
             {
-                new ApiResource(APIScope, "MindNote API")
+                new ApiResource(APIScope, "MindNote API", new string[]{ JwtClaimTypes.Profile, JwtClaimTypes.Id })
             };
         }
 
@@ -55,6 +56,7 @@ namespace MindNote.Server.Identity
                 new Client
                 {
                     ClientId="server.api",
+                    ClientSecrets = new [] { new Secret("secret".Sha256()) },
                     AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                     AllowedScopes = { APIScope },
                     AccessTokenLifetime = 10,

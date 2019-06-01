@@ -4,12 +4,12 @@
 // </auto-generated>
 //----------------------
 
-namespace MindNote.Server.Host.APIServer
+namespace MindNote.Client.API
 {
     #pragma warning disable
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "12.3.1.0 (NJsonSchema v9.14.1.0 (Newtonsoft.Json v11.0.0.0))")]
-    public partial class NodesClient : MindNote.Server.Host.APIServer.BaseClient
+    public partial class NodesClient : MindNote.Client.API.BaseClient
     {
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
@@ -444,7 +444,7 @@ namespace MindNote.Server.Host.APIServer
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "12.3.1.0 (NJsonSchema v9.14.1.0 (Newtonsoft.Json v11.0.0.0))")]
-    public partial class RelationsClient : MindNote.Server.Host.APIServer.BaseClient
+    public partial class RelationsClient : MindNote.Client.API.BaseClient
     {
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;

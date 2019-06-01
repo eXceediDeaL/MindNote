@@ -19,7 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E45973FE-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{69900DEC-F1E7-404B-8F1D-76D7BF6B7937}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindNote.Server.Identity", "src\MindNote.Server.Identity\MindNote.Server.Identity.csproj", "{39EFBD5C-D5D4-4668-B812-204866252F18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Server.Identity", "src\MindNote.Server.Identity\MindNote.Server.Identity.csproj", "{39EFBD5C-D5D4-4668-B812-204866252F18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MindNote.Client.API", "src\MindNote.Client.API\MindNote.Client.API.csproj", "{F5CCC216-4F33-4AE5-B702-BE56165B8970}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{39EFBD5C-D5D4-4668-B812-204866252F18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39EFBD5C-D5D4-4668-B812-204866252F18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39EFBD5C-D5D4-4668-B812-204866252F18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5CCC216-4F33-4AE5-B702-BE56165B8970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5CCC216-4F33-4AE5-B702-BE56165B8970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5CCC216-4F33-4AE5-B702-BE56165B8970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5CCC216-4F33-4AE5-B702-BE56165B8970}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

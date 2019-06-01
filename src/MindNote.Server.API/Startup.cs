@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
 using IdentityModel.Client;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MindNote.Server.API
 {
@@ -51,6 +52,8 @@ namespace MindNote.Server.API
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAuthorization();
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
             {
@@ -140,6 +143,7 @@ namespace MindNote.Server.API
                 config.OAuth2Client = new NSwag.AspNetCore.OAuth2ClientSettings
                 {
                     ClientId = "server.api",
+                    ClientSecret = "secret",
                 };
             });
             app.UseReDoc();

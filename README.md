@@ -21,7 +21,7 @@ Project Status:
 - Use the commands below to create containers:
 
 ```sh
-curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-compose.yml > docker-compose.yml
+curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-compose-production.yml > docker-compose.yml
 docker-compose up
 ```
 

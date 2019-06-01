@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Server.Host.APIServer;
+using MindNote.Client.API;
 
 namespace MindNote.Server.Host
 {

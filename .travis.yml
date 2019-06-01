@@ -48,7 +48,8 @@ jobs:
         - curl http://localhost:9050
         - docker-compose stop
         - docker-compose logs
-    - if: branch = master AND NOT (type = pull_request)
+    - stage: deploy
+      if: branch = master AND NOT (type = pull_request)
       name: deploy master image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

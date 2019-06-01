@@ -17,6 +17,8 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string Content { get; set; }
 
+        public string UserId { get; set; }
+
         public Data.Node ToModel()
         {
             return new Data.Node

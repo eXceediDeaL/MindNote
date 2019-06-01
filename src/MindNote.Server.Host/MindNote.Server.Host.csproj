@@ -20,6 +20,11 @@
   </ItemGroup>
 
 
+  <ItemGroup>
+    <ProjectReference Include="..\MindNote.Client.API\MindNote.Client.API.csproj" />
+  </ItemGroup>
+
+
   <ProjectExtensions><VisualStudio><UserProperties libman_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

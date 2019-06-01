@@ -18,12 +18,12 @@
     "MindNote.Server.Identity": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5050",
+      "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ConnectionString": "server=localhost;user id=root;password=sasa;port=3306;database=mniddb;",
         "DBType": "MySQL",
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "SERVERHOST_URL": "http://localhost:5100"
+        "SERVER_HOST": "http://localhost:5100"
       }
     }
   }

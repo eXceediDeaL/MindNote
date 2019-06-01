@@ -50,7 +50,7 @@ namespace MindNote.Server.Identity
                     options.UseSqlServer(connectString);
                 }
             });
-            string serverHostUrl = Configuration["SERVERHOST_URL"];
+            string serverHostUrl = Configuration["SERVER_HOST"];
             ServerHostUrl = serverHostUrl;
 
             services.AddCors(options =>

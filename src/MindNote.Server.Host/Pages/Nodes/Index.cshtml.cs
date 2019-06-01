@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MindNote.Server.Host.APIServer;
+using MindNote.Client.API;
 
 namespace MindNote.Server.Host.Pages.Nodes
 {

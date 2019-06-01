@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MindNote.Server.Host.APIServer;
+using MindNote.Client.API;
 using Newtonsoft.Json;
 
 namespace MindNote.Server.Host.Pages.Relations

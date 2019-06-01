@@ -1,11 +1,10 @@
-﻿using IdentityModel.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace MindNote.Server.Host.APIServer
+namespace MindNote.Client.API
 {
     public abstract class BaseClient
     {
