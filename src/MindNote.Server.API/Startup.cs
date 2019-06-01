@@ -125,6 +125,9 @@ namespace MindNote.Server.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            string pathBase = Configuration["PATH_BASE"];
+            app.UsePathBase(pathBase);
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -143,14 +146,9 @@ namespace MindNote.Server.API
             app.UseHttpsRedirection();
             app.UseAuthentication();
 
-            app.UseOpenApi(config =>
-            {
-                config.Path = "/api/swagger/{documentName}/swagger.json";
-            });
+            app.UseOpenApi();
             app.UseSwaggerUi3(config =>
             {
-                config.DocumentPath = "/api/swagger/{documentName}/swagger.json";
-                config.Path = "/api/swagger";
                 config.OAuth2Client = new NSwag.AspNetCore.OAuth2ClientSettings
                 {
                     ClientId = "server.api",

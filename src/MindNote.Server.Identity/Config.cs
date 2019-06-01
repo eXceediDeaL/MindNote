@@ -44,6 +44,8 @@ namespace MindNote.Server.Identity
                     RedirectUris = { $"{serverHostUrl}/signin-oidc" },
                     PostLogoutRedirectUris = { $"{serverHostUrl}/signout-callback-oidc" },
 
+                    AllowedCorsOrigins = { serverHostUrl },
+
                     AllowedScopes = new List<string>
                     {
                         IdentityServerConstants.StandardScopes.OpenId,

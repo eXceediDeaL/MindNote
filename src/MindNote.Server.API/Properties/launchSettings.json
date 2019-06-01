@@ -25,6 +25,7 @@
         "ConnectionString": "server=localhost;user id=root;password=sasa;port=3306;database=mndb;",
         "DBType": "MySQL",
         "IDENTITY_SERVER": "http://localhost:5000",
+        "PATH_BASE": "/",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:5050"

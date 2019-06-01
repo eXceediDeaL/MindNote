@@ -8,7 +8,7 @@ using MindNote.Data.Providers;
 
 namespace MindNote.Server.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     [Authorize]
     [EnableCors]

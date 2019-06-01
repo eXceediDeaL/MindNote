@@ -6,6 +6,7 @@ COPY ./src/MindNote.Server.Host/MindNote.Server.Host.csproj ./src/MindNote.Serve
 COPY ./src/MindNote.Server.API/MindNote.Server.API.csproj ./src/MindNote.Server.API/MindNote.Server.API.csproj
 COPY ./src/MindNote.Server.Identity/MindNote.Server.Identity.csproj ./src/MindNote.Server.Identity/MindNote.Server.Identity.csproj
 COPY ./src/MindNote.Data/MindNote.Data.csproj ./src/MindNote.Data/MindNote.Data.csproj
+COPY ./src/MindNote.Client.API/MindNote.Client.API.csproj ./src/MindNote.Client.API/MindNote.Client.API.csproj
 COPY ./src/MindNote.Client/MindNote.Client.csproj ./src/MindNote.Client/MindNote.Client.csproj
 COPY ./src/MindNote.Client.Host/MindNote.Client.Host.csproj ./src/MindNote.Client.Host/MindNote.Client.Host.csproj
 COPY ./src/MindNote.Data.Providers.SqlServer/MindNote.Data.Providers.SqlServer.csproj ./src/MindNote.Data.Providers.SqlServer/MindNote.Data.Providers.SqlServer.csproj

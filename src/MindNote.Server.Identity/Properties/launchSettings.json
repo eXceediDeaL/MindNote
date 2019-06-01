@@ -21,8 +21,10 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ConnectionString": "server=localhost;user id=root;password=sasa;port=3306;database=mniddb;",
+        "PATH_BASE": "/",
         "DBType": "MySQL",
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "IDENTITY_SERVER": "http://localhost:5000",
         "SERVER_HOST": "http://localhost:5100"
       }
     }

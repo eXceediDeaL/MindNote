@@ -52,6 +52,7 @@ namespace MindNote.Server.Identity
             });
             string serverHostUrl = Configuration["SERVER_HOST"];
             ServerHostUrl = serverHostUrl;
+            string identityServer = Configuration["IDENTITY_SERVER"];
 
             services.AddCors(options =>
             {
@@ -69,7 +70,9 @@ namespace MindNote.Server.Identity
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddIdentityServer()
+            services.AddIdentityServer(options => {
+                options.PublicOrigin = identityServer;
+            })
                 .AddDeveloperSigningCredential()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
@@ -83,6 +86,9 @@ namespace MindNote.Server.Identity
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            string pathBase = Configuration["PATH_BASE"];
+            app.UsePathBase(pathBase);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
