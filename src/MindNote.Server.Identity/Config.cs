@@ -51,9 +51,10 @@ namespace MindNote.Server.Identity
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Email,
+                        IdentityServerConstants.StandardScopes.OfflineAccess,
                         APIScope
                     },
-                    // AllowOfflineAccess = true
+                    AllowOfflineAccess = true
                 },
                 new Client
                 {

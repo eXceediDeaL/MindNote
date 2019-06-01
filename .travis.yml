@@ -47,7 +47,7 @@ jobs:
         - sleep 60
         - curl http://localhost:8100
         - docker-compose stop
-        - docker-compose logs
+        - docker-compose logs -t
     - stage: deploy
       if: branch = master AND NOT (type = pull_request)
       name: deploy master image

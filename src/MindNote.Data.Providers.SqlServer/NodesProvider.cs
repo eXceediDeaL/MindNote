@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MindNote.Data.Providers.SqlServer.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace MindNote.Data.Providers.SqlServer
 {
@@ -41,20 +42,20 @@ namespace MindNote.Data.Providers.SqlServer
             await context.SaveChangesAsync();
         }
 
-        public Task<Node> Get(int id, string userId = null)
+        public async Task<Node> Get(int id, string userId = null)
         {
             var query = context.Nodes.Where(x => x.Id == id);
             if (userId != null)
                 query = query.Where(x => x.UserId == userId);
-            return Task.FromResult((query.FirstOrDefault())?.ToModel());
+            return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public Task<IEnumerable<Node>> GetAll(string userId = null)
+        public async Task<IEnumerable<Node>> GetAll(string userId = null)
         {
             var query = context.Nodes.AsQueryable();
             if (userId != null)
                 query = query.Where(x => x.UserId == userId);
-            return Task.FromResult<IEnumerable<Node>>(query.Select(x => x.ToModel()).ToArray());
+            return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<int?> Update(int id, Node data, string userId = null)
@@ -67,6 +68,26 @@ namespace MindNote.Data.Providers.SqlServer
             context.Nodes.Update(raw);
             await context.SaveChangesAsync();
             return raw.Id;
+        }
+
+        public async Task<IEnumerable<Node>> Query(int? id, string name, string content, string userId = null)
+        {
+            var query = context.Nodes.AsQueryable();
+            if (userId != null)
+                query = query.Where(x => x.UserId == userId);
+            if (id.HasValue)
+            {
+                query = query.Where(item => item.Id == id.Value);
+            }
+            if (name != null)
+            {
+                query = query.Where(item => item.Name.Contains(name));
+            }
+            if (content != null)
+            {
+                query = query.Where(item => item.Content.Contains(content));
+            }
+            return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
     }
 }

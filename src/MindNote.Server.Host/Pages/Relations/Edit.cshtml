@@ -1,0 +1,65 @@
+﻿@page
+@model MindNote.Server.Host.Pages.Relations.EditModel
+@{
+    if (Model.IsNew)
+    {
+        ViewData["Title"] = "Create";
+    }
+    else
+    {
+        ViewData["Title"] = $"{Model.Data.Id} - Edit";
+    }
+    ViewData["Id"] = "Relations";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+    <li class="breadcrumb-item"><a asp-page="./Index">Relations</a></li>
+    @if (!Model.IsNew)
+    {
+        <li class="breadcrumb-item">
+            @Model.Data.Id
+        </li>
+        <li class="breadcrumb-item active">Edit</li>
+    }
+    else
+    {
+        <li class="breadcrumb-item active">Create</li>
+    }
+</ul>
+
+<form method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Id" />
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">From</span>
+        </div>
+        <input class="form-control" asp-for="PostData.Data.From" value="@Model.Data.From" />
+        <span asp-validation-for="PostData.Data.From" class="text-danger"></span>
+        <div class="input-group-append">
+            @if (Model.IsNew)
+            {
+                <button type="submit" asp-page-handler="Create" class="btn btn-success">
+                    <i class="fa fa-plus"></i>
+                </button>
+            }
+            else
+            {
+                <button type="submit" asp-page-handler="Edit" class="btn btn-primary">
+                    <i class="fa fa-save"></i>
+                </button>
+                <button type="submit" asp-page-handler="Delete" class="btn btn-danger">
+                    <i class="fa fa-trash"></i>
+                </button>
+            }
+        </div>
+    </div>
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">To</span>
+        </div>
+        <input class="form-control" asp-for="PostData.Data.To" value="@Model.Data.To" />
+        <span asp-validation-for="PostData.Data.To" class="text-danger"></span>
+    </div>
+</form>

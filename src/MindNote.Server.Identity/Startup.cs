@@ -108,7 +108,6 @@ namespace MindNote.Server.Identity
             app.UseCookiePolicy();
 
             // app.UseAuthentication();
-
             app.UseIdentityServer();
 
             app.UseMvc();

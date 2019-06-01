@@ -17,8 +17,4 @@ namespace MindNote.Data.Providers
 
         Task Clear(string userId = null);
     }
-
-    public interface INodesProvider : IItemsProvider<Node> { }
-
-    public interface IRelationsProvider : IItemsProvider<Relation> { }
 }

@@ -27,6 +27,12 @@ namespace MindNote.Server.API.Controllers
             return await provider.GetAll(Helpers.UserHelper.GetId(User));
         }
 
+        [HttpGet("Query")]
+        public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to)
+        {
+            return await provider.Query(id, from, to, Helpers.UserHelper.GetId(User));
+        }
+
         [HttpGet("{id}")]
         public async Task<Relation> Get(int id)
         {

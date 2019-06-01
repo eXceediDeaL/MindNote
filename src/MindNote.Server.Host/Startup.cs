@@ -32,6 +32,7 @@ namespace MindNote.Server.Host
             BaseClient.Url = apiServer;
             BaseClient.IdentityUrl = identityServer;
             Helpers.UserHelper.RegisterUrl = $"{identityServer}/Identity/Account/Register";
+            Helpers.ClientHelper.IdentityServer = identityServer;
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -41,7 +42,6 @@ namespace MindNote.Server.Host
             });
 
             services.AddHttpClient();
-
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -59,10 +59,9 @@ namespace MindNote.Server.Host
                 options.Authority = identityServer;
                 options.RequireHttpsMetadata = false;
 
-                options.ClientId = "server.host";
-                options.ClientSecret = "secret";
+                options.ClientId = Helpers.ClientHelper.ClientID;
+                options.ClientSecret = Helpers.ClientHelper.ClientSecret;
                 options.ResponseType = "code id_token";
-
                 options.SaveTokens = true;
                 options.GetClaimsFromUserInfoEndpoint = true;
 
@@ -70,7 +69,7 @@ namespace MindNote.Server.Host
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
                 options.Scope.Add("email");
-                // options.Scope.Add("offline_access");
+                options.Scope.Add("offline_access");
             });
         }
 

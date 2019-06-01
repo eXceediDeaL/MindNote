@@ -1,7 +1,5 @@
-function showSvg(svg, graph) {
-
-    var width = +svg.attr("width"),
-        height = +svg.attr("height");
+function showRelationsSvg(id, graph, width, height) {
+    const svg = d3.select("#" + id);
 
     var simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(function (d) { return d.id; }).strength(0.05))

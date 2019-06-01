@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MindNote.Data.Providers.SqlServer.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace MindNote.Data.Providers.SqlServer
 {
@@ -41,20 +42,20 @@ namespace MindNote.Data.Providers.SqlServer
             await context.SaveChangesAsync();
         }
 
-        public Task<Relation> Get(int id, string userId = null)
+        public async Task<Relation> Get(int id, string userId = null)
         {
             var query = context.Relations.Where(x => x.Id == id);
             if (userId != null)
                 query = query.Where(x => x.UserId == userId);
-            return Task.FromResult((query.FirstOrDefault())?.ToModel());
+            return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public Task<IEnumerable<Relation>> GetAll(string userId = null)
+        public async Task<IEnumerable<Relation>> GetAll(string userId = null)
         {
             var query = context.Relations.AsQueryable();
             if (userId != null)
                 query = query.Where(x => x.UserId == userId);
-            return Task.FromResult<IEnumerable<Relation>>(query.Select(x => x.ToModel()).ToArray());
+            return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<int?> Update(int id, Relation data, string userId = null)
@@ -67,6 +68,26 @@ namespace MindNote.Data.Providers.SqlServer
             context.Relations.Update(raw);
             await context.SaveChangesAsync();
             return raw.Id;
+        }
+
+        public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId = null)
+        {
+            var query = context.Relations.AsQueryable();
+            if (userId != null)
+                query = query.Where(x => x.UserId == userId);
+            if (id.HasValue)
+            {
+                query = query.Where(item => item.Id == id.Value);
+            }
+            if (from.HasValue)
+            {
+                query = query.Where(item => item.From == from.Value);
+            }
+            if (to.HasValue)
+            {
+                query = query.Where(item => item.To == to.Value);
+            }
+            return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
     }
 }
