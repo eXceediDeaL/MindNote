@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MindNote.Data;
 using MindNote.Data.Providers;
@@ -12,6 +13,7 @@ namespace MindNote.Server.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [EnableCors]
     public class NodesController : ControllerBase
     {
         readonly INodesProvider provider;

@@ -48,6 +48,17 @@ namespace MindNote.Server.API
             });
 
             services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.DataProvider>();
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+                    .AllowCredentials();
+                });
+            });
             // services.AddSingleton<Data.Providers.IDataProvider, Data.Providers.InMemoryProvider>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -147,6 +158,8 @@ namespace MindNote.Server.API
                 };
             });
             app.UseReDoc();
+
+            app.UseCors();
             app.UseMvc();
         }
     }
