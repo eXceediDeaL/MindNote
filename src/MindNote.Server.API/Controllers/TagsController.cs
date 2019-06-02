@@ -12,37 +12,37 @@ namespace MindNote.Server.API.Controllers
     [ApiController]
     [Authorize]
     [EnableCors]
-    public class RelationsController : ControllerBase
+    public class TagsController : ControllerBase
     {
-        readonly IRelationsProvider provider;
+        readonly ITagsProvider provider;
 
-        public RelationsController(IDataProvider provider)
+        public TagsController(IDataProvider provider)
         {
-            this.provider = provider.RelationsProvider;
+            this.provider = provider.TagsProvider;
         }
 
         [HttpGet("All")]
-        public async Task<IEnumerable<Relation>> GetAll()
+        public async Task<IEnumerable<Tag>> GetAll()
         {
             return await provider.GetAll(Helpers.UserHelper.GetId(User));
         }
 
-        [HttpGet("Adjacents/{nodeId}")]
-        public async Task<IEnumerable<Relation>> GetAdjacents(int nodeId)
-        {
-            return await provider.GetAdjacents(nodeId, Helpers.UserHelper.GetId(User));
-        }
-
         [HttpGet("Query")]
-        public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to)
+        public async Task<IEnumerable<Tag>> Query(int? id, string name, string color)
         {
-            return await provider.Query(id, from, to, Helpers.UserHelper.GetId(User));
+            return await provider.Query(id, name, color, Helpers.UserHelper.GetId(User));
         }
 
         [HttpGet("{id}")]
-        public async Task<Relation> Get(int id)
+        public async Task<Tag> Get(int id)
         {
             return await provider.Get(id, Helpers.UserHelper.GetId(User));
+        }
+
+        [HttpGet]
+        public async Task<Tag> GetByName(string name)
+        {
+            return await provider.GetByName(name, Helpers.UserHelper.GetId(User));
         }
 
         [HttpDelete("{id}")]
@@ -58,13 +58,13 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<int?> Update(int id, Relation data)
+        public async Task<int?> Update(int id, Tag data)
         {
             return await provider.Update(id, data, Helpers.UserHelper.GetId(User));
         }
 
         [HttpPost]
-        public async Task<int?> Create([FromBody] Relation data)
+        public async Task<int?> Create([FromBody] Tag data)
         {
             return await provider.Create(data, Helpers.UserHelper.GetId(User));
         }

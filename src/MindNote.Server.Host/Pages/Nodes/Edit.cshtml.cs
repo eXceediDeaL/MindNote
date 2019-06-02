@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MindNote.Client.API;
 using MindNote.Server.Host.Helpers;
 
@@ -18,7 +19,9 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public bool IsNew { get; set; }
 
-        public Node Data { get; set; }
+        public NodesViewModel Data { get; set; }
+
+        public List<SelectListItem> TagSelector { get; private set; }
 
         [BindProperty]
         public NodesPostModel PostData { get; set; }
@@ -28,13 +31,12 @@ namespace MindNote.Server.Host.Pages.Nodes
             this.clientFactory = clientFactory;
         }
 
-        async Task<bool> GetData(int id)
+        async Task<bool> GetData(HttpClient httpclient, int id)
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
             var client = new NodesClient(httpclient);
             try
             {
-                Data = await client.GetAsync(id);
+                Data = new NodesViewModel { Data = await client.GetAsync(id) };
             }
             catch
             {
@@ -46,23 +48,37 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
+            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
+
+            {
+                var tc = new TagsClient(httpclient);
+                var ts = await tc.GetAllAsync();
+                TagSelector = new List<SelectListItem>();
+                TagSelector.Add(new SelectListItem("No tag", "null"));
+                foreach (var v in ts)
+                    TagSelector.Add(new SelectListItem(v.Name, v.Id.ToString()));
+            }
+
             if (!id.HasValue)
             {
                 IsNew = true;
-                Data = new Node
+                Data = new NodesViewModel
                 {
-                    Name = "Untitled",
-                    Content = "",
+                    Data = new Node
+                    {
+                        Name = "Untitled",
+                        Content = "",
+                    }
                 };
-                PostData = new NodesPostModel { Data = Data };
+                PostData = new NodesPostModel { Data = Data.Data };
                 return Page();
             }
             else
             {
                 IsNew = false;
-                if (await GetData(id.Value))
+                if (await GetData(httpclient,id.Value))
                 {
-                    PostData = new NodesPostModel { Data = Data };
+                    PostData = new NodesPostModel { Data = Data.Data };
                     return Page();
                 }
                 else

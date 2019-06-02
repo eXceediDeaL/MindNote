@@ -1,8 +1,8 @@
 ﻿@page
-@model MindNote.Server.Host.Pages.Nodes.IndexModel
+@model MindNote.Server.Host.Pages.Tags.IndexModel
 @{
-    ViewData["Title"] = "Nodes";
-    ViewData["Id"] = "Nodes";
+    ViewData["Title"] = "Tags";
+    ViewData["Id"] = "Tags";
 }
 
 <ul class="breadcrumb">
@@ -16,10 +16,8 @@
         <input class="form-control" asp-for="PostData.QueryId" style="margin-left:10px; width:100px" />
         <label class="control-label" style="margin-left:10px">Name</label>
         <input class="form-control" asp-for="PostData.QueryName" style="margin-left:10px; width:150px" />
-        <label class="control-label" style="margin-left:10px">Content</label>
-        <input class="form-control" asp-for="PostData.QueryContent" style="margin-left:10px; width:150px" />
-        <label class="control-label" style="margin-left:10px">Tag</label>
-        <select class="form-control" asp-for="PostData.QueryTagId" asp-items="Model.TagSelector" style="margin-left:10px; width:150px"></select>
+        <label class="control-label" style="margin-left:10px">Color</label>
+        <input class="form-control" asp-for="PostData.QueryColor" style="margin-left:10px; width:150px" />
         <button type="submit" asp-page-handler="Query" class="btn btn-outline-dark" style="margin-left:10px">
             <i class="fa fa-search"></i>
         </button>
@@ -38,12 +36,6 @@
             <th>
                 Name
             </th>
-            <th>
-                Content
-            </th>
-            <th>
-                Tag
-            </th>
             <th style="width:10%">
                 Operations
             </th>
@@ -57,18 +49,9 @@
                     @item.Data.Id
                 </td>
                 <td>
-                    <a asp-page="./View" asp-route-id="@item.Data.Id">@item.Data.Name</a>
-                </td>
-                <td>
-                    @item.Data.Content
-                </td>
-                <td>
-                    @if (item.Tag != null)
-                    {
-                        <a asp-page="/Tags/View" asp-route-id="@item.Tag.Id">
-                            <tag-display value="@item.Tag"></tag-display>
-                        </a>
-                    }
+                    <a style="margin-left:5px" asp-page="./View" asp-route-id="@item.Data.Id">
+                        <tag-display value="@item.Data"></tag-display>
+                    </a>
                 </td>
                 <td>
                     <div class="row" style="margin-left:0px">

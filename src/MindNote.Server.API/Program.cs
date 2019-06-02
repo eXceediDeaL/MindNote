@@ -32,7 +32,7 @@ namespace MindNote.Server.API
                     using (var context = services.GetRequiredService<Data.Providers.SqlServer.Models.DataContext>())
                     {
                         await context.Database.EnsureCreatedAsync();
-                        await Database.SeedData.Initialize(context);
+                        // await Database.SeedData.Initialize(context);
                     }
                 }
                 catch (Exception ex)

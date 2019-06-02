@@ -1,9 +1,7 @@
 version: "3"
 services:
   host:
-    build:
-      context: .
-      dockerfile: ./docker/host/Dockerfile
+    image: stardustdl/mindnote:host
     environment:
       - API_SERVER=http://localhost:8050
       - IDENTITY_SERVER=http://localhost:8000
@@ -11,9 +9,7 @@ services:
       - ASPNETCORE_URLS=http://localhost:8100
     network_mode: "host"
   api:
-    build:
-      context: .
-      dockerfile: ./docker/api/Dockerfile
+    image: stardustdl/mindnote:api
     environment:
       - ConnectionString=server=localhost;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;
       - DBType=MySQL
@@ -24,9 +20,7 @@ services:
       - mndb
     network_mode: "host"
   identity:
-    build:
-      context: .
-      dockerfile: ./docker/identity/Dockerfile
+    image: stardustdl/mindnote:identity
     environment:
       - ConnectionString=server=localhost;userid=root;pwd=MNdb_passw00d;port=3306;database=mniddb;
       - DBType=MySQL

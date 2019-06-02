@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.API;
 using MindNote.Server.Host.Helpers;
 
-namespace MindNote.Server.Host.Pages.Relations
+namespace MindNote.Server.Host.Pages.Tags
 {
     [Authorize]
     public class EditModel : PageModel
@@ -18,10 +18,10 @@ namespace MindNote.Server.Host.Pages.Relations
 
         public bool IsNew { get; set; }
 
-        public RelationsViewModel Data { get; set; }
+        public TagsViewModel Data { get; set; }
 
         [BindProperty]
-        public RelationsPostModel PostData { get; set; }
+        public TagsPostModel PostData { get; set; }
 
         public EditModel(IHttpClientFactory clientFactory)
         {
@@ -31,10 +31,10 @@ namespace MindNote.Server.Host.Pages.Relations
         async Task<bool> GetData(int id)
         {
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new RelationsClient(httpclient);
+            var client = new TagsClient(httpclient);
             try
             {
-                Data = new RelationsViewModel { Data = await client.GetAsync(id) };
+                Data = new TagsViewModel { Data = await client.GetAsync(id) };
             }
             catch
             {
@@ -49,14 +49,15 @@ namespace MindNote.Server.Host.Pages.Relations
             if (!id.HasValue)
             {
                 IsNew = true;
-                Data = new RelationsViewModel
+                Data = new TagsViewModel
                 {
-                    Data = new Relation
+                    Data = new Tag
                     {
-                        From = 0,
-                        To = 0,
+                        Name = "Untitled-Tag",
+                        Color = "grey",
                     }
                 };
+                PostData = new TagsPostModel { Data = Data.Data };
                 return Page();
             }
             else
@@ -64,6 +65,7 @@ namespace MindNote.Server.Host.Pages.Relations
                 IsNew = false;
                 if (await GetData(id.Value))
                 {
+                    PostData = new TagsPostModel { Data = Data.Data };
                     return Page();
                 }
                 else
@@ -74,7 +76,7 @@ namespace MindNote.Server.Host.Pages.Relations
         public async Task<IActionResult> OnPostEditAsync()
         {
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new RelationsClient(httpclient);
+            var client = new TagsClient(httpclient);
             try
             {
                 await client.UpdateAsync(PostData.Data.Id, PostData.Data);
@@ -89,7 +91,7 @@ namespace MindNote.Server.Host.Pages.Relations
         public async Task<IActionResult> OnPostCreateAsync()
         {
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new RelationsClient(httpclient);
+            var client = new TagsClient(httpclient);
             try
             {
                 var id = await client.CreateAsync(PostData.Data);
@@ -104,7 +106,7 @@ namespace MindNote.Server.Host.Pages.Relations
         public async Task<IActionResult> OnPostDeleteAsync()
         {
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new RelationsClient(httpclient);
+            var client = new TagsClient(httpclient);
             try
             {
                 await client.DeleteAsync(PostData.Data.Id);

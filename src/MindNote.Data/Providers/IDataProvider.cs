@@ -7,5 +7,7 @@ namespace MindNote.Data.Providers
         INodesProvider NodesProvider { get; }
 
         IRelationsProvider RelationsProvider { get; }
+
+        ITagsProvider TagsProvider { get; }
     }
 }

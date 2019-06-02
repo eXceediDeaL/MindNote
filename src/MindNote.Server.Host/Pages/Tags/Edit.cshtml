@@ -1,5 +1,5 @@
 ﻿@page
-@model MindNote.Server.Host.Pages.Relations.EditModel
+@model MindNote.Server.Host.Pages.Tags.EditModel
 @{
     if (Model.IsNew)
     {
@@ -7,18 +7,18 @@
     }
     else
     {
-        ViewData["Title"] = $"{Model.Data.Data.Id} - Edit";
+        ViewData["Title"] = $"{Model.Data.Data.Name} - Edit";
     }
-    ViewData["Id"] = "Relations";
+    ViewData["Id"] = "Tags";
 }
 
 <ul class="breadcrumb">
     <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
-    <li class="breadcrumb-item"><a asp-page="./Index">Relations</a></li>
+    <li class="breadcrumb-item"><a asp-page="./Index">Tags</a></li>
     @if (!Model.IsNew)
     {
         <li class="breadcrumb-item">
-            @Model.Data.Data.Id
+            <a asp-page="./View" asp-route-id="@Model.Data.Data.Id">@Model.Data.Data.Id</a>
         </li>
         <li class="breadcrumb-item active">Edit</li>
     }
@@ -33,10 +33,10 @@
     <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />
     <div class="input-group" style="margin-top:10px">
         <div class="input-group-prepend">
-            <span class="input-group-text">From</span>
+            <span class="input-group-text">Name</span>
         </div>
-        <input class="form-control" asp-for="PostData.Data.From" value="@Model.Data.Data.From" />
-        <span asp-validation-for="PostData.Data.From" class="text-danger"></span>
+        <input class="form-control" asp-for="PostData.Data.Name" value="@Model.Data.Data.Name" />
+        <span asp-validation-for="PostData.Data.Name" class="text-danger"></span>
         <div class="input-group-append">
             @if (Model.IsNew)
             {
@@ -57,9 +57,9 @@
     </div>
     <div class="input-group" style="margin-top:10px">
         <div class="input-group-prepend">
-            <span class="input-group-text">To</span>
+            <span class="input-group-text">Color</span>
         </div>
-        <input class="form-control" asp-for="PostData.Data.To" value="@Model.Data.Data.To" />
-        <span asp-validation-for="PostData.Data.To" class="text-danger"></span>
+        <input class="form-control" asp-for="PostData.Data.Color" value="@Model.Data.Data.Color" type="color"/>
+        <span asp-validation-for="PostData.Data.Color" class="text-danger"></span>
     </div>
 </form>

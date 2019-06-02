@@ -46,8 +46,14 @@
                         </li>
                         <li class="nav-item @((string)ViewData["Id"] == "Relations" ? "active":"")" style="margin-left:10px;">
                             <a class="nav-link" asp-area="" asp-page="/Relations/Index">
-                                <i class="fa fa-list" style="margin-right:3px"></i>
+                                <i class="fa fa-magic" style="margin-right:3px"></i>
                                 Relations
+                            </a>
+                        </li>
+                        <li class="nav-item @((string)ViewData["Id"] == "Tags" ? "active":"")" style="margin-left:10px;">
+                            <a class="nav-link" asp-area="" asp-page="/Tags/Index">
+                                <i class="fa fa-tags" style="margin-right:3px"></i>
+                                Tags
                             </a>
                         </li>
                     </ul>

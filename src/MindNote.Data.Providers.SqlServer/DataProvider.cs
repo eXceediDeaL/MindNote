@@ -11,10 +11,13 @@ namespace MindNote.Data.Providers.SqlServer
         {
             NodesProvider = new NodesProvider(context, this);
             RelationsProvider = new RelationsProvider(context, this);
+            TagsProvider = new TagsProvider(context, this);
         }
 
         public INodesProvider NodesProvider { get; }
 
         public IRelationsProvider RelationsProvider { get; }
+
+        public ITagsProvider TagsProvider { get; }
     }
 }

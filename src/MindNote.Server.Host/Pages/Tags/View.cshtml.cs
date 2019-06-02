@@ -10,44 +10,40 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.API;
 using MindNote.Server.Host.Helpers;
 
-namespace MindNote.Server.Host.Pages.Nodes
+namespace MindNote.Server.Host.Pages.Tags
 {
     [Authorize]
     public class ViewModel : PageModel
     {
         private readonly IHttpClientFactory clientFactory;
 
-        public MarkdownPipelineBuilder MarkdownBuilder { get; private set; }
-
         public ViewModel(IHttpClientFactory clientFactory)
         {
             this.clientFactory = clientFactory;
-            MarkdownBuilder = new MarkdownPipelineBuilder().UseAdvancedExtensions();
         }
 
-        public NodesViewModel Data { get; set; }
+        public TagsViewModel Data { get; set; }
 
         [BindProperty]
-        public NodesPostModel PostData { get; set; }
+        public TagsPostModel PostData { get; set; }
 
         public string Graph { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
+            var client = new TagsClient(httpclient);
             var rsclient = new RelationsClient(httpclient);
             try
             {
-                Data = new NodesViewModel { Data = await client.GetAsync(id) };
-                await Data.LoadTag(httpclient);
-                var res = await rsclient.GetAdjacentsAsync(id);
-                if (res.Count > 0)
-                    Graph = await RelationHelper.GenerateGraph(httpclient, res);
-                else
+                Data = new TagsViewModel { Data = await client.GetAsync(id) };
+                Dictionary<int, Relation> rs = new Dictionary<int, Relation>();
+                /*foreach(var v in (await rsclient.QueryAsync(null, id, null)).Concat(await rsclient.QueryAsync(null, null, id)))
                 {
-                    Graph = await RelationHelper.GenerateGraph(httpclient, res, new Node[] { Data.Data });
-                }
+                    if (!rs.ContainsKey(v.Id))
+                        rs.Add(v.Id, v);
+                }*/
+                Graph = await RelationHelper.GenerateGraph(httpclient, rs.Values);
             }
             catch
             {
@@ -64,7 +60,7 @@ namespace MindNote.Server.Host.Pages.Nodes
                 return BadRequest();
             }
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
+            var client = new TagsClient(httpclient);
             try
             {
                 await client.DeleteAsync(PostData.Data.Id);

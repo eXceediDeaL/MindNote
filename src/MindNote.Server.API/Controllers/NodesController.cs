@@ -30,9 +30,9 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpGet("Query")]
-        public async Task<IEnumerable<Node>> Query(int? id, string name, string content)
+        public async Task<IEnumerable<Node>> Query(int? id, string name, string content, int? tagId)
         {
-            return await provider.Query(id, name, content, Helpers.UserHelper.GetId(User));
+            return await provider.Query(id, name, content, tagId, Helpers.UserHelper.GetId(User));
         }
 
         [HttpGet("{id}")]
@@ -45,6 +45,12 @@ namespace MindNote.Server.API.Controllers
         public async Task Delete(int id)
         {
             await provider.Delete(id, Helpers.UserHelper.GetId(User));
+        }
+
+        [HttpPut("Clear")]
+        public async Task Clear()
+        {
+            await provider.Clear(Helpers.UserHelper.GetId(User));
         }
 
         [HttpPut("{id}")]

@@ -7,7 +7,7 @@
     }
     else
     {
-        ViewData["Title"] = $"{Model.Data.Name} - Edit";
+        ViewData["Title"] = $"{Model.Data.Data.Name} - Edit";
     }
     ViewData["Id"] = "Nodes";
 }
@@ -18,7 +18,7 @@
     @if (!Model.IsNew)
     {
         <li class="breadcrumb-item">
-            <a asp-page="./View" asp-route-id="@Model.Data.Id">@Model.Data.Id</a>
+            <a asp-page="./View" asp-route-id="@Model.Data.Data.Id">@Model.Data.Data.Id</a>
         </li>
         <li class="breadcrumb-item active">Edit</li>
     }
@@ -30,12 +30,12 @@
 
 <form method="post" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Id" />
+    <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />
     <div class="input-group" style="margin-top:10px">
         <div class="input-group-prepend">
             <span class="input-group-text">Name</span>
         </div>
-        <input class="form-control" asp-for="PostData.Data.Name" value="@Model.Data.Name" />
+        <input class="form-control" asp-for="PostData.Data.Name" value="@Model.Data.Data.Name" />
         <span asp-validation-for="PostData.Data.Name" class="text-danger"></span>
         <div class="input-group-append">
             @if (Model.IsNew)
@@ -54,6 +54,13 @@
                 </button>
             }
         </div>
+    </div>
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Tag</span>
+        </div>
+        <select class="form-control" asp-for="PostData.Data.TagId" asp-items="Model.TagSelector"></select>
+        <span asp-validation-for="PostData.Data.TagId" class="text-danger"></span>
     </div>
     <style>
         div textarea {

@@ -49,20 +49,24 @@
         {
             <tr>
                 <td>
-                    @item.Id
+                    @item.Data.Id
                 </td>
                 <td>
-                    @item.From
+                    <a asp-page="/Nodes/View" asp-route-id="@item.Data.From">
+                        @item.Data.From
+                    </a>
                 </td>
                 <td>
-                    @item.To
+                    <a asp-page="/Nodes/View" asp-route-id="@item.Data.To">
+                        @item.Data.To
+                    </a>
                 </td>
                 <td>
                     <div class="row" style="margin-left:0px">
                         <form method="post" style="margin-left:0px">
-                            <input type="hidden" asp-for="PostData.Data.Id" value="@item.Id" />
+                            <input type="hidden" asp-for="PostData.Data.Id" value="@item.Data.Id" />
                             <div class="btn-group-sm">
-                                <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">
+                                <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
                                     <i class="fa fa-edit"></i>
                                 </a>
                                 <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger">

@@ -10,6 +10,8 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public string QueryContent { get; set; }
 
+        public int? QueryTagId { get; set; }
+
         public Node Data { get; set; }
     }
 }

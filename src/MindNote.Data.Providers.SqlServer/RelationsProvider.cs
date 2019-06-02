@@ -20,7 +20,10 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task Clear(string userId = null)
         {
-            context.Relations.RemoveRange(context.Relations);
+            var query = context.Relations.AsQueryable();
+            if (userId != null)
+                query = query.Where(x => x.UserId == userId);
+            context.Relations.RemoveRange(query);
             await context.SaveChangesAsync();
         }
 
@@ -48,6 +51,14 @@ namespace MindNote.Data.Providers.SqlServer
             if (userId != null)
                 query = query.Where(x => x.UserId == userId);
             return (await query.FirstOrDefaultAsync())?.ToModel();
+        }
+
+        public async Task<IEnumerable<Relation>> GetAdjacents(int nodeId, string userId = null)
+        {
+            var query = context.Relations.Where(x => x.From == nodeId || x.To == nodeId);
+            if (userId != null)
+                query = query.Where(x => x.UserId == userId);
+            return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<IEnumerable<Relation>> GetAll(string userId = null)

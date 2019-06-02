@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using MindNote.Client.API;
 using MindNote.Server.Host.Helpers;
-using Newtonsoft.Json;
 
-namespace MindNote.Server.Host.Pages.Relations
+namespace MindNote.Server.Host.Pages.Tags
 {
+
     [Authorize]
     public class IndexModel : PageModel
     {
@@ -23,31 +24,32 @@ namespace MindNote.Server.Host.Pages.Relations
             this.clientFactory = clientFactory;
         }
 
-        [BindProperty]
-        public RelationsPostModel PostData { get; set; }
-
-        public IEnumerable<RelationsViewModel> Data { get; set; }
-
-        public string Graph { get; set; }
+        public IList<TagsViewModel> Data { get; set; }
 
         public async Task OnGetAsync()
         {
-            HttpClient httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var rsclient = new RelationsClient(httpclient);
-            var nsclient = new NodesClient(httpclient);
-            var rs = await rsclient.GetAllAsync();
-            Data = rs.Select(x=>new RelationsViewModel { Data = x }).ToArray();
-            Graph = await RelationHelper.GenerateGraph(httpclient, rs, await nsclient.GetAllAsync());
+            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
+            var client = new TagsClient(httpclient);
+            var ms = await client.GetAllAsync();
+            Data = ms.Select(x => new TagsViewModel { Data = x }).ToList();
         }
+
+        [BindProperty]
+        public TagsPostModel PostData { get; set; }
 
         public async Task<IActionResult> OnPostQueryAsync()
         {
-            HttpClient httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var rsclient = new RelationsClient(httpclient);
-            var nsclient = new NodesClient(httpclient);
-            var ms = await rsclient.QueryAsync(PostData.QueryId, PostData.QueryFrom, PostData.QueryTo);
-            Data = ms.Select(x => new RelationsViewModel { Data = x }).ToArray();
-            Graph = await RelationHelper.GenerateGraph(httpclient, ms, await nsclient.GetAllAsync());
+            try
+            {
+                var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
+                var client = new TagsClient(httpclient);
+                var ms = await client.QueryAsync(PostData.QueryId, PostData.QueryName, PostData.QueryColor);
+                Data = ms.Select(x => new TagsViewModel { Data = x }).ToList();
+            }
+            catch
+            {
+                Data = Array.Empty<TagsViewModel>();
+            }
             return Page();
         }
 
@@ -59,7 +61,7 @@ namespace MindNote.Server.Host.Pages.Relations
             }
 
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            NodesClient client = new NodesClient(httpclient);
+            var client = new TagsClient(httpclient);
             try
             {
                 await client.DeleteAsync(PostData.Data.Id);

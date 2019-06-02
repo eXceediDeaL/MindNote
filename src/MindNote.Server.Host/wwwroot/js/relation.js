@@ -2,10 +2,10 @@ function showRelationsSvg(id, graph, width, height) {
     const svg = d3.select("#" + id);
 
     var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().id(function (d) { return d.id; }).strength(0.05))
-        .force("charge", d3.forceManyBody().strength(-100))
+        .force("link", d3.forceLink().id(function (d) { return d.id; }).strength(0.1))
+        .force("charge", d3.forceManyBody().strength(-30))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collide", d3.forceCollide(20).strength(0.2).iterations(5));
+        .force("collide", d3.forceCollide(20).strength(0.5).iterations(3));
 
     drag = simulation => {
 
@@ -48,7 +48,7 @@ function showRelationsSvg(id, graph, width, height) {
         .data(graph.nodes)
         .join("circle")
         .attr("r", 10)
-        .attr("fill", d => scale(Math.ceil(Math.random() * 10)))
+        .attr("fill", d => d.color)
         .call(drag(simulation));
 
     const node_text = svg.append("g")

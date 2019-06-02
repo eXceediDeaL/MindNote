@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace MindNote.Data
 {
-    public class Node
+    public class Tag
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public string Content { get; set; }
-
-        public int? TagId { get; set; }
+        public string Color { get; set; }
     }
 }

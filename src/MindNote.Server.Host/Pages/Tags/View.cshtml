@@ -1,8 +1,8 @@
 ﻿@page
-@model MindNote.Server.Host.Pages.Nodes.ViewModel
+@model MindNote.Server.Host.Pages.Tags.ViewModel
 @{
     ViewData["Title"] = Model.Data.Data.Name;
-    ViewData["Id"] = "Nodes";
+    ViewData["Id"] = "Tags";
 }
 
 @section header{
@@ -18,12 +18,15 @@
 
 <ul class="breadcrumb">
     <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
-    <li class="breadcrumb-item"><a asp-page="/Nodes/Index">Nodes</a></li>
+    <li class="breadcrumb-item"><a asp-page="/Nodes/Index">Tags</a></li>
     <li class="breadcrumb-item active">@Model.Data.Data.Id</li>
 </ul>
 
 <div class="row" style="margin-left:0px">
-    <h1 class="display-4">@Html.DisplayFor(model => model.Data.Data.Name)</h1>
+    <h1 class="display-4">
+        <span style="display:inline-block; border-radius:50%; height:24px; width:24px; position:relative; background-color:@(Model.Data.Data.Color ?? "grey")"></span>
+        <span style="margin-left: 10px">@Html.DisplayFor(model => model.Data.Data.Name)</span>
+    </h1>
     <button class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()" style="margin-left:20px; margin-top:auto; margin-bottom:auto">
         <i class="fa fa-expand"></i>
     </button>
@@ -31,17 +34,10 @@
 
 <div class="row" style="margin-top:20px">
     <div class="col-9" id="divMain">
-        @Html.Raw(Markdig.Markdown.ToHtml(Model.Data.Data.Content ?? "", Model.MarkdownBuilder.Build()))
+        
     </div>
     <div class="col-3" id="divSidebar">
         <dl>
-            @if (Model.Data.Tag != null)
-            {
-            <dt style="float:left; min-width:30px"><i class="fa fa-tag"></i></dt>
-                <a asp-page="/Tags/View" asp-route-id="@Model.Data.Tag.Id">
-                    <tag-display value="@Model.Data.Tag"></tag-display>
-                </a>
-            }
             <dd>
                 <form method="post" style="margin-left:0px; margin-top:10px;">
                     <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />

@@ -19,6 +19,8 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string UserId { get; set; }
 
+        public int? TagId { get; set; }
+
         public Data.Node ToModel()
         {
             return new Data.Node
@@ -26,6 +28,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = Id,
                 Name = Name,
                 Content = Content,
+                TagId = TagId,
             };
         }
 
@@ -36,6 +39,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = data.Id,
                 Name = data.Name,
                 Content = data.Content,
+                TagId = data.TagId,
             };
             return res;
         }
