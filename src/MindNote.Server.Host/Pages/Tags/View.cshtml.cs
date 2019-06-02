@@ -27,7 +27,7 @@ namespace MindNote.Server.Host.Pages.Tags
         [BindProperty]
         public TagsPostModel PostData { get; set; }
 
-        public string Graph { get; set; }
+        public RelationHelper.D3Graph Graph { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {

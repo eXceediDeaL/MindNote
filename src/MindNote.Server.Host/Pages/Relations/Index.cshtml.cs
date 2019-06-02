@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.API;
 using MindNote.Server.Host.Helpers;
+using MindNote.Server.Host.Pages.Shared;
 using Newtonsoft.Json;
 
 namespace MindNote.Server.Host.Pages.Relations
@@ -28,7 +29,7 @@ namespace MindNote.Server.Host.Pages.Relations
 
         public IEnumerable<RelationsViewModel> Data { get; set; }
 
-        public string Graph { get; set; }
+        public GraphViewModel Graph { get; set; } 
 
         public async Task OnGetAsync()
         {
@@ -37,7 +38,10 @@ namespace MindNote.Server.Host.Pages.Relations
             var nsclient = new NodesClient(httpclient);
             var rs = await rsclient.GetAllAsync();
             Data = rs.Select(x=>new RelationsViewModel { Data = x }).ToArray();
-            Graph = await RelationHelper.GenerateGraph(httpclient, rs, await nsclient.GetAllAsync());
+            Graph = new GraphViewModel
+            {
+                Graph = await RelationHelper.GenerateGraph(httpclient, rs, await nsclient.GetAllAsync())
+            };
         }
 
         public async Task<IActionResult> OnPostQueryAsync()
@@ -47,7 +51,10 @@ namespace MindNote.Server.Host.Pages.Relations
             var nsclient = new NodesClient(httpclient);
             var ms = await rsclient.QueryAsync(PostData.QueryId, PostData.QueryFrom, PostData.QueryTo);
             Data = ms.Select(x => new RelationsViewModel { Data = x }).ToArray();
-            Graph = await RelationHelper.GenerateGraph(httpclient, ms, await nsclient.GetAllAsync());
+            Graph = new GraphViewModel
+            {
+                Graph = await RelationHelper.GenerateGraph(httpclient, ms, await nsclient.GetAllAsync())
+            };
             return Page();
         }
 

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.API;
 using MindNote.Server.Host.Helpers;
+using MindNote.Server.Host.Pages.Shared;
 
 namespace MindNote.Server.Host.Pages.Nodes
 {
@@ -30,7 +31,7 @@ namespace MindNote.Server.Host.Pages.Nodes
         [BindProperty]
         public NodesPostModel PostData { get; set; }
 
-        public string Graph { get; set; }
+        public GraphViewModel Graph { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -43,10 +44,22 @@ namespace MindNote.Server.Host.Pages.Nodes
                 await Data.LoadTag(httpclient);
                 var res = await rsclient.GetAdjacentsAsync(id);
                 if (res.Count > 0)
-                    Graph = await RelationHelper.GenerateGraph(httpclient, res);
+                {
+                    var graph = await RelationHelper.GenerateGraph(httpclient, res);
+                    Graph = new GraphViewModel
+                    {
+                        Graph = graph,
+                        SelectNodeIndex = graph.nodes.IndexOf(graph.nodes.First(x => x.id == id)),
+                    };
+                }
                 else
                 {
-                    Graph = await RelationHelper.GenerateGraph(httpclient, res, new Node[] { Data.Data });
+                    var graph = await RelationHelper.GenerateGraph(httpclient, res, new Node[] { Data.Data });
+                    Graph = new GraphViewModel
+                    {
+                        Graph = graph,
+                        SelectNodeIndex = 0,
+                    };
                 }
             }
             catch

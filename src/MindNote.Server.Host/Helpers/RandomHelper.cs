@@ -11,7 +11,7 @@ namespace MindNote.Server.Host.Helpers
         public static string Color()
         {
             int r = rand.Next(256), g = rand.Next(256), b = rand.Next(256);
-            return String.Format("#{0:X}{1:X}{2:X}", r, g, b);
+            return String.Format("#{0:X2}{1:X2}{2:X2}", r, g, b);
         }
 
         public static T Choice<T>(IList<T> list)
