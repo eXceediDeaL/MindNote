@@ -4,6 +4,7 @@
 /.vscode/
 /resources/*
 /temp/*
+tempkey.rsa
 
 # User-specific files
 *.suo

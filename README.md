@@ -17,14 +17,19 @@ Project Status:
 
 # Usage
 
-- Install Docker and Docker-Compose
-- Use the commands below to create containers:
+1. Install Docker and Docker-Compose
+2. Get `docker-compose.yml`
 
 ```sh
-curl https://raw.githubusercontent.com/StardustDL/MindNote/dev/docker/docker-compose.yml > docker-compose.yml
-docker-compose up
+curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-compose-production.yml > docker-compose.yml
 ```
 
-It will create a MySQL container, an API server container, and a host server container.
+3. Replace `http://localhost` in `docker-compose.yml` with your host URL.
+4. Use `docker-compose up` to start containers.
 
-The host server listens to the port `8085`.
+It will create a MySQL container, an API server container, an identity server container, and a host server container.
+
+- The host server listens to the port `8100`.
+- The API server listens to the port `8050`.
+  - You can visit `swagger` to see the all APIs.
+- The Identity server listens to the port `8000`.

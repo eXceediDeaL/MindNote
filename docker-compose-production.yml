@@ -1,0 +1,38 @@
+version: "3"
+services:
+  host:
+    image: stardustdl/mindnote:host
+    environment:
+      - API_SERVER=http://localhost:8050
+      - IDENTITY_SERVER=http://localhost:8000
+      - PATH_BASE=/
+      - ASPNETCORE_URLS=http://localhost:8100
+    network_mode: "host"
+  api:
+    image: stardustdl/mindnote:api
+    environment:
+      - ConnectionString=server=localhost;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;
+      - DBType=MySQL
+      - PATH_BASE=/
+      - IDENTITY_SERVER=http://localhost:8000
+      - ASPNETCORE_URLS=http://localhost:8050
+    depends_on:
+      - mndb
+    network_mode: "host"
+  identity:
+    image: stardustdl/mindnote:identity
+    environment:
+      - ConnectionString=server=localhost;userid=root;pwd=MNdb_passw00d;port=3306;database=mniddb;
+      - DBType=MySQL
+      - SERVER_HOST=http://localhost:8100
+      - IDENTITY_SERVER=http://localhost:8000
+      - ASPNETCORE_URLS=http://localhost:8000
+    depends_on:
+      - mndb
+    network_mode: "host"
+  mndb:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=MNdb_passw00d
+    ports:
+      - "3306:3306"

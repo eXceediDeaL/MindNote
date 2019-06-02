@@ -45,10 +45,11 @@ jobs:
         - docker-compose build
         - docker-compose up -d
         - sleep 60
-        - curl http://localhost:8085
+        - curl http://localhost:8100
         - docker-compose stop
-        - docker-compose logs
-    - if: branch = master AND NOT (type = pull_request)
+        - docker-compose logs -t
+    - stage: deploy
+      if: branch = master AND NOT (type = pull_request)
       name: deploy master image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -56,9 +57,12 @@ jobs:
       - docker images
       - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:api
       - docker push $DOCKER_USERNAME/mindnote:api
+      - docker tag mindnote_identity:latest $DOCKER_USERNAME/mindnote:identity
+      - docker push $DOCKER_USERNAME/mindnote:identity
       - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:host
       - docker push $DOCKER_USERNAME/mindnote:host
-    - if: branch = dev AND NOT (type = pull_request)
+    - stage: deploy
+      if: branch = dev AND NOT (type = pull_request)
       name: deploy dev image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -66,5 +70,7 @@ jobs:
       - docker images
       - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:dev-api
       - docker push $DOCKER_USERNAME/mindnote:dev-api
+      - docker tag mindnote_identity:latest $DOCKER_USERNAME/mindnote:dev-identity
+      - docker push $DOCKER_USERNAME/mindnote:dev-identity
       - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:dev-host
       - docker push $DOCKER_USERNAME/mindnote:dev-host

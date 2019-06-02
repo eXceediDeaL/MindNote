@@ -8,6 +8,8 @@
 
         public int To { get; set; }
 
+        public string UserId { get; set; }
+
         public Data.Relation ToModel()
         {
             return new Data.Relation

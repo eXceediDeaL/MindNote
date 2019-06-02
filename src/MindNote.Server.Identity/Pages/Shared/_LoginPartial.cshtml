@@ -1,0 +1,35 @@
+﻿﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<ul class="navbar-nav">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">
+                <img gravatar="@(await UserManager.GetEmailAsync(await UserManager.GetUserAsync(User)))" size="24" default="mp" style="display:inline" class="rounded" />
+                <span style="margin-left:5px;">@User.Identity.Name</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <form method="post" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+                <button type="submit" class="nav-link btn btn-link text-dark">
+                    <i class="fa fa-sign-out-alt" style="margin-right:3px"></i>
+                    Logout
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@(Context.Request.PathBase + Context.Request.Path + Context.Request.QueryString)">
+                <i class="fa fa-sign-in-alt" style="margin-right:3px"></i>
+                Login
+            </a>
+        </li>
+    }
+</ul>

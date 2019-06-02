@@ -19,10 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\MindNote.API\MindNote.API.csproj" />
+    <ProjectReference Include="..\..\src\MindNote.Server.API\MindNote.Server.API.csproj" />
     <ProjectReference Include="..\..\src\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\MindNote.Data\MindNote.Data.csproj" />
-    <ProjectReference Include="..\..\src\MindNote.Host\MindNote.Host.csproj" />
+    <ProjectReference Include="..\..\src\MindNote.Server.Host\MindNote.Server.Host.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,123 @@
+﻿@page
+@model MindNote.Server.Host.Pages.Nodes.ViewModel
+@{
+    ViewData["Title"] = Model.Data.Data.Name;
+    ViewData["Id"] = "Nodes";
+}
+
+@section header{
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/highlight.js/styles/default.min.css">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/default.min.css"
+              asp-fallback-href="~/lib/highlight.js/styles/default.css"
+              crossorigin="anonymous" />
+    </environment>
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+    <li class="breadcrumb-item"><a asp-page="/Nodes/Index">Nodes</a></li>
+    <li class="breadcrumb-item active">@Model.Data.Data.Id</li>
+</ul>
+
+<div class="row" style="margin-left:0px">
+    <h1 class="display-4">@Html.DisplayFor(model => model.Data.Data.Name)</h1>
+    <button class="btn btn-sm btn-outline-secondary" onclick="toggleSidebar()" style="margin-left:20px; margin-top:auto; margin-bottom:auto">
+        <i class="fa fa-expand"></i>
+    </button>
+</div>
+
+<div class="row" style="margin-top:20px">
+    <div class="col-9" id="divMain">
+        @Html.Raw(Markdig.Markdown.ToHtml(Model.Data.Data.Content ?? "", Model.MarkdownBuilder.Build()))
+    </div>
+    <div class="col-3" id="divSidebar">
+        <dl>
+            @if (Model.Data.Tag != null)
+            {
+            <dt style="float:left; min-width:30px"><i class="fa fa-tag"></i></dt>
+                <a asp-page="/Tags/View" asp-route-id="@Model.Data.Tag.Id">
+                    <tag-display value="@Model.Data.Tag"></tag-display>
+                </a>
+            }
+            <dd>
+                <form method="post" style="margin-left:0px; margin-top:10px;">
+                    <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />
+                    <div class="btn-group-toggle">
+                        <a asp-page="./Edit" asp-route-id="@Model.Data.Data.Id" class="btn btn-outline-primary">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </form>
+            </dd>
+        </dl>
+        <br />
+        <div class="card border-0">
+            <div class="card-header border-0">
+                <a class="card-link" data-toggle="collapse" href="#divRelations">
+                    Relations
+                </a>
+            </div>
+            <div id="divRelations" class="collapse show">
+                <div style="text-align:center">
+                    <svg height="100%" width="100%" preserveAspectRatio="xMidYMid meet" id="svg" style="min-height:300px"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://d3js.org/d3.v5.js"></script>
+    <script src="~/js/relation.js"></script>
+    <script>
+        var o = document.getElementById("divRelations");
+        var h = o.offsetHeight;
+        var w = o.offsetWidth;
+
+        graph = @Html.Raw(Model.Graph);
+        showRelationsSvg("svg", graph, w, h);
+    </script>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+        tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+        });
+    </script>
+
+    <environment include="Development">
+        <script src="~/lib/highlight.js/highlight.min.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"
+                asp-fallback-src="~/lib/highlight.js/highlight.min.js"
+                crossorigin="anonymous"></script>
+    </environment>
+
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script>
+        var isSidebarShow = true;
+        function toggleSidebar() {
+            if (isSidebarShow) {
+                document.getElementById("divMain").className = "col-12";
+                document.getElementById("divSidebar").style = "display:none";
+                isSidebarShow = false;
+            }
+            else {
+                document.getElementById("divMain").className = "col-9";
+                document.getElementById("divSidebar").style = "";
+                isSidebarShow = true;
+            }
+        }
+    </script>
+}

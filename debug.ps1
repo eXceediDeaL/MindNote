@@ -4,7 +4,13 @@ if ($args.Count -eq 0) {
 else {
     switch ($args[0]) {
         "api" {
-            dotnet run -p ./src/MindNote.API
+            dotnet run -p ./src/MindNote.Server.API
+        }
+        "id" {
+            dotnet run -p ./src/MindNote.Server.Identity
+        }
+        "host" {
+            dotnet run -p ./src/MindNote.Server.Host
         }
         default {
             Write-Output "The type is not found."

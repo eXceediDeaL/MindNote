@@ -1,0 +1,100 @@
+﻿@page
+@model MindNote.Server.Host.Pages.Relations.IndexModel
+@{
+    ViewData["Title"] = "Relations";
+    ViewData["Id"] = "Relations";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+</ul>
+
+<div class="text-center" style="width:100%">
+    <form method="post" class="form-inline" style="display:inline-flex">
+        <label class="control-label">Id</label>
+        <input class="form-control" asp-for="PostData.QueryId" style="margin-left:10px; width:100px" />
+        <label class="control-label" style="margin-left:10px">From</label>
+        <input class="form-control" asp-for="PostData.QueryFrom" style="margin-left:10px; width:150px" />
+        <label class="control-label" style="margin-left:10px">To</label>
+        <input class="form-control" asp-for="PostData.QueryTo" style="margin-left:10px; width:150px" />
+        <button type="submit" asp-page-handler="Query" class="btn btn-outline-dark" style="margin-left:10px">
+            <i class="fa fa-search"></i>
+        </button>
+        <a asp-page="./Edit" class="btn btn-outline-success" style="margin-left:10px">
+            <i class="fa fa-plus"></i>
+        </a>
+    </form>
+</div>
+
+<table class="table table-hover" style="margin-top:10px">
+    <thead>
+        <tr>
+            <th style="width:6%">
+                Id
+            </th>
+            <th>
+                From
+            </th>
+            <th>
+                To
+            </th>
+            <th style="width:10%">
+                Operations
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Data)
+        {
+            <tr>
+                <td>
+                    @item.Data.Id
+                </td>
+                <td>
+                    <a asp-page="/Nodes/View" asp-route-id="@item.Data.From">
+                        @item.Data.From
+                    </a>
+                </td>
+                <td>
+                    <a asp-page="/Nodes/View" asp-route-id="@item.Data.To">
+                        @item.Data.To
+                    </a>
+                </td>
+                <td>
+                    <div class="row" style="margin-left:0px">
+                        <form method="post" style="margin-left:0px">
+                            <input type="hidden" asp-for="PostData.Data.Id" value="@item.Data.Id" />
+                            <div class="btn-group-sm">
+                                <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div id="divRelations" style="text-align:center">
+    <svg height="100%" width="100%" preserveAspectRatio="xMidYMid meet" style="min-height:600px;" id="svg"></svg>
+</div>
+
+
+@section Scripts {
+    <script src="https://d3js.org/d3.v5.js"></script>
+    <script src="~/js/relation.js"></script>
+    <script>
+        var o = document.getElementById("divRelations");
+        var h = o.offsetHeight;
+        var w = o.offsetWidth;
+
+        graph = @Html.Raw(Model.Graph);
+        showRelationsSvg("svg", graph, w, h);
+    </script>
+}

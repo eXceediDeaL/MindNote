@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -11,9 +12,14 @@ namespace MindNote.Data.Providers.SqlServer.Models
     {
         public int Id { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
         public string Content { get; set; }
+
+        public string UserId { get; set; }
+
+        public int? TagId { get; set; }
 
         public Data.Node ToModel()
         {
@@ -22,6 +28,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = Id,
                 Name = Name,
                 Content = Content,
+                TagId = TagId,
             };
         }
 
@@ -32,6 +39,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 Id = data.Id,
                 Name = data.Name,
                 Content = data.Content,
+                TagId = data.TagId,
             };
             return res;
         }
