@@ -97,9 +97,9 @@ namespace MindNote.Server.Host.Helpers
                         });
                     var link = subDic[t];
                     if (s == v.From)
-                        link.left = true;
-                    else
                         link.right = true;
+                    else
+                        link.left = true;
                 }
             }
 

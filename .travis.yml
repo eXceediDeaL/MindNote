@@ -55,11 +55,11 @@ jobs:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker-compose build
       - docker images
-      - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:api
+      - docker tag mindnote:api $DOCKER_USERNAME/mindnote:api
       - docker push $DOCKER_USERNAME/mindnote:api
-      - docker tag mindnote_identity:latest $DOCKER_USERNAME/mindnote:identity
+      - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:identity
       - docker push $DOCKER_USERNAME/mindnote:identity
-      - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:host
+      - docker tag mindnote:host $DOCKER_USERNAME/mindnote:host
       - docker push $DOCKER_USERNAME/mindnote:host
     - stage: deploy
       if: branch = dev AND NOT (type = pull_request)
@@ -68,9 +68,9 @@ jobs:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker-compose build
       - docker images
-      - docker tag mindnote_api:latest $DOCKER_USERNAME/mindnote:dev-api
+      - docker tag mindnote:api $DOCKER_USERNAME/mindnote:dev-api
       - docker push $DOCKER_USERNAME/mindnote:dev-api
-      - docker tag mindnote_identity:latest $DOCKER_USERNAME/mindnote:dev-identity
+      - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:dev-identity
       - docker push $DOCKER_USERNAME/mindnote:dev-identity
-      - docker tag mindnote_host:latest $DOCKER_USERNAME/mindnote:dev-host
+      - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
       - docker push $DOCKER_USERNAME/mindnote:dev-host

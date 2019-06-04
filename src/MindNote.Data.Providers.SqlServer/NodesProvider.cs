@@ -41,12 +41,11 @@ namespace MindNote.Data.Providers.SqlServer
         {
             var raw = await context.Nodes.FindAsync(id);
             if (raw == null || (userId != null && raw.UserId != userId)) return;
-            context.Nodes.Remove(raw);
             {
                 var provider = parent.RelationsProvider;
-                var ts = await provider.GetAdjacents(id, userId);
-                context.Relations.RemoveRange(ts.Select(x => Models.Relation.FromModel(x)));
+                await provider.ClearAdjacents(id, userId);
             }
+            context.Nodes.Remove(raw);
             await context.SaveChangesAsync();
         }
 

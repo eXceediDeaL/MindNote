@@ -61,6 +61,15 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
+        public async Task ClearAdjacents(int nodeId, string userId = null)
+        {
+            var query = context.Relations.Where(x => x.From == nodeId || x.To == nodeId);
+            if (userId != null)
+                query = query.Where(x => x.UserId == userId);
+            context.Relations.RemoveRange(query);
+            await context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Relation>> GetAll(string userId = null)
         {
             var query = context.Relations.AsQueryable();

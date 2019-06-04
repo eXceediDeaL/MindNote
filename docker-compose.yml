@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/host/Dockerfile
+    image: mindnote:host
     environment:
       - API_SERVER=http://localhost:8050
       - IDENTITY_SERVER=http://localhost:8000
@@ -15,6 +16,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/api/Dockerfile
+    image: mindnote:api
     environment:
       - ConnectionString=server=localhost;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;
       - DBType=MySQL
@@ -29,6 +31,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/identity/Dockerfile
+    image: mindnote:identity
     environment:
       - ConnectionString=server=localhost;userid=root;pwd=MNdb_passw00d;port=3306;database=mniddb;
       - DBType=MySQL

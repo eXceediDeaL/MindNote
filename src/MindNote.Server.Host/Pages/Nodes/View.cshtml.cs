@@ -18,12 +18,9 @@ namespace MindNote.Server.Host.Pages.Nodes
     {
         private readonly IHttpClientFactory clientFactory;
 
-        public MarkdownPipelineBuilder MarkdownBuilder { get; private set; }
-
         public ViewModel(IHttpClientFactory clientFactory)
         {
             this.clientFactory = clientFactory;
-            MarkdownBuilder = new MarkdownPipelineBuilder().UseAdvancedExtensions();
         }
 
         public NodesViewModel Data { get; set; }
@@ -33,6 +30,8 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public GraphViewModel Graph { get; set; }
 
+        public MarkdownViewModel Markdown { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
@@ -41,6 +40,7 @@ namespace MindNote.Server.Host.Pages.Nodes
             try
             {
                 Data = new NodesViewModel { Data = await client.GetAsync(id) };
+                Markdown = new MarkdownViewModel { Raw = Data.Data.Content };
                 await Data.LoadTag(httpclient);
                 var res = await rsclient.GetAdjacentsAsync(id);
                 if (res.Count > 0)

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.API;
 using MindNote.Server.Host.Helpers;
+using MindNote.Server.Host.Pages.Shared;
 
 namespace MindNote.Server.Host.Pages.Tags
 {
@@ -27,23 +28,32 @@ namespace MindNote.Server.Host.Pages.Tags
         [BindProperty]
         public TagsPostModel PostData { get; set; }
 
-        public RelationHelper.D3Graph Graph { get; set; }
+        public GraphViewModel Graph { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
             var client = new TagsClient(httpclient);
             var rsclient = new RelationsClient(httpclient);
+            var nsclient = new NodesClient(httpclient);
             try
             {
                 Data = new TagsViewModel { Data = await client.GetAsync(id) };
-                Dictionary<int, Relation> rs = new Dictionary<int, Relation>();
-                /*foreach(var v in (await rsclient.QueryAsync(null, id, null)).Concat(await rsclient.QueryAsync(null, null, id)))
                 {
-                    if (!rs.ContainsKey(v.Id))
-                        rs.Add(v.Id, v);
-                }*/
-                Graph = await RelationHelper.GenerateGraph(httpclient, rs.Values);
+                    Dictionary<int, Relation> rs = new Dictionary<int, Relation>();
+                    foreach (var v in await nsclient.QueryAsync(null, null, null, id))
+                    {
+                        foreach(var r in await rsclient.GetAdjacentsAsync(v.Id))
+                        {
+                            if (rs.ContainsKey(r.Id)) continue;
+                            rs.Add(r.Id, r);
+                        }
+                    }
+                    Graph = new GraphViewModel
+                    {
+                        Graph = await RelationHelper.GenerateGraph(httpclient, rs.Values)
+                    };
+                }
             }
             catch
             {
