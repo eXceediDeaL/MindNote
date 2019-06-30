@@ -13,8 +13,6 @@ namespace MindNote.Data
 
         public int? TagId { get; set; }
 
-        public string UserId { get; set; }
-
         public object Clone() => MemberwiseClone();
 
         public override bool Equals(object obj)
@@ -28,8 +26,7 @@ namespace MindNote.Data
                    Id == other.Id &&
                    Name == other.Name &&
                    Content == other.Content &&
-                   EqualityComparer<int?>.Default.Equals(TagId, other.TagId) &&
-                   UserId == other.UserId;
+                   EqualityComparer<int?>.Default.Equals(TagId, other.TagId);
         }
 
         public override int GetHashCode()
@@ -39,7 +36,6 @@ namespace MindNote.Data
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Content);
             hashCode = hashCode * -1521134295 + EqualityComparer<int?>.Default.GetHashCode(TagId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(UserId);
             return hashCode;
         }
 

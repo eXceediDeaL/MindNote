@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MindNote.Data.Providers.InMemory
@@ -28,14 +29,12 @@ namespace MindNote.Data.Providers.InMemory
         {
             var raw = new Model<Node>
             {
-                Data = data,
+                Data = (Node)data.Clone(),
                 UserId = userId,
             };
-            count++;
-            raw.Data.UserId = userId;
-            raw.Data.Id = count;
-            Data.Add(count, raw);
-            return Task.FromResult<int?>(count);
+            raw.Data.Id = Interlocked.Increment(ref count);
+            Data.Add(raw.Data.Id, raw);
+            return Task.FromResult<int?>(raw.Data.Id);
         }
 
         public Task<int?> Delete(int id, string userId = null)

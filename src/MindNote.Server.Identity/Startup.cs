@@ -90,6 +90,11 @@ namespace MindNote.Server.Identity
             string pathBase = Configuration["PATH_BASE"];
             app.UsePathBase(pathBase);
 
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -105,11 +110,6 @@ namespace MindNote.Server.Identity
             app.UseCors();
 
             app.UseHttpsRedirection();
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
