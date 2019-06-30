@@ -3,7 +3,7 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "font-awesome@5.8.1",
+      "library": "font-awesome@5.9.0",
       "destination": "wwwroot/lib/font-awesome/"
     },
     {
@@ -11,11 +11,11 @@
       "destination": "wwwroot/lib/twitter-bootstrap/"
     },
     {
-      "library": "jquery@3.3.1",
+      "library": "jquery@3.4.1",
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "library": "jquery-validate@1.19.0",
+      "library": "jquery-validate@1.19.1",
       "destination": "wwwroot/lib/jquery-validate/"
     },
     {
@@ -23,7 +23,7 @@
       "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
-      "library": "monaco-editor@0.17.0",
+      "library": "monaco-editor@0.17.1",
       "destination": "wwwroot/lib/monaco-editor/"
     },
     {

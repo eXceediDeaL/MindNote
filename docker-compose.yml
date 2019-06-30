@@ -5,37 +5,13 @@ services:
       context: .
       dockerfile: ./docker/host/Dockerfile
     image: mindnote:host
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://*:8100
-    network_mode: "host"
-    entrypoint: ["./wait-for-it.sh", "localhost:8050", "-t", "0", "--", "dotnet", "MindNote.Server.Host.dll"]
   api:
     build:
       context: .
       dockerfile: ./docker/api/Dockerfile
     image: mindnote:api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://*:8050
-    depends_on:
-      - mndb
-    network_mode: "host"
-    entrypoint: ["./wait-for-it.sh", "localhost:8000", "-t", "0", "--", "dotnet", "MindNote.Server.API.dll"]
   identity:
     build:
       context: .
       dockerfile: ./docker/identity/Dockerfile
     image: mindnote:identity
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://*:8000
-    depends_on:
-      - mndb
-    network_mode: "host"
-    entrypoint: ["./wait-for-it.sh", "localhost:3306", "-t", "0", "--", "dotnet", "MindNote.Server.Identity.dll"]
-  mndb:
-    image: mysql
-    network_mode: "host"
-    environment:
-      - MYSQL_ROOT_PASSWORD=MNdb_passw00d

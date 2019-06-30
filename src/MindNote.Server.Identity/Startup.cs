@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using MindNote.Server.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace MindNote.Server.Identity
 {
@@ -104,6 +105,12 @@ namespace MindNote.Server.Identity
             app.UseCors();
 
             app.UseHttpsRedirection();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

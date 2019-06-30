@@ -32,8 +32,7 @@ jobs:
       script:
         - dotnet build
         - dotnet test
-    - stage: docker
-      name: build and run images
+    - name: build and run images
       os: linux
       dist: xenial
       language: csharp
@@ -43,11 +42,16 @@ jobs:
         docker
       script:
         - docker-compose build
-        - docker-compose up -d
-        - sleep 60
-        - curl http://localhost:8100
-        - docker-compose stop
-        - docker-compose logs -t
+        - docker tag mindnote:api $DOCKER_USERNAME/mindnote:dev-api
+        - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:dev-identity
+        - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
+        - sudo sh -c "echo \"\n127.0.0.1 mindnote.com\n127.0.0.1 api.mindnote.com\n127.0.0.1 id.mindnote.com\" >> /etc/hosts"
+        - cd ./docker/test
+        - docker-compose up -d && sleep 20
+        - curl http://mindnote.com > /dev/null
+        - curl http://api.mindnote.com > /dev/null
+        - curl http://id.mindnote.com > /dev/null
+        - docker-compose stop && docker-compose logs -t
     - stage: deploy
       if: branch = master AND NOT (type = pull_request)
       name: deploy master image

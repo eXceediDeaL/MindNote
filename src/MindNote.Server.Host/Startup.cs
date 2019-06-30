@@ -96,6 +96,12 @@ namespace MindNote.Server.Host
             }
 
             app.UseHttpsRedirection();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
             app.UseAuthentication();
             app.UseStaticFiles();
             app.UseCookiePolicy();

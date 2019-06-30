@@ -12,8 +12,8 @@ Project Status:
 |-|-|
 |Repository|[![issue](https://img.shields.io/github/issues/StardustDL/MindNote.svg)](https://github.com/StardustDL/MindNote/issues/) [![pull requests](https://img.shields.io/github/issues-pr/StardustDL/MindNote.svg)](https://github.com/StardustDL/MindNote/pulls/)|
 |Dependencies|[![dependencies](https://img.shields.io/librariesio/github/StardustDL/MindNote.svg)](https://libraries.io/github/StardustDL/MindNote)|
-|Build|[![master](https://img.shields.io/travis/StardustDL/MindNote/master.svg?label=master)](https://travis-ci.org/StardustDL/MindNote) [![dev](https://img.shields.io/travis/StardustDL/MindNote/dev.svg?label=dev)](https://travis-ci.org/StardustDL/MindNote)|
-|Coverage|[![master](https://img.shields.io/codecov/c/github/StardustDL/MindNote/master.svg?label=master)](https://codecov.io/gh/StardustDL/MindNote) [![dev](https://img.shields.io/codecov/c/github/StardustDL/MindNote/dev.svg?label=dev)](https://codecov.io/gh/StardustDL/MindNote)|
+|Build|[![master](https://img.shields.io/travis/StardustDL/MindNote/master.svg?label=master)](https://travis-ci.org/StardustDL/MindNote) [![dev](https://img.shields.io/travis/StardustDL/MindNote/dev.svg?label=dev)](https://travis-ci.org/StardustDL/MindNote) [![test](https://img.shields.io/travis/StardustDL/MindNote/test.svg?label=test)](https://travis-ci.org/StardustDL/MindNote)|
+|Coverage|[![master](https://img.shields.io/codecov/c/github/StardustDL/MindNote/master.svg?label=master)](https://codecov.io/gh/StardustDL/MindNote) [![dev](https://img.shields.io/codecov/c/github/StardustDL/MindNote/dev.svg?label=dev)](https://codecov.io/gh/StardustDL/MindNote) [![test](https://img.shields.io/codecov/c/github/StardustDL/MindNote/test.svg?label=test)](https://codecov.io/gh/StardustDL/MindNote)|
 
 # Usage
 
@@ -27,9 +27,10 @@ curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-
 3. Replace `http://localhost` in `docker-compose.yml` with your host URL.
 4. Use `docker-compose up` to start containers.
 
-It will create a MySQL container, an API server container, an identity server container, and a host server container.
+It will create a MySQL container, an API server container, an identity server container, a host server container and a nginx server container for reverse proxy.
 
-- The host server listens to the port `8100`.
-- The API server listens to the port `8050`.
-  - You can visit `swagger` to see the all APIs.
-- The Identity server listens to the port `8000`.
+The default hostnames are:
+
+- `id.mindnote.com`
+- `api.mindnote.com`
+- `mindnote.com`
