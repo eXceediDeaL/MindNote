@@ -20,12 +20,9 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "API_SERVER": "http://localhost:5050",
-        "IDENTITY_SERVER": "http://localhost:5000",
-        "PATH_BASE": "/"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5100"
+      "applicationUrl": "http://localhost:8100"
     }
   }
 }

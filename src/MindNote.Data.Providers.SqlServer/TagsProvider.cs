@@ -50,10 +50,10 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task Delete(int id, string userId = null)
+        public async Task<int?> Delete(int id, string userId = null)
         {
             var raw = await context.Tags.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId)) return;
+            if (raw == null || (userId != null && raw.UserId != userId)) return null;
             context.Tags.Remove(raw);
             {
                 var queryNode = context.Nodes.AsQueryable();
@@ -63,6 +63,7 @@ namespace MindNote.Data.Providers.SqlServer
                 ClearNodeTag(queryNode);
             }
             await context.SaveChangesAsync();
+            return id;
         }
 
         public async Task<Tag> Get(int id, string userId = null)

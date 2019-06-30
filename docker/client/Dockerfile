@@ -1,27 +1,20 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
 WORKDIR /build
 
 COPY *.sln .
-COPY ./src/MindNote.Server.Host/MindNote.Server.Host.csproj ./src/MindNote.Server.Host/MindNote.Server.Host.csproj
-COPY ./src/MindNote.Server.API/MindNote.Server.API.csproj ./src/MindNote.Server.API/MindNote.Server.API.csproj
-COPY ./src/MindNote.Server.Identity/MindNote.Server.Identity.csproj ./src/MindNote.Server.Identity/MindNote.Server.Identity.csproj
-COPY ./src/MindNote.Data/MindNote.Data.csproj ./src/MindNote.Data/MindNote.Data.csproj
-COPY ./src/MindNote.Client.API/MindNote.Client.API.csproj ./src/MindNote.Client.API/MindNote.Client.API.csproj
-COPY ./src/MindNote.Client/MindNote.Client.csproj ./src/MindNote.Client/MindNote.Client.csproj
-COPY ./src/MindNote.Client.Host/MindNote.Client.Host.csproj ./src/MindNote.Client.Host/MindNote.Client.Host.csproj
-COPY ./src/MindNote.Data.Providers.SqlServer/MindNote.Data.Providers.SqlServer.csproj ./src/MindNote.Data.Providers.SqlServer/MindNote.Data.Providers.SqlServer.csproj
-COPY ./test/Test.Unit/Test.Unit.csproj ./test/Test.Unit/Test.Unit.csproj
+COPY ./src ./src
+COPY ./test ./test
 
 RUN dotnet restore
 
-COPY ./src ./src
+RUN cd ./src/MindNote.Client.Host && dotnet publish -c Release -o /build
 
-RUN cd ./src/MindNote.Client.Host && dotnet publish -c Release -o /build/out
-
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 WORKDIR /app
-COPY --from=build /build/out ./
+COPY --from=build /build ./
+COPY ./docker/wait-for-it.sh ./
+RUN chmod +x ./wait-for-it.sh
 
 EXPOSE 80/tcp
 
-ENTRYPOINT sleep 30 && dotnet MindNote.Client.Host.dll
+ENTRYPOINT ["dotnet", "MindNote.Client.Host.dll"]

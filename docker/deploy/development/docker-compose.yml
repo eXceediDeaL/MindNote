@@ -1,0 +1,42 @@
+version: "3"
+services:
+  host:
+    image: stardustdl/mindnote:dev-host
+    environment:
+      - API_SERVER=http://localhost:8050
+      - IDENTITY_SERVER=http://localhost:8000
+    depends_on:
+      - api
+    ports:
+      - "8100:80"
+    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Server.Host.dll"]
+  api:
+    image: stardustdl/mindnote:dev-api
+    environment:
+      - ConnectionString=server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;
+      - DBType=MySQL
+      - IDENTITY_SERVER=http://localhost:8000
+    depends_on:
+      - mndb
+      - identity
+    ports:
+      - "8050:80"
+    entrypoint: ["./wait-for-it.sh", "identity:80", "-t", "0", "--", "dotnet", "MindNote.Server.API.dll"]
+  identity:
+    image: stardustdl/mindnote:dev-identity
+    environment:
+      - ConnectionString=server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mniddb;
+      - DBType=MySQL
+      - IDENTITY_SERVER=http://localhost:8000
+      - SERVER_HOST=http://localhost:8100
+    depends_on:
+      - mndb
+    ports:
+      - "8000:80"
+    entrypoint: ["./wait-for-it.sh", "mndb:3306", "-t", "0", "--", "dotnet", "MindNote.Server.Identity.dll"]
+  mndb:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=MNdb_passw00d
+    volumes:
+      - "./db:/var/lib/mysql"

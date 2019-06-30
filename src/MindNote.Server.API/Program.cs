@@ -32,6 +32,7 @@ namespace MindNote.Server.API
                     using (var context = services.GetRequiredService<Data.Providers.SqlServer.Models.DataContext>())
                     {
                         await context.Database.EnsureCreatedAsync();
+                        await context.Database.MigrateAsync();
                         // await Database.SeedData.Initialize(context);
                     }
                 }

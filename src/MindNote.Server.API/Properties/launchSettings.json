@@ -20,15 +20,14 @@
     "MindNote.Server.API": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "/api/swagger",
+      "launchUrl": "swagger",
       "environmentVariables": {
         "ConnectionString": "server=localhost;user id=root;password=sasa;port=3306;database=mndb;",
         "DBType": "MySQL",
-        "IDENTITY_SERVER": "http://localhost:5000",
         "PATH_BASE": "/",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5050"
+      "applicationUrl": "http://localhost:8050"
     }
   }
 }

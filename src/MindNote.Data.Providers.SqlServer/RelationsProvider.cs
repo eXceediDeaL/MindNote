@@ -37,12 +37,13 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task Delete(int id, string userId = null)
+        public async Task<int?> Delete(int id, string userId = null)
         {
             var raw = await context.Relations.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId)) return;
+            if (raw == null || (userId != null && raw.UserId != userId)) return null;
             context.Relations.Remove(raw);
             await context.SaveChangesAsync();
+            return id;
         }
 
         public async Task<Relation> Get(int id, string userId = null)

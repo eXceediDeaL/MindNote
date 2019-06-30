@@ -46,9 +46,9 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task Delete(int id)
+        public async Task<int?> Delete(int id)
         {
-            await provider.Delete(id, Helpers.UserHelper.GetId(User));
+            return await provider.Delete(id, Helpers.UserHelper.GetId(User));
         }
 
         [HttpPut("Clear")]
