@@ -9,6 +9,6 @@ namespace MindNote.Data.Providers
 
         Task<IEnumerable<Relation>> GetAdjacents(int nodeId, string userId = null);
 
-        Task ClearAdjacents(int nodeId, string userId = null);
+        Task<int?> ClearAdjacents(int nodeId, string userId = null);
     }
 }

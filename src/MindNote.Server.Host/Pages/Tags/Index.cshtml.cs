@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using MindNote.Client.API;
+using MindNote.Client.SDK.API;
+using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
 
 namespace MindNote.Server.Host.Pages.Tags
@@ -17,20 +18,22 @@ namespace MindNote.Server.Host.Pages.Tags
     [Authorize]
     public class IndexModel : PageModel
     {
-        private readonly IHttpClientFactory clientFactory;
+        private readonly ITagsClient client;
+        private readonly IIdentityDataGetter idData;
 
-        public IndexModel(IHttpClientFactory clientFactory)
+        public IndexModel(ITagsClient client, IIdentityDataGetter idData)
         {
-            this.clientFactory = clientFactory;
+            this.client = client;
+            this.idData = idData;
         }
 
         public IList<TagsViewModel> Data { get; set; }
 
         public async Task OnGetAsync()
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new TagsClient(httpclient);
-            var ms = await client.GetAllAsync();
+            string token = await idData.GetAccessToken(this.HttpContext);
+
+            var ms = await client.GetAll(token);
             Data = ms.Select(x => new TagsViewModel { Data = x }).ToList();
         }
 
@@ -39,11 +42,11 @@ namespace MindNote.Server.Host.Pages.Tags
 
         public async Task<IActionResult> OnPostQueryAsync()
         {
+            string token = await idData.GetAccessToken(this.HttpContext);
             try
             {
-                var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-                var client = new TagsClient(httpclient);
-                var ms = await client.QueryAsync(PostData.QueryId, PostData.QueryName, PostData.QueryColor);
+
+                var ms = await client.Query(token, PostData.QueryId, PostData.QueryName, PostData.QueryColor);
                 Data = ms.Select(x => new TagsViewModel { Data = x }).ToList();
             }
             catch
@@ -60,11 +63,10 @@ namespace MindNote.Server.Host.Pages.Tags
                 return BadRequest();
             }
 
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new TagsClient(httpclient);
+            string token = await idData.GetAccessToken(this.HttpContext);
             try
             {
-                await client.DeleteAsync(PostData.Data.Id);
+                await client.Delete(token, PostData.Data.Id);
                 return RedirectToPage();
             }
             catch

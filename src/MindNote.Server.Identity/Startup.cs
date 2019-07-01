@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using MindNote.Server.Share.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MindNote.Server.Identity
 {
@@ -29,17 +30,8 @@ namespace MindNote.Server.Identity
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureDBServices(DBConfiguration db, IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            var db = DBConfiguration.Load(Configuration);
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 if (db.Type == DBType.MySql)
@@ -51,8 +43,10 @@ namespace MindNote.Server.Identity
                     options.UseSqlServer(db.ConnectionString);
                 }
             });
+        }
 
-            var server = LinkedServerConfiguration.Load(Configuration);
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
+        {
             ServerHostUrl = server.Host;
 
             services.AddCors(options =>
@@ -79,15 +73,33 @@ namespace MindNote.Server.Identity
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients(server.Host))
                 .AddAspNetIdentity<IdentityUser>();
-
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
+        {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            var db = DBConfiguration.Load(Configuration);
+            ConfigureDBServices(db, services);
+
+            var server = LinkedServerConfiguration.Load(Configuration);
+            ConfigureIdentityServices(server, services);
+
+            ConfigureFinalServices(Configuration, services);
+        }
+
+        public static void ConfigureApp(IConfiguration configuration, IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
@@ -117,6 +129,37 @@ namespace MindNote.Server.Identity
             app.UseIdentityServer();
 
             app.UseMvc();
+        }
+
+        static async Task InitializeDatabase(IServiceProvider provider)
+        {
+            using (var scope = provider.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+
+                try
+                {
+                    using (var context = services.GetRequiredService<ApplicationDbContext>())
+                    {
+                        await context.Database.EnsureCreatedAsync();
+                        await context.Database.MigrateAsync();
+                        await Database.SeedData.Initialize(context);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Startup>>();
+                    logger.LogError(ex, "An error occurred when create or migrate DB.");
+                }
+            }
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            ConfigureApp(Configuration, app, env);
+
+            InitializeDatabase(app.ApplicationServices).Wait();
         }
     }
 }

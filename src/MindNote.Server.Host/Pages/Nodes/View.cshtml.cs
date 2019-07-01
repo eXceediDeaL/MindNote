@@ -7,7 +7,9 @@ using Markdig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MindNote.Client.API;
+using MindNote.Client.SDK;
+using MindNote.Client.SDK.API;
+using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
 using MindNote.Server.Host.Pages.Shared;
 
@@ -16,11 +18,17 @@ namespace MindNote.Server.Host.Pages.Nodes
     [Authorize]
     public class ViewModel : PageModel
     {
-        private readonly IHttpClientFactory clientFactory;
+        private readonly INodesClient client;
+        private readonly IIdentityDataGetter idData;
+        private readonly ITagsClient tagsClient;
+        private readonly IRelationsClient relationsClient;
 
-        public ViewModel(IHttpClientFactory clientFactory)
+        public ViewModel(INodesClient client, ITagsClient tagsClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
         {
-            this.clientFactory = clientFactory;
+            this.client = client;
+            this.tagsClient = tagsClient;
+            this.relationsClient = relationsClient;
+            this.idData = idData;
         }
 
         public NodesViewModel Data { get; set; }
@@ -34,18 +42,16 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
-            var rsclient = new RelationsClient(httpclient);
+            string token = await idData.GetAccessToken(this.HttpContext);
             try
             {
-                Data = new NodesViewModel { Data = await client.GetAsync(id) };
+                Data = new NodesViewModel { Data = await client.Get(token, id) };
                 Markdown = new MarkdownViewModel { Raw = Data.Data.Content };
-                await Data.LoadTag(httpclient);
-                var res = await rsclient.GetAdjacentsAsync(id);
+                await Data.LoadTag(tagsClient, token);
+                var res = (await relationsClient.GetAdjacents(token, id)).ToList();
                 if (res.Count > 0)
                 {
-                    var graph = await RelationHelper.GenerateGraph(httpclient, res);
+                    var graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token);
                     Graph = new GraphViewModel
                     {
                         Graph = graph,
@@ -54,7 +60,7 @@ namespace MindNote.Server.Host.Pages.Nodes
                 }
                 else
                 {
-                    var graph = await RelationHelper.GenerateGraph(httpclient, res, new Node[] { Data.Data });
+                    var graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token, new Node[] { Data.Data });
                     Graph = new GraphViewModel
                     {
                         Graph = graph,
@@ -76,11 +82,10 @@ namespace MindNote.Server.Host.Pages.Nodes
             {
                 return BadRequest();
             }
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
+            string token = await idData.GetAccessToken(this.HttpContext);
             try
             {
-                await client.DeleteAsync(PostData.Data.Id);
+                await client.Delete(token, PostData.Data.Id);
                 return RedirectToPage("./Index");
             }
             catch

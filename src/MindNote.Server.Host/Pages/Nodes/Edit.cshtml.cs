@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MindNote.Client.API;
+using MindNote.Client.SDK.API;
+using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
 
 namespace MindNote.Server.Host.Pages.Nodes
@@ -15,7 +16,9 @@ namespace MindNote.Server.Host.Pages.Nodes
     [Authorize]
     public class EditModel : PageModel
     {
-        private readonly IHttpClientFactory clientFactory;
+        private readonly INodesClient client;
+        private readonly IIdentityDataGetter idData;
+        private readonly ITagsClient tagsClient;
 
         public bool IsNew { get; set; }
 
@@ -26,17 +29,18 @@ namespace MindNote.Server.Host.Pages.Nodes
         [BindProperty]
         public NodesPostModel PostData { get; set; }
 
-        public EditModel(IHttpClientFactory clientFactory)
+        public EditModel(INodesClient client, ITagsClient tagsClient, IIdentityDataGetter idData)
         {
-            this.clientFactory = clientFactory;
+            this.client = client;
+            this.tagsClient = tagsClient;
+            this.idData = idData;
         }
 
-        async Task<bool> GetData(HttpClient httpclient, int id)
+        async Task<bool> GetData(int id, string token)
         {
-            var client = new NodesClient(httpclient);
             try
             {
-                Data = new NodesViewModel { Data = await client.GetAsync(id) };
+                Data = new NodesViewModel { Data = await client.Get(token, id) };
             }
             catch
             {
@@ -48,13 +52,14 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
+            string token = await idData.GetAccessToken(this.HttpContext);
 
             {
-                var tc = new TagsClient(httpclient);
-                var ts = await tc.GetAllAsync();
-                TagSelector = new List<SelectListItem>();
-                TagSelector.Add(new SelectListItem("No tag", "null"));
+                var ts = await tagsClient.GetAll(token);
+                TagSelector = new List<SelectListItem>
+                {
+                    new SelectListItem("No tag", "null")
+                };
                 foreach (var v in ts)
                     TagSelector.Add(new SelectListItem(v.Name, v.Id.ToString()));
             }
@@ -76,7 +81,7 @@ namespace MindNote.Server.Host.Pages.Nodes
             else
             {
                 IsNew = false;
-                if (await GetData(httpclient,id.Value))
+                if (await GetData(id.Value, token))
                 {
                     PostData = new NodesPostModel { Data = Data.Data };
                     return Page();
@@ -88,11 +93,11 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnPostEditAsync()
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
+            string token = await idData.GetAccessToken(this.HttpContext);
+
             try
             {
-                await client.UpdateAsync(PostData.Data.Id, PostData.Data);
+                await client.Update(token, PostData.Data.Id, PostData.Data);
                 return RedirectToPage(new { id = PostData.Data.Id });
             }
             catch
@@ -103,11 +108,11 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
+            string token = await idData.GetAccessToken(this.HttpContext);
+
             try
             {
-                var id = await client.CreateAsync(PostData.Data);
+                var id = await client.Create(token, PostData.Data);
                 return RedirectToPage(new { id });
             }
             catch
@@ -118,11 +123,11 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
+            string token = await idData.GetAccessToken(this.HttpContext);
+
             try
             {
-                await client.DeleteAsync(PostData.Data.Id);
+                await client.Delete(token, PostData.Data.Id);
                 return RedirectToPage("./Index");
             }
             catch

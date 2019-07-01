@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using MindNote.Client.API;
+using MindNote.Client.SDK;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -17,7 +17,7 @@ namespace MindNote.Server.Host.Helpers
         internal const string ClientID = "server.host";
         internal const string ClientSecret = "secret";
 
-        public static async Task<HttpClient> CreateAuthorizedClientAsync(this IHttpClientFactory clientFactory, PageModel page)
+        /*public static async Task<HttpClient> CreateAuthorizedClientAsync(this IHttpClientFactory clientFactory, PageModel page)
         {
             HttpClient httpclient = clientFactory.CreateClient();
             httpclient.SetBearerToken(await page.HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken));
@@ -79,6 +79,6 @@ namespace MindNote.Server.Host.Helpers
                 }
             }
             return httpclient;
-        }
+        }*/
     }
 }

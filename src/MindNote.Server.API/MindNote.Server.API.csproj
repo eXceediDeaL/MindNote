@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MindNote.Client.SDK\MindNote.Client.SDK.csproj" />
     <ProjectReference Include="..\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
     <ProjectReference Include="..\MindNote.Data\MindNote.Data.csproj" />
     <ProjectReference Include="..\MindNote.Server.Share\MindNote.Server.Share.csproj" />

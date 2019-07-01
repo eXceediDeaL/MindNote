@@ -1,4 +1,4 @@
-﻿using MindNote.Client.API;
+﻿using MindNote.Client.SDK.API;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,10 +10,9 @@ namespace MindNote.Server.Host.Helpers
 {
     public class RelationHelper
     {
-        public static async Task<IEnumerable<Node>> GetNodes(HttpClient httpclient, IEnumerable<Relation> relations)
+        public static async Task<IEnumerable<Node>> GetNodes(INodesClient client, IEnumerable<Relation> relations, string token)
         {
             if (relations == null) return Array.Empty<Node>();
-            NodesClient nsclient = new NodesClient(httpclient);
             HashSet<int> ns = new HashSet<int>();
             foreach (var v in relations)
             {
@@ -23,7 +22,7 @@ namespace MindNote.Server.Host.Helpers
             List<Node> res = new List<Node>();
             foreach (var v in ns)
             {
-                res.Add(await nsclient.GetAsync(v));
+                res.Add(await client.Get(token, v));
             }
             return res;
         }
@@ -50,18 +49,16 @@ namespace MindNote.Server.Host.Helpers
             public IList<D3GraphNode> nodes;
         }
 
-        public static async Task<D3Graph> GenerateGraph(HttpClient httpclient, IEnumerable<Relation> relations, IEnumerable<Node> nodes = null)
+        public static async Task<D3Graph> GenerateGraph(INodesClient nodeC, ITagsClient tagC, IEnumerable<Relation> relations, string token, IEnumerable<Node> nodes = null)
         {
             var rand = new Random();
-            if (nodes == null) nodes = await GetNodes(httpclient, relations);
+            if (nodes == null) nodes = await GetNodes(nodeC, relations, token);
 
             var tags = new List<Tag>();
             {
-                var tc = new TagsClient(httpclient);
-
                 foreach (var v in nodes)
                 {
-                    tags.Add(v.TagId == null ? null : await tc.GetAsync(v.TagId.Value));
+                    tags.Add(v.TagId == null ? null : await tagC.Get(token, v.TagId.Value));
                 }
             }
 

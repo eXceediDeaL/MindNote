@@ -1,4 +1,4 @@
-﻿using MindNote.Client.API;
+﻿using MindNote.Client.SDK.API;
 
 namespace MindNote.Server.Host.Pages.Nodes
 {

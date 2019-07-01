@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using MindNote.Client.API;
+using MindNote.Client.SDK.API;
 
 namespace MindNote.Server.Host.TagHelpers
 {

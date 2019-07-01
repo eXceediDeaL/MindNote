@@ -101,13 +101,13 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult(query.Where(x => x.From == nodeId || x.To == nodeId).Select(x => (Relation)x.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task ClearAdjacents(int nodeId, string userId = null)
+        public Task<int?> ClearAdjacents(int nodeId, string userId = null)
         {
             foreach (var v in GetAdjacents(nodeId, userId).Result.Select(x => x.Id).ToArray())
             {
                 Data.Remove(v);
             }
-            return Task.CompletedTask;
+            return Task.FromResult<int?>(nodeId);
         }
     }
 }

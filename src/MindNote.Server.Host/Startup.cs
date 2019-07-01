@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Client.API;
+using MindNote.Client.SDK;
+using MindNote.Client.SDK.API;
+using MindNote.Client.SDK.Identity;
 using MindNote.Server.Share.Configuration;
 
 namespace MindNote.Server.Host
@@ -25,33 +27,18 @@ namespace MindNote.Server.Host
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
         {
-            var server = LinkedServerConfiguration.Load(Configuration);
-            BaseClient.Url = server.Api;
-            BaseClient.IdentityUrl = server.Identity;
             Helpers.UserHelper.RegisterUrl = $"{server.Identity}/Identity/Account/Register";
             Helpers.ClientHelper.IdentityServer = server.Identity;
-
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            services.AddHttpClient();
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             services.AddAuthentication(options =>
-                {
-                    options.DefaultScheme = "Cookies";
-                    options.DefaultChallengeScheme = "oidc";
-                })
+            {
+                options.DefaultScheme = "Cookies";
+                options.DefaultChallengeScheme = "oidc";
+            })
             .AddCookie("Cookies")
             .AddOpenIdConnect("oidc", options =>
             {
@@ -73,15 +60,40 @@ namespace MindNote.Server.Host
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
+        {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            var server = LinkedServerConfiguration.Load(Configuration);
+            ConfigureIdentityServices(server, services);
+
+            services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();
+            services.AddScoped<INodesClient, NodesClient>(x => new NodesClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
+            services.AddScoped<ITagsClient, TagsClient>(x => new TagsClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
+            services.AddScoped<IRelationsClient, RelationsClient>(x => new RelationsClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
+
+            ConfigureFinalServices(Configuration, services);
+        }
+
+        public static void ConfigureApp(IConfiguration configuration, IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            if (env.IsDevelopment())
+            if (env?.IsDevelopment() == true)
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -95,10 +107,17 @@ namespace MindNote.Server.Host
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
+
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseMvc();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            ConfigureApp(Configuration, app, env);
         }
     }
 }

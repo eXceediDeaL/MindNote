@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using MindNote.Client.SDK.Identity;
 
 namespace MindNote.Server.API.Controllers
 {
@@ -11,6 +12,13 @@ namespace MindNote.Server.API.Controllers
     [EnableCors]
     public class HelpersController : ControllerBase
     {
+        IIdentityDataGetter identityDataGetter;
+
+        public HelpersController(IIdentityDataGetter identityDataGetter)
+        {
+            this.identityDataGetter = identityDataGetter;
+        }
+
         [HttpGet("Heartbeat")]
         public Task Heartbeat()
         {

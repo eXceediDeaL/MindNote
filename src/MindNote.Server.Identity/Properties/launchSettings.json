@@ -1,7 +1,7 @@
-﻿{
+{
   "iisSettings": {
-    "windowsAuthentication": false, 
-    "anonymousAuthentication": true, 
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:62507",
       "sslPort": 44365
@@ -17,13 +17,12 @@
     },
     "MindNote.Server.Identity": {
       "commandName": "Project",
+      "commandLineArgs": "db:Type=MSSqlServer",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:8000",
       "environmentVariables": {
-        "ConnectionString": "server=localhost;user id=root;password=sasa;port=3306;database=mniddb;",
-        "DBType": "MySQL",
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://localhost:8000"
     }
   }
 }

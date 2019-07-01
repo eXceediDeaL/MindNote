@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Test.Data
 {
-    class Tester
+    public class Tester
     {
         Random random;
         const int TestCount = 10;
