@@ -17,6 +17,11 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\MindNote.Server.Share\MindNote.Server.Share.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
     <Content Update="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

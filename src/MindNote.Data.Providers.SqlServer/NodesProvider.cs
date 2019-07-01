@@ -29,6 +29,14 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int?> Create(Node data, string userId = null)
         {
+            if (string.IsNullOrEmpty(data.Name))
+                return null;
+            if (data.TagId.HasValue)
+            {
+                if (await parent.TagsProvider.Get(data.TagId.Value, userId) == null)
+                    return null;
+            }
+
             var raw = Models.Node.FromModel(data);
             if (userId != null)
                 raw.UserId = userId;

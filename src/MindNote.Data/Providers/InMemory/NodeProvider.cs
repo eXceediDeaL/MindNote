@@ -25,8 +25,16 @@ namespace MindNote.Data.Providers.InMemory
             return Task.CompletedTask;
         }
 
-        public Task<int?> Create(Node data, string userId = null)
+        public async Task<int?> Create(Node data, string userId = null)
         {
+            if (string.IsNullOrEmpty(data.Name))
+                return null;
+            if (data.TagId.HasValue)
+            {
+                if (await parent.TagsProvider.Get(data.TagId.Value, userId) == null)
+                    return null;
+            }
+
             var raw = new Model<Node>
             {
                 Data = (Node)data.Clone(),
@@ -34,7 +42,7 @@ namespace MindNote.Data.Providers.InMemory
             };
             raw.Data.Id = Interlocked.Increment(ref count);
             Data.Add(raw.Data.Id, raw);
-            return Task.FromResult<int?>(raw.Data.Id);
+            return raw.Data.Id;
         }
 
         public Task<int?> Delete(int id, string userId = null)
@@ -62,7 +70,7 @@ namespace MindNote.Data.Providers.InMemory
             var query = Data.Values.AsEnumerable();
             if (userId != null)
                 query = query.Where(x => x.UserId == userId);
-            return Task.FromResult(query.Select(x => (Node)x.Data.Clone()));
+            return Task.FromResult(query.Select(x => (Node)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<IEnumerable<Node>> Query(int? id, string name, string content, int? tagId, string userId = null)
@@ -78,7 +86,7 @@ namespace MindNote.Data.Providers.InMemory
                 query = query.Where(x => x.Data.Content.Contains(content));
             if (tagId.HasValue)
                 query = query.Where(x => x.Data.TagId == tagId.Value);
-            return Task.FromResult(query.Select(x => (Node)x.Data.Clone()));
+            return Task.FromResult(query.Select(x => (Node)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<int?> Update(int id, Node data, string userId = null)

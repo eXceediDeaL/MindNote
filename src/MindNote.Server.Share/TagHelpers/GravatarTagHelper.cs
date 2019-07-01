@@ -2,7 +2,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace MindNote.Server.Identity.TagHelpers
+namespace MindNote.Server.Share.TagHelpers
 {
     [HtmlTargetElement("img", Attributes = nameof(Gravatar))]
     public class GravatarTagHelper : TagHelper

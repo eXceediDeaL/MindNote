@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MindNote.Client.API;
+using MindNote.Server.Share.Configuration;
 
 namespace MindNote.Server.Host
 {
@@ -27,12 +28,11 @@ namespace MindNote.Server.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string apiServer = Configuration["API_SERVER"];
-            string identityServer = Configuration["IDENTITY_SERVER"];
-            BaseClient.Url = apiServer;
-            BaseClient.IdentityUrl = identityServer;
-            Helpers.UserHelper.RegisterUrl = $"{identityServer}/Identity/Account/Register";
-            Helpers.ClientHelper.IdentityServer = identityServer;
+            var server = LinkedServerConfiguration.Load(Configuration);
+            BaseClient.Url = server.Api;
+            BaseClient.IdentityUrl = server.Identity;
+            Helpers.UserHelper.RegisterUrl = $"{server.Identity}/Identity/Account/Register";
+            Helpers.ClientHelper.IdentityServer = server.Identity;
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -56,7 +56,7 @@ namespace MindNote.Server.Host
             .AddOpenIdConnect("oidc", options =>
             {
                 options.SignInScheme = "Cookies";
-                options.Authority = identityServer;
+                options.Authority = server.Identity;
                 options.RequireHttpsMetadata = false;
 
                 options.ClientId = Helpers.ClientHelper.ClientID;
@@ -76,9 +76,6 @@ namespace MindNote.Server.Host
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            string pathBase = Configuration["PATH_BASE"];
-            app.UsePathBase(pathBase);
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto

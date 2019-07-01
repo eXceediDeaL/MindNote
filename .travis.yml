@@ -46,7 +46,7 @@ jobs:
         - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:dev-identity
         - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
         - sudo sh -c "echo \"\n127.0.0.1 mindnote.com\n127.0.0.1 api.mindnote.com\n127.0.0.1 id.mindnote.com\" >> /etc/hosts"
-        - cd ./docker/deploy/development
+        - cd ./docker/deploy
         - docker-compose up -d && sleep 20
         - curl http://mindnote.com > /dev/null
         - curl http://api.mindnote.com > /dev/null

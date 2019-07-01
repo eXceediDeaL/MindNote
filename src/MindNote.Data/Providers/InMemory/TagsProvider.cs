@@ -60,7 +60,7 @@ namespace MindNote.Data.Providers.InMemory
             var query = Data.Values.AsEnumerable();
             if (userId != null)
                 query = query.Where(x => x.UserId == userId);
-            return Task.FromResult(query.Select(x => (Tag)x.Data.Clone()));
+            return Task.FromResult(query.Select(x => (Tag)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<IEnumerable<Tag>> Query(int? id, string name, string color, string userId = null)
@@ -74,7 +74,7 @@ namespace MindNote.Data.Providers.InMemory
                 query = query.Where(x => x.Data.Name.Contains(name));
             if (color != null)
                 query = query.Where(x => x.Data.Color.Contains(color));
-            return Task.FromResult(query.Select(x => (Tag)x.Data.Clone()));
+            return Task.FromResult(query.Select(x => (Tag)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<int?> Update(int id, Tag data, string userId = null)

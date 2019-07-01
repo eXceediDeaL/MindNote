@@ -1,0 +1,17 @@
+{
+    "Logging": {
+      "LogLevel": {
+        "Default": "Warning"
+      }
+    },
+    "AllowedHosts": "*",
+    "server": {
+      "Identity": "http://id.mindnote.com",
+      "Host": "http://mindnote.com"
+    },
+    "db": {
+      "ConnectionString": "server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mniddb;",
+      "Type": "MySQL"
+    }
+  }
+  

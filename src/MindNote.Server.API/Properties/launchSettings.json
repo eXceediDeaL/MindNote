@@ -22,9 +22,6 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ConnectionString": "server=localhost;user id=root;password=sasa;port=3306;database=mndb;",
-        "DBType": "MySQL",
-        "PATH_BASE": "/",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:8050"

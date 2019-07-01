@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MindNote.Client.API\MindNote.Client.API.csproj" />
+    <ProjectReference Include="..\MindNote.Server.Share\MindNote.Server.Share.csproj" />
   </ItemGroup>
 
 

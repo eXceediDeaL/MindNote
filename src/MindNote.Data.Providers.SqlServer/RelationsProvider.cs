@@ -29,6 +29,10 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int?> Create(Relation data, string userId = null)
         {
+            if ((await parent.NodesProvider.Get(data.From, userId) == null) || (await parent.NodesProvider.Get(data.To, userId) == null))
+            {
+                return null;
+            }
             var raw = Models.Relation.FromModel(data);
             if (userId != null)
                 raw.UserId = userId;

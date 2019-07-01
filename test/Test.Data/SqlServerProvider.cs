@@ -35,7 +35,7 @@ namespace Test.Data
         }
 
         [TestMethod]
-        public void Relatioin()
+        public void Relation()
         {
             using (var context = CreateContext("sqlserver_test_relation"))
             {

@@ -14,6 +14,7 @@ using MindNote.Server.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
+using MindNote.Server.Share.Configuration;
 
 namespace MindNote.Server.Identity
 {
@@ -38,22 +39,21 @@ namespace MindNote.Server.Identity
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            string connectString = Configuration["ConnectionString"];
-            string dbType = Configuration["DBType"];
+            var db = DBConfiguration.Load(Configuration);
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                if (dbType == "MySQL")
+                if (db.Type == DBType.MySql)
                 {
-                    options.UseMySql(connectString);
+                    options.UseMySql(db.ConnectionString);
                 }
                 else
                 {
-                    options.UseSqlServer(connectString);
+                    options.UseSqlServer(db.ConnectionString);
                 }
             });
-            string serverHostUrl = Configuration["SERVER_HOST"];
-            ServerHostUrl = serverHostUrl;
-            string identityServer = Configuration["IDENTITY_SERVER"];
+
+            var server = LinkedServerConfiguration.Load(Configuration);
+            ServerHostUrl = server.Host;
 
             services.AddCors(options =>
             {
@@ -72,24 +72,23 @@ namespace MindNote.Server.Identity
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer(options => {
-                options.PublicOrigin = identityServer;
+                options.PublicOrigin = server.Identity;
             })
                 .AddDeveloperSigningCredential()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients(serverHostUrl))
+                .AddInMemoryClients(Config.GetClients(server.Host))
                 .AddAspNetIdentity<IdentityUser>();
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            string pathBase = Configuration["PATH_BASE"];
-            app.UsePathBase(pathBase);
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto

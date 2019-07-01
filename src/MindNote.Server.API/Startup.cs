@@ -17,6 +17,7 @@ using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
 using IdentityModel.Client;
 using System.IdentityModel.Tokens.Jwt;
+using MindNote.Server.Share.Configuration;
 
 namespace MindNote.Server.API
 {
@@ -32,22 +33,22 @@ namespace MindNote.Server.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectString = Configuration["ConnectionString"];
-            string identityServer = Configuration["IDENTITY_SERVER"];
-            string dbType = Configuration["DBType"];
+            var db = DBConfiguration.Load(Configuration);
             services.AddDbContext<Data.Providers.SqlServer.Models.DataContext>(options =>
             {
-                if (dbType == "MySQL")
+                if (db.Type == DBType.MySql)
                 {
-                    options.UseMySql(connectString);
+                    options.UseMySql(db.ConnectionString);
                 }
                 else
                 {
-                    options.UseSqlServer(connectString);
+                    options.UseSqlServer(db.ConnectionString);
                 }
             });
-
             services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.DataProvider>();
+
+            var server = LinkedServerConfiguration.Load(Configuration);
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -68,7 +69,7 @@ namespace MindNote.Server.API
 
             services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
             {
-                options.Authority = identityServer;
+                options.Authority = server.Identity;
                 options.RequireHttpsMetadata = false;
 
                 options.Audience = "api";
@@ -76,7 +77,7 @@ namespace MindNote.Server.API
 
             DiscoveryResponse disco = null;
             using (var client = new HttpClient())
-                disco = client.GetDiscoveryDocumentAsync(identityServer).Result;
+                disco = client.GetDiscoveryDocumentAsync(server.Identity).Result;
 
             services.AddOpenApiDocument(config =>
             {
@@ -92,8 +93,8 @@ namespace MindNote.Server.API
                             {
                                 { "api", "MindNote API" },
                             },
-                            AuthorizationUrl = disco.IsError ? $"{identityServer}/connect/authorize" : disco.AuthorizeEndpoint,
-                            TokenUrl = disco.IsError ? $"{identityServer}/connect/token" : disco.TokenEndpoint,
+                            AuthorizationUrl = disco.IsError ? $"{server.Identity}/connect/authorize" : disco.AuthorizeEndpoint,
+                            TokenUrl = disco.IsError ? $"{server.Identity}/connect/token" : disco.TokenEndpoint,
                         },
                     }
                 });
@@ -125,9 +126,6 @@ namespace MindNote.Server.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            string pathBase = Configuration["PATH_BASE"];
-            app.UsePathBase(pathBase);
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
