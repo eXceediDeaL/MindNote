@@ -2,12 +2,12 @@
 using System;
 using System.Security.Cryptography;
 
-namespace MindNote.Server.Identity.TagHelpers
+namespace MindNote.Server.Share.TagHelpers
 {
     [HtmlTargetElement("img", Attributes = nameof(Gravatar))]
     public class GravatarTagHelper : TagHelper
     {
-        static string ComputeHash(string input)
+        private static string ComputeHash(string input)
         {
             MD5CryptoServiceProvider MD5 = new MD5CryptoServiceProvider();
             byte[] inputArray = System.Text.Encoding.ASCII.GetBytes(input);

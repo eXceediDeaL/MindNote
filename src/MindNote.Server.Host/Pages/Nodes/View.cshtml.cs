@@ -1,28 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Markdig;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MindNote.Client.API;
+using MindNote.Client.SDK.API;
+using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
+using MindNote.Server.Host.Pages.Shared;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Nodes
 {
     [Authorize]
     public class ViewModel : PageModel
     {
-        private readonly IHttpClientFactory clientFactory;
+        private readonly INodesClient client;
+        private readonly IIdentityDataGetter idData;
+        private readonly ITagsClient tagsClient;
+        private readonly IRelationsClient relationsClient;
 
-        public MarkdownPipelineBuilder MarkdownBuilder { get; private set; }
-
-        public ViewModel(IHttpClientFactory clientFactory)
+        public ViewModel(INodesClient client, ITagsClient tagsClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
         {
-            this.clientFactory = clientFactory;
-            MarkdownBuilder = new MarkdownPipelineBuilder().UseAdvancedExtensions();
+            this.client = client;
+            this.tagsClient = tagsClient;
+            this.relationsClient = relationsClient;
+            this.idData = idData;
         }
 
         public NodesViewModel Data { get; set; }
@@ -30,23 +32,36 @@ namespace MindNote.Server.Host.Pages.Nodes
         [BindProperty]
         public NodesPostModel PostData { get; set; }
 
-        public string Graph { get; set; }
+        public GraphViewModel Graph { get; set; }
+
+        public MarkdownViewModel Markdown { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
-            var rsclient = new RelationsClient(httpclient);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
-                Data = new NodesViewModel { Data = await client.GetAsync(id) };
-                await Data.LoadTag(httpclient);
-                var res = await rsclient.GetAdjacentsAsync(id);
+                Data = new NodesViewModel { Data = await client.Get(token, id) };
+                Markdown = new MarkdownViewModel { Raw = Data.Data.Content };
+                await Data.LoadTag(tagsClient, token);
+                List<Relation> res = (await relationsClient.GetAdjacents(token, id)).ToList();
                 if (res.Count > 0)
-                    Graph = await RelationHelper.GenerateGraph(httpclient, res);
+                {
+                    RelationHelper.D3Graph graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token);
+                    Graph = new GraphViewModel
+                    {
+                        Graph = graph,
+                        SelectNodeIndex = graph.nodes.IndexOf(graph.nodes.First(x => x.id == id)),
+                    };
+                }
                 else
                 {
-                    Graph = await RelationHelper.GenerateGraph(httpclient, res, new Node[] { Data.Data });
+                    RelationHelper.D3Graph graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token, new Node[] { Data.Data });
+                    Graph = new GraphViewModel
+                    {
+                        Graph = graph,
+                        SelectNodeIndex = 0,
+                    };
                 }
             }
             catch
@@ -63,11 +78,10 @@ namespace MindNote.Server.Host.Pages.Nodes
             {
                 return BadRequest();
             }
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var client = new NodesClient(httpclient);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
-                await client.DeleteAsync(PostData.Data.Id);
+                await client.Delete(token, PostData.Data.Id);
                 return RedirectToPage("./Index");
             }
             catch

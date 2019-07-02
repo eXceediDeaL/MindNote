@@ -1,18 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MindNote.Server.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MindNote.Server.Identity.Data;
+using MindNote.Server.Share.Configuration;
+using System;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Identity
 {
@@ -27,33 +28,56 @@ namespace MindNote.Server.Identity
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureDBServices(DBConfiguration db, IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            string connectString = Configuration["ConnectionString"];
-            string dbType = Configuration["DBType"];
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                if (dbType == "MySQL")
+                if (db.Type == DBType.MySql)
                 {
-                    options.UseMySql(connectString);
+                    options.UseMySql(db.ConnectionString);
                 }
                 else
                 {
-                    options.UseSqlServer(connectString);
+                    options.UseSqlServer(db.ConnectionString);
                 }
             });
-            string serverHostUrl = Configuration["SERVER_HOST"];
-            ServerHostUrl = serverHostUrl;
-            string identityServer = Configuration["IDENTITY_SERVER"];
+        }
 
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server,IConfiguration configuration, IServiceCollection services)
+        {
+            ServerHostUrl = server.Host;
+
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddDefaultUI(UIFramework.Bootstrap4)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            var idServer = services.AddIdentityServer(options =>
+            {
+                options.PublicOrigin = server.Identity;
+            })
+                .AddDeveloperSigningCredential();
+
+            {
+                var idSection = configuration.GetSection("identityServer");
+                {
+                    var obj = idSection.GetSection("IdentityResources").Get<IdentityResource[]>();
+                    idServer.AddInMemoryIdentityResources(obj ?? SampleConfig.GetIdentityResources());
+                }
+                {
+                    var obj = idSection.GetSection("ApiResources").Get<ApiResource[]>();
+                    idServer.AddInMemoryApiResources(obj ?? SampleConfig.GetApiResources());
+                }
+                {
+                    var obj = idSection.GetSection("Clients").Get<Client[]>();
+                    idServer.AddInMemoryClients(obj ?? SampleConfig.GetClients(server.Host));
+                }
+            }
+
+            idServer.AddAspNetIdentity<IdentityUser>();
+        }
+
+        public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
+        {
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -66,30 +90,36 @@ namespace MindNote.Server.Identity
                 });
             });
 
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddIdentityServer(options => {
-                options.PublicOrigin = identityServer;
-            })
-                .AddDeveloperSigningCredential()
-                .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients(serverHostUrl))
-                .AddAspNetIdentity<IdentityUser>();
-
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
         {
-            string pathBase = Configuration["PATH_BASE"];
-            app.UsePathBase(pathBase);
+            DBConfiguration db = DBConfiguration.Load(Configuration);
+            ConfigureDBServices(db, services);
 
-            if (env.IsDevelopment())
+            LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
+            ConfigureIdentityServices(server, Configuration, services);
+
+            ConfigureFinalServices(Configuration, services);
+        }
+
+        public static void ConfigureApp(IConfiguration configuration, IApplicationBuilder app, IHostingEnvironment env)
+        {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
+            if (env?.IsDevelopment() == true)
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
@@ -104,6 +134,7 @@ namespace MindNote.Server.Identity
             app.UseCors();
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
@@ -111,6 +142,37 @@ namespace MindNote.Server.Identity
             app.UseIdentityServer();
 
             app.UseMvc();
+        }
+
+        private static async Task InitializeDatabase(IServiceProvider provider)
+        {
+            using (IServiceScope scope = provider.CreateScope())
+            {
+                IServiceProvider services = scope.ServiceProvider;
+
+                try
+                {
+                    using (ApplicationDbContext context = services.GetRequiredService<ApplicationDbContext>())
+                    {
+                        await context.Database.EnsureCreatedAsync();
+                        await context.Database.MigrateAsync();
+                        await Database.SeedData.Initialize(context);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ILogger<Startup> logger = services.GetRequiredService<ILogger<Startup>>();
+                    logger.LogError(ex, "An error occurred when create or migrate DB.");
+                }
+            }
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            ConfigureApp(Configuration, app, env);
+
+            InitializeDatabase(app.ApplicationServices).Wait();
         }
     }
 }

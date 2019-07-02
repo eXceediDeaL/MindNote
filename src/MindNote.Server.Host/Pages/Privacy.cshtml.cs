@@ -1,24 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MindNote.Client.API;
+using MindNote.Client.SDK.API;
+using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages
 {
     [Authorize]
     public class PrivacyModel : PageModel
     {
-        private readonly IHttpClientFactory clientFactory;
+        private readonly ITagsClient tagsClient;
+        private readonly INodesClient nodesClient;
+        private readonly IIdentityDataGetter idData;
+        private readonly IRelationsClient relationsClient;
 
-        public PrivacyModel(IHttpClientFactory clientFactory)
+        public PrivacyModel(ITagsClient tagsClient, INodesClient nodesClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
         {
-            this.clientFactory = clientFactory;
+            this.tagsClient = tagsClient;
+            this.nodesClient = nodesClient;
+            this.idData = idData;
+            this.relationsClient = relationsClient;
         }
 
         public void OnGet()
@@ -27,17 +31,14 @@ namespace MindNote.Server.Host.Pages
 
         public async Task<IActionResult> OnPostInitializeAsync()
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var nc = new NodesClient(httpclient);
-            var tc = new TagsClient(httpclient);
-            var rc = new RelationsClient(httpclient);
+            string token = await idData.GetAccessToken(HttpContext);
 
             List<Tag> tags = new List<Tag>();
 
             for (int i = 1; i <= 5; i++)
             {
-                var t = new Tag { Name = $"tag{i}", Color = RandomHelper.Color() };
-                t.Id = (await tc.CreateAsync(t)).Value;
+                Tag t = new Tag { Name = $"tag{i}", Color = RandomHelper.Color() };
+                t.Id = (await tagsClient.Create(token, t)).Value;
                 tags.Add(t);
             }
 
@@ -45,8 +46,8 @@ namespace MindNote.Server.Host.Pages
 
             for (int i = 1; i <= 10; i++)
             {
-                var t = new Node { Name = $"Node {i}", Content = $"Contents of node {i}.", TagId = RandomHelper.Choice(tags).Id };
-                t.Id = (await nc.CreateAsync(t)).Value;
+                Node t = new Node { Name = $"Node {i}", Content = $"Contents of node {i}.", TagId = RandomHelper.Choice(tags).Id };
+                t.Id = (await nodesClient.Create(token, t)).Value;
                 nodes.Add(t);
             }
 
@@ -54,8 +55,8 @@ namespace MindNote.Server.Host.Pages
 
             for (int i = 1; i <= 10; i++)
             {
-                var t = new Relation { From = RandomHelper.Choice(nodes).Id, To = RandomHelper.Choice(nodes).Id };
-                t.Id = (await rc.CreateAsync(t)).Value;
+                Relation t = new Relation { From = RandomHelper.Choice(nodes).Id, To = RandomHelper.Choice(nodes).Id };
+                t.Id = (await relationsClient.Create(token, t)).Value;
                 relations.Add(t);
             }
 
@@ -64,11 +65,10 @@ namespace MindNote.Server.Host.Pages
 
         public async Task<IActionResult> OnPostClearAsync()
         {
-            var httpclient = await clientFactory.CreateAuthorizedClientAsync(this);
-            var nc = new NodesClient(httpclient);
-            await nc.ClearAsync();
-            var tc = new TagsClient(httpclient);
-            await tc.ClearAsync();
+            string token = await idData.GetAccessToken(HttpContext);
+
+            await nodesClient.Clear(token);
+            await tagsClient.Clear(token);
             return RedirectToPage();
         }
     }

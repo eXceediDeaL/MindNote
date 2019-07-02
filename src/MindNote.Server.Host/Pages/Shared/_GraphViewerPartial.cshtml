@@ -1,0 +1,40 @@
+﻿@model GraphViewModel
+
+<link rel="stylesheet" href="~/css/relation.css" />
+
+<div class="input-group mt-2">
+    <div class="input-group-prepend">
+        <span class="input-group-text">Node name</span>
+    </div>
+    <div class="form-control">
+        <label id="__graphViewPartial_lblNodeName"></label>
+    </div>
+</div>
+<div id="__graphViewPartial_divRelations" style="text-align:center">
+    <svg height="100%" width="100%" preserveAspectRatio="xMidYMid meet" style="min-height:600px;" id="__graphViewPartial_svg"></svg>
+</div>
+
+<script src="https://d3js.org/d3.v5.js"></script>
+<script src="~/js/relation.js"></script>
+<script>
+    var o = document.getElementById("__graphViewPartial_divRelations");
+    var h = o.offsetHeight;
+    var w = o.offsetWidth;
+
+    const tip = "<p style='color:lightgray'> Ctrl-drag a node to move the graph layout. Click a node or an edge to select it. Double click a node to navigate to it. </p>";
+    document.getElementById("__graphViewPartial_lblNodeName").innerHTML = tip;
+
+    graph = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Graph));
+    var handlers = {
+        onNodeMouseover: (d) => {
+            document.getElementById("__graphViewPartial_lblNodeName").innerText = d.name;
+        },
+        onNodeMouseout: (d) => {
+            document.getElementById("__graphViewPartial_lblNodeName").innerHTML = tip;
+        },
+        onNodeDblclick: (d) => {
+            window.location.href = "/Nodes/View?id=" + d.id.toString();
+        },
+    };
+    showRelationsSvg("__graphViewPartial_svg", graph.nodes, graph.links, w, h, false, false, @Model.SelectNodeIndex, 0, handlers);
+</script>

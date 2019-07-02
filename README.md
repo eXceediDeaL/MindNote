@@ -27,9 +27,10 @@ curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-
 3. Replace `http://localhost` in `docker-compose.yml` with your host URL.
 4. Use `docker-compose up` to start containers.
 
-It will create a MySQL container, an API server container, an identity server container, and a host server container.
+It will create a MySQL container, an API server container, an identity server container, a host server container and a nginx server container for reverse proxy.
 
-- The host server listens to the port `8100`.
-- The API server listens to the port `8050`.
-  - You can visit `swagger` to see the all APIs.
-- The Identity server listens to the port `8000`.
+The default hostnames are:
+
+- `id.mindnote.com`
+- `api.mindnote.com`
+- `mindnote.com`

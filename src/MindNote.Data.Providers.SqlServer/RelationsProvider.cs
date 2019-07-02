@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using MindNote.Data.Providers.SqlServer.Models;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace MindNote.Data.Providers.SqlServer
 {
-    class RelationsProvider : IRelationsProvider
+    internal class RelationsProvider : IRelationsProvider
     {
-        readonly DataContext context;
-        readonly IDataProvider parent;
+        private readonly DataContext context;
+        private readonly IDataProvider parent;
 
         public RelationsProvider(DataContext context, IDataProvider dataProvider)
         {
@@ -20,60 +19,101 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task Clear(string userId = null)
         {
-            var query = context.Relations.AsQueryable();
+            IQueryable<Models.Relation> query = context.Relations.AsQueryable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             context.Relations.RemoveRange(query);
             await context.SaveChangesAsync();
         }
 
         public async Task<int?> Create(Relation data, string userId = null)
         {
-            var raw = Models.Relation.FromModel(data);
+            if ((await parent.NodesProvider.Get(data.From, userId) == null) || (await parent.NodesProvider.Get(data.To, userId) == null))
+            {
+                return null;
+            }
+            Models.Relation raw = Models.Relation.FromModel(data);
             if (userId != null)
+            {
                 raw.UserId = userId;
+            }
+
             context.Relations.Add(raw);
             await context.SaveChangesAsync();
             return raw.Id;
         }
 
-        public async Task Delete(int id, string userId = null)
+        public async Task<int?> Delete(int id, string userId = null)
         {
-            var raw = await context.Relations.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId)) return;
+            Models.Relation raw = await context.Relations.FindAsync(id);
+            if (raw == null || (userId != null && raw.UserId != userId))
+            {
+                return null;
+            }
+
             context.Relations.Remove(raw);
             await context.SaveChangesAsync();
+            return id;
         }
 
         public async Task<Relation> Get(int id, string userId = null)
         {
-            var query = context.Relations.Where(x => x.Id == id);
+            IQueryable<Models.Relation> query = context.Relations.Where(x => x.Id == id);
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
         public async Task<IEnumerable<Relation>> GetAdjacents(int nodeId, string userId = null)
         {
-            var query = context.Relations.Where(x => x.From == nodeId || x.To == nodeId);
+            IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == nodeId || x.To == nodeId);
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
+        }
+
+        public async Task<int?> ClearAdjacents(int nodeId, string userId = null)
+        {
+            IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == nodeId || x.To == nodeId);
+            if (userId != null)
+            {
+                query = query.Where(x => x.UserId == userId);
+            }
+
+            context.Relations.RemoveRange(query);
+            await context.SaveChangesAsync();
+            return nodeId;
         }
 
         public async Task<IEnumerable<Relation>> GetAll(string userId = null)
         {
-            var query = context.Relations.AsQueryable();
+            IQueryable<Models.Relation> query = context.Relations.AsQueryable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<int?> Update(int id, Relation data, string userId = null)
         {
-            var raw = await context.Relations.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId)) return null;
-            var value = Models.Relation.FromModel(data);
+            Models.Relation raw = await context.Relations.FindAsync(id);
+            if (raw == null || (userId != null && raw.UserId != userId))
+            {
+                return null;
+            }
+
+            Models.Relation value = Models.Relation.FromModel(data);
             raw.From = value.From;
             raw.To = value.To;
             context.Relations.Update(raw);
@@ -83,9 +123,12 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId = null)
         {
-            var query = context.Relations.AsQueryable();
+            IQueryable<Models.Relation> query = context.Relations.AsQueryable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             if (id.HasValue)
             {
                 query = query.Where(item => item.Id == id.Value);

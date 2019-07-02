@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Client.API;
+using MindNote.Client.SDK.API;
+using MindNote.Client.SDK.Identity;
+using MindNote.Server.Share.Configuration;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MindNote.Server.Host
 {
@@ -24,39 +22,24 @@ namespace MindNote.Server.Host
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
         {
-            string apiServer = Configuration["API_SERVER"];
-            string identityServer = Configuration["IDENTITY_SERVER"];
-            BaseClient.Url = apiServer;
-            BaseClient.IdentityUrl = identityServer;
-            Helpers.UserHelper.RegisterUrl = $"{identityServer}/Identity/Account/Register";
-            Helpers.ClientHelper.IdentityServer = identityServer;
+            services.AddAuthorization();
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
-            services.AddHttpClient();
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            Helpers.UserHelper.RegisterUrl = $"{server.Identity}/Identity/Account/Register";
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             services.AddAuthentication(options =>
-                {
-                    options.DefaultScheme = "Cookies";
-                    options.DefaultChallengeScheme = "oidc";
-                })
+            {
+                options.DefaultScheme = "Cookies";
+                options.DefaultChallengeScheme = "oidc";
+            })
             .AddCookie("Cookies")
             .AddOpenIdConnect("oidc", options =>
             {
                 options.SignInScheme = "Cookies";
-                options.Authority = identityServer;
+                options.Authority = server.Identity;
                 options.RequireHttpsMetadata = false;
 
                 options.ClientId = Helpers.ClientHelper.ClientID;
@@ -73,18 +56,40 @@ namespace MindNote.Server.Host
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
         {
-            string pathBase = Configuration["PATH_BASE"];
-            app.UsePathBase(pathBase);
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
 
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
+            ConfigureIdentityServices(server, services);
+
+            services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();
+            services.AddScoped<INodesClient, NodesClient>(x => new NodesClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
+            services.AddScoped<ITagsClient, TagsClient>(x => new TagsClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
+            services.AddScoped<IRelationsClient, RelationsClient>(x => new RelationsClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
+
+            ConfigureFinalServices(Configuration, services);
+        }
+
+        public static void ConfigureApp(IConfiguration configuration, IApplicationBuilder app, IHostingEnvironment env)
+        {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            if (env.IsDevelopment())
+            if (env?.IsDevelopment() == true)
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -96,11 +101,19 @@ namespace MindNote.Server.Host
             }
 
             app.UseHttpsRedirection();
+
             app.UseAuthentication();
+
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
             app.UseMvc();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            ConfigureApp(Configuration, app, env);
         }
     }
 }

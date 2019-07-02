@@ -5,10 +5,12 @@
     ViewData["Id"] = "Nodes";
 }
 
+@*
 <ul class="breadcrumb">
     <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
     <li class="breadcrumb-item active">@ViewData["Title"]</li>
 </ul>
+*@
 
 <div class="text-center" style="width:100%">
     <form method="post" class="form-inline" style="display:inline-flex">
@@ -29,19 +31,19 @@
     </form>
 </div>
 
-<table class="table table-hover" style="margin-top:10px">
+<table class="table table-hover" style="margin-top:10px; table-layout:fixed;">
     <thead>
         <tr>
             <th style="width:6%">
                 Id
             </th>
-            <th>
+            <th style="width:10%">
                 Name
             </th>
             <th>
                 Content
             </th>
-            <th>
+            <th style="width:10%">
                 Tag
             </th>
             <th style="width:10%">
@@ -56,10 +58,10 @@
                 <td>
                     @item.Data.Id
                 </td>
-                <td>
+                <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     <a asp-page="./View" asp-route-id="@item.Data.Id">@item.Data.Name</a>
                 </td>
-                <td>
+                <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     @item.Data.Content
                 </td>
                 <td>
@@ -78,7 +80,7 @@
                                 <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger">
+                                <button asp-page-handler="Delete" asp-route-id="@item.Data.Id" class="btn btn-outline-danger">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>

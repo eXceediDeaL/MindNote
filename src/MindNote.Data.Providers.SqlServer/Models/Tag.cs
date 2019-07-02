@@ -22,7 +22,7 @@
 
         public static Tag FromModel(Data.Tag data)
         {
-            var res = new Tag
+            Tag res = new Tag
             {
                 Id = data.Id,
                 Name = data.Name,

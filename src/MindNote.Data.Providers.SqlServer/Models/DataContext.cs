@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MindNote.Data.Providers.SqlServer.Models
 {
@@ -16,12 +13,5 @@ namespace MindNote.Data.Providers.SqlServer.Models
         public DbSet<Relation> Relations { get; set; }
 
         public DbSet<Tag> Tags { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Tag>()
-                .HasAlternateKey(c => c.Name);
-            base.OnModelCreating(modelBuilder);
-        }
     }
 }

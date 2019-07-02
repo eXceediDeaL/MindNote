@@ -1,11 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using MindNote.Data;
+﻿using MindNote.Data;
 using MindNote.Data.Providers;
 using MindNote.Data.Providers.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MindNote.Server.API.Database
@@ -14,13 +12,15 @@ namespace MindNote.Server.API.Database
     {
         public static async Task Initialize(Data.Providers.SqlServer.Models.DataContext context)
         {
-            var rand = new Random();
+            Random rand = new Random();
 
             if (context.Nodes.Any())
+            {
                 return;
+            }
 
             IDataProvider provider = new DataProvider(context);
-            var ns = new List<int>();
+            List<int> ns = new List<int>();
             for (int i = 1; i < 7; i++)
             {
                 Node cn = new Node
