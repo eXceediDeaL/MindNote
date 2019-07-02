@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Markdig;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
 using MindNote.Server.Host.Pages.Shared;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Tags
 {
@@ -39,18 +35,22 @@ namespace MindNote.Server.Host.Pages.Tags
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             try
             {
                 Data = new TagsViewModel { Data = await client.Get(token, id) };
                 {
                     Dictionary<int, Relation> rs = new Dictionary<int, Relation>();
-                    foreach (var v in await nodesClient.Query(token, null, null, null, id))
+                    foreach (Node v in await nodesClient.Query(token, null, null, null, id))
                     {
-                        foreach (var r in await relationsClient.GetAdjacents(token, v.Id))
+                        foreach (Relation r in await relationsClient.GetAdjacents(token, v.Id))
                         {
-                            if (rs.ContainsKey(r.Id)) continue;
+                            if (rs.ContainsKey(r.Id))
+                            {
+                                continue;
+                            }
+
                             rs.Add(r.Id, r);
                         }
                     }
@@ -74,7 +74,7 @@ namespace MindNote.Server.Host.Pages.Tags
             {
                 return BadRequest();
             }
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 await client.Delete(token, PostData.Data.Id);

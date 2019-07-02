@@ -1,16 +1,13 @@
 ﻿using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MindNote.Server.Identity
 {
     public static class Config
     {
-        private const string APIScope = "api";
+        public const string APIScope = "api";
 
         public static IEnumerable<IdentityResource> GetIdentityResources()
         {
@@ -61,8 +58,7 @@ namespace MindNote.Server.Identity
                     ClientId="server.api",
                     ClientSecrets = new [] { new Secret("secret".Sha256()) },
                     AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                    AllowedScopes = { APIScope },
-                    AccessTokenLifetime = 10,
+                    AllowedScopes = { APIScope }
                 }
             };
         }

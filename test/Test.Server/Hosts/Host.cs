@@ -1,51 +1,92 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Data.Providers;
-using MindNote.Server.Host;
+using MindNote.Server.Identity;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using Test.Server.Apis;
+using Test.Server.Identities;
 
 namespace Test.Server.Hosts
 {
     [TestClass]
     public class Host
     {
+        public static IEnumerable<object[]> AuthGetUrls
+        {
+            get
+            {
+                List<string> res = new List<string>
+                {
+                    "/Identity/Login",
+                };
+
+                {
+                    string[] sub = new string[]
+                    {
+                        "Index"
+                    };
+                    res.AddRange(sub.Select(x => "/Nodes/" + x));
+                }
+                {
+                    string[] sub = new string[]
+                    {
+                        "Index"
+                    };
+                    res.AddRange(sub.Select(x => "/Relations/" + x));
+                }
+                {
+                    string[] sub = new string[]
+                    {
+                        "Index"
+                    };
+                    res.AddRange(sub.Select(x => "/Tags/" + x));
+                }
+                return res.Select(x => new object[] { x });
+            }
+        }
+
         [DataTestMethod]
         [DataRow("/Index")]
+        [DataRow("/Error")]
         public void Urls(string url)
         {
-            using (TestServer testServer = new TestServer(Program.CreateWebHostBuilder(Array.Empty<string>())))
+            using (TestServer testServer = new TestServer(MindNote.Server.Host.Program.CreateWebHostBuilder(Array.Empty<string>())))
             {
-                using (var client = testServer.CreateClient())
+                using (HttpClient client = testServer.CreateClient())
                 {
-                    var response = client.GetAsync(url).Result;
+                    HttpResponseMessage response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
                 }
             }
         }
 
         [DataTestMethod]
-        [DataRow("/Index")]
-        //[DataRow("/Nodes/Index")]
-        //[DataRow("/Relations/Index")]
-        //[DataRow("/Tags/Index")]
-        public void Get(string url)
+        [DynamicData(nameof(AuthGetUrls))]
+        public void AuthGet(string url)
         {
             IDataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            var idData = new TestIdentityDataGetter("id", "email@host", "user");
-            using (var api = new TestApiWebApplicationFactory<MindNote.Server.API.Startup>(provider, idData))
+            IdentityServer4.Test.TestUser user = Utils.DefaultUser;
+            using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
             {
-                using (var testServer = new TestHostWebApplicationFactory<Startup, MindNote.Server.API.Startup>(api, idData))
+                string token = id.GetBearerToken(user.Username, user.Password, Config.APIScope);
+                MockTokenIdentityDataGetter idData = new MockTokenIdentityDataGetter(token);
+                using (MockApiWebApplicationFactory api = new MockApiWebApplicationFactory(id.Server, provider, new IdentityDataGetter()))
                 {
-                    using (var client = testServer.CreateClient())
+                    using (MockHostWebApplicationFactory<MindNote.Server.API.Startup> testServer = new MockHostWebApplicationFactory<MindNote.Server.API.Startup>(id.Server, api, idData))
                     {
-                        var response = client.GetAsync(url).Result;
-                        response.EnsureSuccessStatusCode();
+                        using (HttpClient client = testServer.CreateClient())
+                        {
+                            HttpResponseMessage response = client.GetAsync(url).Result;
+                            Assert.IsFalse(response.IsSuccessStatusCode);
+
+                            client.SetBearerToken(token);
+                            response = client.GetAsync(url).Result;
+                            response.EnsureSuccessStatusCode();
+                        }
                     }
                 }
             }

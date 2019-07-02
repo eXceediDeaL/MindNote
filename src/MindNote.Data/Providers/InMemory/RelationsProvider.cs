@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace MindNote.Data.Providers.InMemory
 {
-    class RelationsProvider : IRelationsProvider
+    internal class RelationsProvider : IRelationsProvider
     {
-        int count = 0;
+        private int count = 0;
         private readonly IDataProvider parent;
-        readonly Dictionary<int, Model<Relation>> Data = new Dictionary<int, Model<Relation>>();
+        private readonly Dictionary<int, Model<Relation>> Data = new Dictionary<int, Model<Relation>>();
 
         public RelationsProvider(IDataProvider parent)
         {
@@ -18,19 +18,22 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task Clear(string userId = null)
         {
-            var query = GetAll(userId).Result;
-            foreach (var v in query.Select(x => x.Id))
+            IEnumerable<Relation> query = GetAll(userId).Result;
+            foreach (int v in query.Select(x => x.Id))
+            {
                 Data.Remove(v);
+            }
+
             return Task.CompletedTask;
         }
 
         public async Task<int?> Create(Relation data, string userId = null)
         {
-            if((await parent.NodesProvider.Get(data.From,userId) == null) || (await parent.NodesProvider.Get(data.To, userId) == null))
+            if ((await parent.NodesProvider.Get(data.From, userId) == null) || (await parent.NodesProvider.Get(data.To, userId) == null))
             {
                 return null;
             }
-            var raw = new Model<Relation>
+            Model<Relation> raw = new Model<Relation>
             {
                 Data = (Relation)data.Clone(),
                 UserId = userId,
@@ -42,7 +45,7 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<int?> Delete(int id, string userId = null)
         {
-            if (Data.TryGetValue(id, out var value))
+            if (Data.TryGetValue(id, out Model<Relation> value))
             {
                 if (userId == null || value.UserId == userId)
                 {
@@ -55,35 +58,50 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<Relation> Get(int id, string userId = null)
         {
-            var query = GetAll(userId).Result;
+            IEnumerable<Relation> query = GetAll(userId).Result;
             return Task.FromResult(query.Where(x => x.Id == id).Select(x => (Relation)x.Clone()).FirstOrDefault());
         }
 
         public Task<IEnumerable<Relation>> GetAll(string userId = null)
         {
-            var query = Data.Values.AsEnumerable();
+            IEnumerable<Model<Relation>> query = Data.Values.AsEnumerable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             return Task.FromResult(query.Select(x => (Relation)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId = null)
         {
-            var query = Data.Values.AsEnumerable();
+            IEnumerable<Model<Relation>> query = Data.Values.AsEnumerable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             if (id.HasValue)
+            {
                 query = query.Where(x => x.Data.Id == id.Value);
+            }
+
             if (from.HasValue)
+            {
                 query = query.Where(x => x.Data.From == from.Value);
+            }
+
             if (to.HasValue)
+            {
                 query = query.Where(x => x.Data.To == to.Value);
+            }
+
             return Task.FromResult(query.Select(x => (Relation)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<int?> Update(int id, Relation data, string userId = null)
         {
-            if (Data.TryGetValue(id, out var value))
+            if (Data.TryGetValue(id, out Model<Relation> value))
             {
                 if (userId == null || value.UserId == userId)
                 {
@@ -97,13 +115,13 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<IEnumerable<Relation>> GetAdjacents(int nodeId, string userId = null)
         {
-            var query = GetAll(userId).Result;
+            IEnumerable<Relation> query = GetAll(userId).Result;
             return Task.FromResult(query.Where(x => x.From == nodeId || x.To == nodeId).Select(x => (Relation)x.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<int?> ClearAdjacents(int nodeId, string userId = null)
         {
-            foreach (var v in GetAdjacents(nodeId, userId).Result.Select(x => x.Id).ToArray())
+            foreach (int v in GetAdjacents(nodeId, userId).Result.Select(x => x.Id).ToArray())
             {
                 Data.Remove(v);
             }

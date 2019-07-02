@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages
 {
@@ -34,14 +31,14 @@ namespace MindNote.Server.Host.Pages
 
         public async Task<IActionResult> OnPostInitializeAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             List<Tag> tags = new List<Tag>();
 
             for (int i = 1; i <= 5; i++)
             {
-                var t = new Tag { Name = $"tag{i}", Color = RandomHelper.Color() };
-                t.Id = (await tagsClient.Create(token,t)).Value;
+                Tag t = new Tag { Name = $"tag{i}", Color = RandomHelper.Color() };
+                t.Id = (await tagsClient.Create(token, t)).Value;
                 tags.Add(t);
             }
 
@@ -49,8 +46,8 @@ namespace MindNote.Server.Host.Pages
 
             for (int i = 1; i <= 10; i++)
             {
-                var t = new Node { Name = $"Node {i}", Content = $"Contents of node {i}.", TagId = RandomHelper.Choice(tags).Id };
-                t.Id = (await nodesClient.Create(token,t)).Value;
+                Node t = new Node { Name = $"Node {i}", Content = $"Contents of node {i}.", TagId = RandomHelper.Choice(tags).Id };
+                t.Id = (await nodesClient.Create(token, t)).Value;
                 nodes.Add(t);
             }
 
@@ -58,8 +55,8 @@ namespace MindNote.Server.Host.Pages
 
             for (int i = 1; i <= 10; i++)
             {
-                var t = new Relation { From = RandomHelper.Choice(nodes).Id, To = RandomHelper.Choice(nodes).Id };
-                t.Id = (await relationsClient.Create(token,t)).Value;
+                Relation t = new Relation { From = RandomHelper.Choice(nodes).Id, To = RandomHelper.Choice(nodes).Id };
+                t.Id = (await relationsClient.Create(token, t)).Value;
                 relations.Add(t);
             }
 
@@ -68,7 +65,7 @@ namespace MindNote.Server.Host.Pages
 
         public async Task<IActionResult> OnPostClearAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             await nodesClient.Clear(token);
             await tagsClient.Clear(token);

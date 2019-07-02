@@ -31,7 +31,7 @@ namespace MindNote.Client.SDK.API
 
         public HttpClient Client { get; private set; }
 
-        RawNodesClient Raw { get; set; }
+        private RawNodesClient Raw { get; set; }
 
         public async Task Clear(string token)
         {

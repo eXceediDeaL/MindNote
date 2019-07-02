@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
-using MindNote.Server.Host.Helpers;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Nodes
 {
@@ -36,7 +32,7 @@ namespace MindNote.Server.Host.Pages.Nodes
             this.idData = idData;
         }
 
-        async Task<bool> GetData(int id, string token)
+        private async Task<bool> GetData(int id, string token)
         {
             try
             {
@@ -52,16 +48,18 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             {
-                var ts = await tagsClient.GetAll(token);
+                IEnumerable<Tag> ts = await tagsClient.GetAll(token);
                 TagSelector = new List<SelectListItem>
                 {
                     new SelectListItem("No tag", "null")
                 };
-                foreach (var v in ts)
+                foreach (Tag v in ts)
+                {
                     TagSelector.Add(new SelectListItem(v.Name, v.Id.ToString()));
+                }
             }
 
             if (!id.HasValue)
@@ -87,13 +85,15 @@ namespace MindNote.Server.Host.Pages.Nodes
                     return Page();
                 }
                 else
+                {
                     return NotFound();
+                }
             }
         }
 
         public async Task<IActionResult> OnPostEditAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             try
             {
@@ -108,11 +108,11 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             try
             {
-                var id = await client.Create(token, PostData.Data);
+                int? id = await client.Create(token, PostData.Data);
                 return RedirectToPage(new { id });
             }
             catch
@@ -123,7 +123,7 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             try
             {

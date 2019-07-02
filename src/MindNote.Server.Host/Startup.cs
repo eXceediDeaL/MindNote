@@ -1,20 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Client.SDK;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Share.Configuration;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MindNote.Server.Host
 {
@@ -29,8 +24,9 @@ namespace MindNote.Server.Host
 
         public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
         {
+            services.AddAuthorization();
+
             Helpers.UserHelper.RegisterUrl = $"{server.Identity}/Identity/Account/Register";
-            Helpers.ClientHelper.IdentityServer = server.Identity;
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -75,7 +71,7 @@ namespace MindNote.Server.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var server = LinkedServerConfiguration.Load(Configuration);
+            LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
             ConfigureIdentityServices(server, services);
 
             services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();

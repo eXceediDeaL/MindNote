@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace MindNote.Server.Host.Helpers
 {
     public static class RandomHelper
     {
-        static readonly Random rand = new Random();
+        private static readonly Random rand = new Random();
 
         public static string Color()
         {

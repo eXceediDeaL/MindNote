@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MindNote.Client.SDK.Identity;
 using MindNote.Data;
 using MindNote.Data.Providers;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.API.Controllers
 {
@@ -15,9 +15,8 @@ namespace MindNote.Server.API.Controllers
     [EnableCors]
     public class TagsController : ControllerBase
     {
-        readonly ITagsProvider provider;
-
-        IIdentityDataGetter identityDataGetter;
+        private readonly ITagsProvider provider;
+        private readonly IIdentityDataGetter identityDataGetter;
 
         public TagsController(IDataProvider provider, IIdentityDataGetter identityDataGetter)
         {

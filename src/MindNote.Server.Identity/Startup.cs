@@ -1,21 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MindNote.Server.Identity.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.HttpOverrides;
-using MindNote.Server.Share.Configuration;
 using Microsoft.Extensions.Logging;
+using MindNote.Server.Identity.Data;
+using MindNote.Server.Share.Configuration;
+using System;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Identity
 {
@@ -49,6 +46,23 @@ namespace MindNote.Server.Identity
         {
             ServerHostUrl = server.Host;
 
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddDefaultUI(UIFramework.Bootstrap4)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddIdentityServer(options =>
+            {
+                options.PublicOrigin = server.Identity;
+            })
+                .AddDeveloperSigningCredential()
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryApiResources(Config.GetApiResources())
+                .AddInMemoryClients(Config.GetClients(server.Host))
+                .AddAspNetIdentity<IdentityUser>();
+        }
+
+        public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
+        {
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -61,22 +75,6 @@ namespace MindNote.Server.Identity
                 });
             });
 
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddIdentityServer(options => {
-                options.PublicOrigin = server.Identity;
-            })
-                .AddDeveloperSigningCredential()
-                .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients(server.Host))
-                .AddAspNetIdentity<IdentityUser>();
-        }
-
-        public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
-        {
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -90,10 +88,10 @@ namespace MindNote.Server.Identity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var db = DBConfiguration.Load(Configuration);
+            DBConfiguration db = DBConfiguration.Load(Configuration);
             ConfigureDBServices(db, services);
 
-            var server = LinkedServerConfiguration.Load(Configuration);
+            LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
             ConfigureIdentityServices(server, services);
 
             ConfigureFinalServices(Configuration, services);
@@ -106,7 +104,7 @@ namespace MindNote.Server.Identity
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            if (env.IsDevelopment())
+            if (env?.IsDevelopment() == true)
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
@@ -131,15 +129,15 @@ namespace MindNote.Server.Identity
             app.UseMvc();
         }
 
-        static async Task InitializeDatabase(IServiceProvider provider)
+        private static async Task InitializeDatabase(IServiceProvider provider)
         {
-            using (var scope = provider.CreateScope())
+            using (IServiceScope scope = provider.CreateScope())
             {
-                var services = scope.ServiceProvider;
+                IServiceProvider services = scope.ServiceProvider;
 
                 try
                 {
-                    using (var context = services.GetRequiredService<ApplicationDbContext>())
+                    using (ApplicationDbContext context = services.GetRequiredService<ApplicationDbContext>())
                     {
                         await context.Database.EnsureCreatedAsync();
                         await context.Database.MigrateAsync();
@@ -148,7 +146,7 @@ namespace MindNote.Server.Identity
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<Startup>>();
+                    ILogger<Startup> logger = services.GetRequiredService<ILogger<Startup>>();
                     logger.LogError(ex, "An error occurred when create or migrate DB.");
                 }
             }

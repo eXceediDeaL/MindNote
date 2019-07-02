@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using System.Text;
-using MindNote.Data.Providers.SqlServer.Models;
+﻿using MindNote.Data.Providers.SqlServer.Models;
 
 namespace MindNote.Data.Providers.SqlServer
 {

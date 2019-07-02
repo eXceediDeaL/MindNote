@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MindNote.Client.SDK;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
 using MindNote.Server.Host.Pages.Shared;
-using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Relations
 {
@@ -41,9 +36,9 @@ namespace MindNote.Server.Host.Pages.Relations
 
         public async Task OnGetAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
-            var rs = await client.GetAll(token);
+            IEnumerable<Relation> rs = await client.GetAll(token);
             Data = rs.Select(x => new RelationsViewModel { Data = x }).ToArray();
             Graph = new GraphViewModel
             {
@@ -53,9 +48,9 @@ namespace MindNote.Server.Host.Pages.Relations
 
         public async Task<IActionResult> OnPostQueryAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
-            var ms = await client.Query(token, PostData.QueryId, PostData.QueryFrom, PostData.QueryTo);
+            IEnumerable<Relation> ms = await client.Query(token, PostData.QueryId, PostData.QueryFrom, PostData.QueryTo);
             Data = ms.Select(x => new RelationsViewModel { Data = x }).ToArray();
             Graph = new GraphViewModel
             {
@@ -71,7 +66,7 @@ namespace MindNote.Server.Host.Pages.Relations
                 return BadRequest();
             }
 
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 await client.Delete(token, PostData.Data.Id);

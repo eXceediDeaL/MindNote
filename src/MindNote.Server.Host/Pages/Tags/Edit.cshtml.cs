@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
-using MindNote.Server.Host.Helpers;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Tags
 {
@@ -31,7 +26,7 @@ namespace MindNote.Server.Host.Pages.Tags
             this.idData = idData;
         }
 
-        async Task<bool> GetData(int id, string token)
+        private async Task<bool> GetData(int id, string token)
         {
             try
             {
@@ -64,20 +59,22 @@ namespace MindNote.Server.Host.Pages.Tags
             else
             {
                 IsNew = false;
-                string token = await idData.GetAccessToken(this.HttpContext);
+                string token = await idData.GetAccessToken(HttpContext);
                 if (await GetData(id.Value, token))
                 {
                     PostData = new TagsPostModel { Data = Data.Data };
                     return Page();
                 }
                 else
+                {
                     return NotFound();
+                }
             }
         }
 
         public async Task<IActionResult> OnPostEditAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 await client.Update(token, PostData.Data.Id, PostData.Data);
@@ -91,10 +88,10 @@ namespace MindNote.Server.Host.Pages.Tags
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
-                var id = await client.Create(token, PostData.Data);
+                int? id = await client.Create(token, PostData.Data);
                 return RedirectToPage(new { id });
             }
             catch
@@ -105,7 +102,7 @@ namespace MindNote.Server.Host.Pages.Tags
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 await client.Delete(token, PostData.Data.Id);

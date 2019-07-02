@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Test.Data
 {
-    static class Utils
+    internal static class Utils
     {
         public static T Choice<T>(this Random random, IList<T> list)
         {
@@ -15,7 +15,10 @@ namespace Test.Data
         {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < len; i++)
+            {
                 sb.Append(random.Next(127));
+            }
+
             return sb.ToString();
         }
     }

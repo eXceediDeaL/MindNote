@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using MindNote.Client.SDK;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
-using MindNote.Server.Host.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Nodes
 {
@@ -35,35 +30,37 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public IList<NodesViewModel> Data { get; set; }
 
-        async Task<IList<NodesViewModel>> GenData(IList<Node> nodes, string token)
+        private async Task<IList<NodesViewModel>> GenData(IList<Node> nodes, string token)
         {
             List<NodesViewModel> res = new List<NodesViewModel>();
-            foreach (var v in nodes)
+            foreach (Node v in nodes)
             {
-                var t = new NodesViewModel { Data = v };
+                NodesViewModel t = new NodesViewModel { Data = v };
                 await t.LoadTag(tagsClient, token);
                 res.Add(t);
             }
             return res;
         }
 
-        async Task GenTagSelector(string token)
+        private async Task GenTagSelector(string token)
         {
-            var ts = await tagsClient.GetAll(token);
+            IEnumerable<Tag> ts = await tagsClient.GetAll(token);
             TagSelector = new List<SelectListItem>
             {
                 new SelectListItem("Any tag", "null")
             };
-            foreach (var v in ts)
+            foreach (Tag v in ts)
+            {
                 TagSelector.Add(new SelectListItem(v.Name, v.Id.ToString()));
+            }
         }
 
         public async Task OnGetAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             await GenTagSelector(token);
-            var ms = await client.GetAll(token);
+            IEnumerable<Node> ms = await client.GetAll(token);
             Data = await GenData(ms.ToList(), token);
         }
 
@@ -72,12 +69,12 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnPostQueryAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
             try
             {
                 await GenTagSelector(token);
-                var ms = await client.Query(token, PostData.QueryId, PostData.QueryName, PostData.QueryContent, PostData.QueryTagId);
+                IEnumerable<Node> ms = await client.Query(token, PostData.QueryId, PostData.QueryName, PostData.QueryContent, PostData.QueryTagId);
                 Data = await GenData(ms.ToList(), token);
             }
             catch
@@ -94,7 +91,7 @@ namespace MindNote.Server.Host.Pages.Nodes
                 return BadRequest();
             }
 
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 await client.Delete(token, PostData.Data.Id);

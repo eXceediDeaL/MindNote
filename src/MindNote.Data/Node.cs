@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MindNote.Data
 {
-    public class Node : IEquatable<Node>,ICloneable
+    public class Node : IEquatable<Node>, ICloneable
     {
         public int Id { get; set; }
 
@@ -31,7 +31,7 @@ namespace MindNote.Data
 
         public override int GetHashCode()
         {
-            var hashCode = -330879835;
+            int hashCode = -330879835;
             hashCode = hashCode * -1521134295 + Id.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Content);

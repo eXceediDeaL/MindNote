@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using MindNote.Client.SDK.Identity;
+using MindNote.Server.Share.Configuration;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
-using IdentityModel.Client;
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using MindNote.Server.Share.Configuration;
-using MindNote.Client.SDK.Identity;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.API
 {
@@ -60,11 +56,10 @@ namespace MindNote.Server.API
 
                 options.Audience = "api";
             });
+        }
 
-            DiscoveryResponse disco = null;
-            using (var client = new HttpClient())
-                disco = client.GetDiscoveryDocumentAsync(server.Identity).Result;
-
+        public static void ConfigureDocumentServices(LinkedServerConfiguration server, IServiceCollection services)
+        {
             services.AddOpenApiDocument(config =>
             {
                 config.AddSecurity("bearer", Enumerable.Empty<string>(), new SwaggerSecurityScheme
@@ -79,8 +74,8 @@ namespace MindNote.Server.API
                             {
                                 { "api", "MindNote API" },
                             },
-                            AuthorizationUrl = disco.IsError ? $"{server.Identity}/connect/authorize" : disco.AuthorizeEndpoint,
-                            TokenUrl = disco.IsError ? $"{server.Identity}/connect/token" : disco.TokenEndpoint,
+                            AuthorizationUrl = $"{server.Identity}/connect/authorize",
+                            TokenUrl = $"{server.Identity}/connect/token",
                         },
                     }
                 });
@@ -129,11 +124,13 @@ namespace MindNote.Server.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var db = DBConfiguration.Load(Configuration);
+            DBConfiguration db = DBConfiguration.Load(Configuration);
             ConfigureDBServices(db, services);
 
-            var server = LinkedServerConfiguration.Load(Configuration);
+            LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
             ConfigureIdentityServices(server, services);
+
+            ConfigureDocumentServices(server, services);
 
             services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();
 
@@ -173,18 +170,18 @@ namespace MindNote.Server.API
             app.UseReDoc();
 
             app.UseCors();
-            app.UseMvc();            
+            app.UseMvc();
         }
 
         public static async Task InitializeDatabase(IServiceProvider provider)
         {
-            using (var scope = provider.CreateScope())
+            using (IServiceScope scope = provider.CreateScope())
             {
-                var services = scope.ServiceProvider;
+                IServiceProvider services = scope.ServiceProvider;
 
                 try
                 {
-                    using (var context = services.GetRequiredService<Data.Providers.SqlServer.Models.DataContext>())
+                    using (Data.Providers.SqlServer.Models.DataContext context = services.GetRequiredService<Data.Providers.SqlServer.Models.DataContext>())
                     {
                         await context.Database.EnsureCreatedAsync();
                         await context.Database.MigrateAsync();
@@ -193,7 +190,7 @@ namespace MindNote.Server.API
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "An error occurred when create or migrate DB.");
                 }
             }

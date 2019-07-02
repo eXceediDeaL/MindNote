@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace MindNote.Data.Providers.InMemory
+﻿namespace MindNote.Data.Providers.InMemory
 {
     public class DataProvider : IDataProvider
     {
@@ -19,7 +16,7 @@ namespace MindNote.Data.Providers.InMemory
         public ITagsProvider TagsProvider { get; private set; }
     }
 
-    struct Model<T>
+    internal struct Model<T>
     {
         public T Data { get; set; }
 

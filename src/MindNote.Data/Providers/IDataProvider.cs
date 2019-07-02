@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace MindNote.Data.Providers
+﻿namespace MindNote.Data.Providers
 {
     public interface IDataProvider
     {

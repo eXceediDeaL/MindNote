@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace MindNote.Data.Providers.InMemory
 {
-    class NodesProvider : INodesProvider
+    internal class NodesProvider : INodesProvider
     {
-        int count = 0;
+        private int count = 0;
         private readonly IDataProvider parent;
-        readonly Dictionary<int, Model<Node>> Data = new Dictionary<int, Model<Node>>();
+        private readonly Dictionary<int, Model<Node>> Data = new Dictionary<int, Model<Node>>();
 
         public NodesProvider(IDataProvider parent)
         {
@@ -18,9 +18,12 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task Clear(string userId = null)
         {
-            var query = GetAll(userId).Result;
-            foreach (var v in query.Select(x => x.Id))
+            IEnumerable<Node> query = GetAll(userId).Result;
+            foreach (int v in query.Select(x => x.Id))
+            {
                 Data.Remove(v);
+            }
+
             parent.RelationsProvider.Clear(userId).Wait();
             return Task.CompletedTask;
         }
@@ -28,14 +31,19 @@ namespace MindNote.Data.Providers.InMemory
         public async Task<int?> Create(Node data, string userId = null)
         {
             if (string.IsNullOrEmpty(data.Name))
+            {
                 return null;
+            }
+
             if (data.TagId.HasValue)
             {
                 if (await parent.TagsProvider.Get(data.TagId.Value, userId) == null)
+                {
                     return null;
+                }
             }
 
-            var raw = new Model<Node>
+            Model<Node> raw = new Model<Node>
             {
                 Data = (Node)data.Clone(),
                 UserId = userId,
@@ -47,7 +55,7 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<int?> Delete(int id, string userId = null)
         {
-            if (Data.TryGetValue(id, out var value))
+            if (Data.TryGetValue(id, out Model<Node> value))
             {
                 if (userId == null || value.UserId == userId)
                 {
@@ -61,37 +69,55 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<Node> Get(int id, string userId = null)
         {
-            var query = GetAll(userId).Result;
+            IEnumerable<Node> query = GetAll(userId).Result;
             return Task.FromResult(query.Where(x => x.Id == id).Select(x => (Node)x.Clone()).FirstOrDefault());
         }
 
         public Task<IEnumerable<Node>> GetAll(string userId = null)
         {
-            var query = Data.Values.AsEnumerable();
+            IEnumerable<Model<Node>> query = Data.Values.AsEnumerable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             return Task.FromResult(query.Select(x => (Node)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<IEnumerable<Node>> Query(int? id, string name, string content, int? tagId, string userId = null)
         {
-            var query = Data.Values.AsEnumerable();
+            IEnumerable<Model<Node>> query = Data.Values.AsEnumerable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             if (id.HasValue)
+            {
                 query = query.Where(x => x.Data.Id == id.Value);
+            }
+
             if (name != null)
+            {
                 query = query.Where(x => x.Data.Name.Contains(name));
+            }
+
             if (content != null)
+            {
                 query = query.Where(x => x.Data.Content.Contains(content));
+            }
+
             if (tagId.HasValue)
+            {
                 query = query.Where(x => x.Data.TagId == tagId.Value);
+            }
+
             return Task.FromResult(query.Select(x => (Node)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<int?> Update(int id, Node data, string userId = null)
         {
-            if (Data.TryGetValue(id, out var value))
+            if (Data.TryGetValue(id, out Model<Node> value))
             {
                 if (userId == null || value.UserId == userId)
                 {

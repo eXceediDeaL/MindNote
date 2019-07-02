@@ -1,9 +1,7 @@
 ﻿using MindNote.Client.SDK.API;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Helpers
@@ -12,15 +10,19 @@ namespace MindNote.Server.Host.Helpers
     {
         public static async Task<IEnumerable<Node>> GetNodes(INodesClient client, IEnumerable<Relation> relations, string token)
         {
-            if (relations == null) return Array.Empty<Node>();
+            if (relations == null)
+            {
+                return Array.Empty<Node>();
+            }
+
             HashSet<int> ns = new HashSet<int>();
-            foreach (var v in relations)
+            foreach (Relation v in relations)
             {
                 ns.Add(v.From);
                 ns.Add(v.To);
             }
             List<Node> res = new List<Node>();
-            foreach (var v in ns)
+            foreach (int v in ns)
             {
                 res.Add(await client.Get(token, v));
             }
@@ -51,40 +53,54 @@ namespace MindNote.Server.Host.Helpers
 
         public static async Task<D3Graph> GenerateGraph(INodesClient nodeC, ITagsClient tagC, IEnumerable<Relation> relations, string token, IEnumerable<Node> nodes = null)
         {
-            var rand = new Random();
-            if (nodes == null) nodes = await GetNodes(nodeC, relations, token);
-
-            var tags = new List<Tag>();
+            Random rand = new Random();
+            if (nodes == null)
             {
-                foreach (var v in nodes)
+                nodes = await GetNodes(nodeC, relations, token);
+            }
+
+            List<Tag> tags = new List<Tag>();
+            {
+                foreach (Node v in nodes)
                 {
                     tags.Add(v.TagId == null ? null : await tagC.Get(token, v.TagId.Value));
                 }
             }
 
 
-            var outGraph = new Dictionary<int, Dictionary<int, D3GraphLink>>();
+            Dictionary<int, Dictionary<int, D3GraphLink>> outGraph = new Dictionary<int, Dictionary<int, D3GraphLink>>();
             IEnumerable<D3GraphNode> resNodes;
 
-            var graph = new Dictionary<int, HashSet<int>>();
+            Dictionary<int, HashSet<int>> graph = new Dictionary<int, HashSet<int>>();
 
             if (relations != null)
             {
-                foreach (var v in relations)
+                foreach (Relation v in relations)
                 {
                     if (!graph.ContainsKey(v.From))
+                    {
                         graph.Add(v.From, new HashSet<int>());
+                    }
+
                     graph[v.From].Add(v.To);
                 }
-                foreach (var v in relations)
+                foreach (Relation v in relations)
                 {
-                    if (v.From == v.To) continue;
-                    var s = Math.Min(v.From, v.To);
-                    var t = Math.Max(v.From, v.To);
+                    if (v.From == v.To)
+                    {
+                        continue;
+                    }
+
+                    int s = Math.Min(v.From, v.To);
+                    int t = Math.Max(v.From, v.To);
                     if (!outGraph.ContainsKey(s))
+                    {
                         outGraph.Add(s, new Dictionary<int, D3GraphLink>());
-                    var subDic = outGraph[s];
+                    }
+
+                    Dictionary<int, D3GraphLink> subDic = outGraph[s];
                     if (!subDic.ContainsKey(t))
+                    {
                         subDic.Add(t, new D3GraphLink
                         {
                             source = s,
@@ -92,27 +108,35 @@ namespace MindNote.Server.Host.Helpers
                             left = false,
                             right = false
                         });
-                    var link = subDic[t];
+                    }
+
+                    D3GraphLink link = subDic[t];
                     if (s == v.From)
+                    {
                         link.right = true;
+                    }
                     else
+                    {
                         link.left = true;
+                    }
                 }
             }
 
             {
-                var isReflexive = new HashSet<int>();
-                foreach (var v in nodes)
+                HashSet<int> isReflexive = new HashSet<int>();
+                foreach (Node v in nodes)
                 {
-                    if (graph.TryGetValue(v.Id, out var to))
+                    if (graph.TryGetValue(v.Id, out HashSet<int> to))
                     {
                         if (to.Contains(v.Id))
+                        {
                             isReflexive.Add(v.Id);
+                        }
                     }
                 }
                 resNodes = nodes.Zip(tags, (node, tag) =>
                 {
-                    var res = new D3GraphNode
+                    D3GraphNode res = new D3GraphNode
                     {
                         id = node.Id,
                         color = tag?.Color ?? "grey",
@@ -123,8 +147,8 @@ namespace MindNote.Server.Host.Helpers
                 });
             }
 
-            var jns = resNodes;
-            var jrs = from x in outGraph.Values from y in x.Values select y;
+            IEnumerable<D3GraphNode> jns = resNodes;
+            IEnumerable<D3GraphLink> jrs = from x in outGraph.Values from y in x.Values select y;
             return new D3Graph { links = jrs.ToList(), nodes = jns.ToList() };
         }
     }

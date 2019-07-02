@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MindNote.Client.SDK.Identity;
 using MindNote.Data;
 using MindNote.Data.Providers;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.API.Controllers
 {
@@ -17,9 +15,8 @@ namespace MindNote.Server.API.Controllers
     [EnableCors]
     public class NodesController : ControllerBase
     {
-        readonly INodesProvider provider;
-
-        IIdentityDataGetter identityDataGetter;
+        private readonly INodesProvider provider;
+        private readonly IIdentityDataGetter identityDataGetter;
 
         public NodesController(IDataProvider provider, IIdentityDataGetter identityDataGetter)
         {

@@ -1,19 +1,7 @@
-﻿using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using MindNote.Client.SDK;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-
-namespace MindNote.Server.Host.Helpers
+﻿namespace MindNote.Server.Host.Helpers
 {
     public static class ClientHelper
     {
-        public static string IdentityServer { get; set; }
-
         internal const string ClientID = "server.host";
         internal const string ClientSecret = "secret";
 

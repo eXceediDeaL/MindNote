@@ -1,6 +1,4 @@
-﻿using MindNote.Client.SDK;
-using MindNote.Client.SDK.API;
-using System.Net.Http;
+﻿using MindNote.Client.SDK.API;
 using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Nodes
@@ -13,8 +11,14 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task LoadTag(ITagsClient client, string token)
         {
-            if (Data.TagId.HasValue) Tag = await client.Get(token, Data.TagId.Value);
-            else Tag = null;
+            if (Data.TagId.HasValue)
+            {
+                Tag = await client.Get(token, Data.TagId.Value);
+            }
+            else
+            {
+                Tag = null;
+            }
         }
     }
 }

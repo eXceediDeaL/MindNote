@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
-using MindNote.Server.Host.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Tags
 {
@@ -31,9 +27,9 @@ namespace MindNote.Server.Host.Pages.Tags
 
         public async Task OnGetAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
 
-            var ms = await client.GetAll(token);
+            IEnumerable<Tag> ms = await client.GetAll(token);
             Data = ms.Select(x => new TagsViewModel { Data = x }).ToList();
         }
 
@@ -42,11 +38,11 @@ namespace MindNote.Server.Host.Pages.Tags
 
         public async Task<IActionResult> OnPostQueryAsync()
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
 
-                var ms = await client.Query(token, PostData.QueryId, PostData.QueryName, PostData.QueryColor);
+                IEnumerable<Tag> ms = await client.Query(token, PostData.QueryId, PostData.QueryName, PostData.QueryColor);
                 Data = ms.Select(x => new TagsViewModel { Data = x }).ToList();
             }
             catch
@@ -63,7 +59,7 @@ namespace MindNote.Server.Host.Pages.Tags
                 return BadRequest();
             }
 
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 await client.Delete(token, PostData.Data.Id);

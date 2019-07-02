@@ -7,20 +7,22 @@ using System.Threading.Tasks;
 
 namespace Test.Server
 {
-    public class TestIdentityDataGetter : IIdentityDataGetter
+    public class MockIdentityDataGetter : IIdentityDataGetter
     {
-        string id, email, name;
+        private readonly string id, email, name;
+        private readonly string accessToken;
 
-        public TestIdentityDataGetter(string id, string email, string name)
+        public MockIdentityDataGetter(string id, string email, string name, string accessToken)
         {
             this.id = id;
             this.email = email;
             this.name = name;
+            this.accessToken = accessToken;
         }
 
         public Task<string> GetAccessToken(HttpContext context)
         {
-            return Task.FromResult("token");
+            return Task.FromResult(accessToken);
         }
 
         public string GetClaim(IEnumerable<Claim> claims, string name)

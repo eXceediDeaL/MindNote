@@ -9,21 +9,21 @@ namespace Test.Data
         [TestMethod]
         public void Node()
         {
-            var tester = new Tester(new DataProvider());
+            Tester tester = new Tester(new DataProvider());
             tester.NodeIndependent();
         }
 
         [TestMethod]
         public void Relatioin()
         {
-            var tester = new Tester(new DataProvider());
+            Tester tester = new Tester(new DataProvider());
             tester.RelationIndependent();
         }
 
         [TestMethod]
         public void Tag()
         {
-            var tester = new Tester(new DataProvider());
+            Tester tester = new Tester(new DataProvider());
             tester.TagIndependent();
         }
     }

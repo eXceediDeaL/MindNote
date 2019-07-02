@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MindNote.Data
 {
@@ -29,7 +28,7 @@ namespace MindNote.Data
 
         public override int GetHashCode()
         {
-            var hashCode = -337219602;
+            int hashCode = -337219602;
             hashCode = hashCode * -1521134295 + Id.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Color);

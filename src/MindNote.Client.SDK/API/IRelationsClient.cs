@@ -33,7 +33,7 @@ namespace MindNote.Client.SDK.API
 
         public HttpClient Client { get; private set; }
 
-        RawRelationsClient Raw { get; set; }
+        private RawRelationsClient Raw { get; set; }
 
         public async Task Clear(string token)
         {

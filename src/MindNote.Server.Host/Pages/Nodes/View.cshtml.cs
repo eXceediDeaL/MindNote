@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Markdig;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MindNote.Client.SDK;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
 using MindNote.Server.Host.Pages.Shared;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Nodes
 {
@@ -42,16 +38,16 @@ namespace MindNote.Server.Host.Pages.Nodes
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 Data = new NodesViewModel { Data = await client.Get(token, id) };
                 Markdown = new MarkdownViewModel { Raw = Data.Data.Content };
                 await Data.LoadTag(tagsClient, token);
-                var res = (await relationsClient.GetAdjacents(token, id)).ToList();
+                List<Relation> res = (await relationsClient.GetAdjacents(token, id)).ToList();
                 if (res.Count > 0)
                 {
-                    var graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token);
+                    RelationHelper.D3Graph graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token);
                     Graph = new GraphViewModel
                     {
                         Graph = graph,
@@ -60,7 +56,7 @@ namespace MindNote.Server.Host.Pages.Nodes
                 }
                 else
                 {
-                    var graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token, new Node[] { Data.Data });
+                    RelationHelper.D3Graph graph = await RelationHelper.GenerateGraph(client, tagsClient, res, token, new Node[] { Data.Data });
                     Graph = new GraphViewModel
                     {
                         Graph = graph,
@@ -82,7 +78,7 @@ namespace MindNote.Server.Host.Pages.Nodes
             {
                 return BadRequest();
             }
-            string token = await idData.GetAccessToken(this.HttpContext);
+            string token = await idData.GetAccessToken(HttpContext);
             try
             {
                 await client.Delete(token, PostData.Data.Id);

@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using MindNote.Data.Providers.SqlServer.Models;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace MindNote.Data.Providers.SqlServer
 {
-    class NodesProvider : INodesProvider
+    internal class NodesProvider : INodesProvider
     {
-        readonly DataContext context;
-        readonly IDataProvider parent;
+        private readonly DataContext context;
+        private readonly IDataProvider parent;
 
         public NodesProvider(DataContext context, IDataProvider dataProvider)
         {
@@ -20,9 +20,12 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task Clear(string userId = null)
         {
             await parent.RelationsProvider.Clear(userId);
-            var query = context.Nodes.AsQueryable();
+            IQueryable<Models.Node> query = context.Nodes.AsQueryable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             context.Nodes.RemoveRange(query);
             await context.SaveChangesAsync();
         }
@@ -30,16 +33,24 @@ namespace MindNote.Data.Providers.SqlServer
         public async Task<int?> Create(Node data, string userId = null)
         {
             if (string.IsNullOrEmpty(data.Name))
+            {
                 return null;
+            }
+
             if (data.TagId.HasValue)
             {
                 if (await parent.TagsProvider.Get(data.TagId.Value, userId) == null)
+                {
                     return null;
+                }
             }
 
-            var raw = Models.Node.FromModel(data);
+            Models.Node raw = Models.Node.FromModel(data);
             if (userId != null)
+            {
                 raw.UserId = userId;
+            }
+
             context.Nodes.Add(raw);
             await context.SaveChangesAsync();
             return raw.Id;
@@ -47,10 +58,14 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int?> Delete(int id, string userId = null)
         {
-            var raw = await context.Nodes.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId)) return null;
+            Models.Node raw = await context.Nodes.FindAsync(id);
+            if (raw == null || (userId != null && raw.UserId != userId))
             {
-                var provider = parent.RelationsProvider;
+                return null;
+            }
+
+            {
+                IRelationsProvider provider = parent.RelationsProvider;
                 await provider.ClearAdjacents(id, userId);
             }
             context.Nodes.Remove(raw);
@@ -60,25 +75,35 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<Node> Get(int id, string userId = null)
         {
-            var query = context.Nodes.Where(x => x.Id == id);
+            IQueryable<Models.Node> query = context.Nodes.Where(x => x.Id == id);
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
         public async Task<IEnumerable<Node>> GetAll(string userId = null)
         {
-            var query = context.Nodes.AsQueryable();
+            IQueryable<Models.Node> query = context.Nodes.AsQueryable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<int?> Update(int id, Node data, string userId = null)
         {
-            var raw = await context.Nodes.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId)) return null;
-            var value = Models.Node.FromModel(data);
+            Models.Node raw = await context.Nodes.FindAsync(id);
+            if (raw == null || (userId != null && raw.UserId != userId))
+            {
+                return null;
+            }
+
+            Models.Node value = Models.Node.FromModel(data);
             raw.Name = value.Name;
             raw.Content = value.Content;
             raw.TagId = value.TagId;
@@ -89,9 +114,12 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<IEnumerable<Node>> Query(int? id, string name, string content, int? tagId, string userId = null)
         {
-            var query = context.Nodes.AsQueryable();
+            IQueryable<Models.Node> query = context.Nodes.AsQueryable();
             if (userId != null)
+            {
                 query = query.Where(x => x.UserId == userId);
+            }
+
             if (id.HasValue)
             {
                 query = query.Where(item => item.Id == id.Value);

@@ -18,7 +18,7 @@ namespace MindNote.Client.SDK.API
 
         public HttpClient Client { get; private set; }
 
-        RawHelpersClient Raw { get; set; }
+        private RawHelpersClient Raw { get; set; }
 
         public async Task Heartbeat(string token)
         {

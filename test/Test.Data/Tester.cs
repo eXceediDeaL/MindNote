@@ -4,23 +4,22 @@ using MindNote.Data.Providers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Test.Data
 {
     public class Tester
     {
-        Random random;
-        const int TestCount = 10;
-        const int UserCount = 5;
-        const double DeleteRate = 0.5;
+        private readonly Random random;
+        private const int TestCount = 10;
+        private const int UserCount = 5;
+        private const double DeleteRate = 0.5;
 
         public IDataProvider Provider
         {
             get; private set;
         }
 
-        string[] usernames;
+        private readonly string[] usernames;
 
         public Tester(IDataProvider provider)
         {
@@ -32,7 +31,9 @@ namespace Test.Data
         public void Valid(Node item, string userId)
         {
             if (item.TagId.HasValue)
+            {
                 Assert.IsNotNull(Provider.TagsProvider.Get(item.TagId.Value, userId).Result, "no tag with from id {0}", item.TagId.Value);
+            }
         }
 
         public void Valid(Relation item, string userId)
@@ -46,16 +47,16 @@ namespace Test.Data
             Assert.IsFalse(string.IsNullOrEmpty(item.Name), "name is null/empty");
         }
 
-        void NodeBasic()
+        private void NodeBasic()
         {
-            var pro = Provider.NodesProvider;
+            INodesProvider pro = Provider.NodesProvider;
 
             pro.Clear();
             Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
 
             for (int i = 0; i < TestCount; i++)
             {
-                var data = new Node
+                Node data = new Node
                 {
                     Name = $"item {i}",
                     Content = $"item content {i}",
@@ -67,13 +68,13 @@ namespace Test.Data
                 Assert.AreEqual(data, data.Clone(), "clone failed");
 
                 {
-                    var tid = pro.Create(data, username).Result;
+                    int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
                     id = tid.Value;
 
                     Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
 
-                    var actual = pro.Get(id, username).Result;
+                    Node actual = pro.Get(id, username).Result;
                     Valid(actual, username);
 
                     data.Id = id;
@@ -87,9 +88,9 @@ namespace Test.Data
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    var items = pro.Query(id, data.Name, data.Content, null, username).Result;
+                    IEnumerable<Node> items = pro.Query(id, data.Name, data.Content, null, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
-                    var actual = items.First();
+                    Node actual = items.First();
                     Valid(actual, username);
 
                     data.Id = id;
@@ -103,48 +104,48 @@ namespace Test.Data
                 }
             }
 
-            foreach (var user in usernames)
+            foreach (string user in usernames)
             {
-                var items = pro.GetAll(user).Result;
-                foreach (var v in items)
+                IEnumerable<Node> items = pro.GetAll(user).Result;
+                foreach (Node v in items)
                 {
                     Valid(v, user);
                 }
             }
         }
 
-        void NodeFailed()
+        private void NodeFailed()
         {
             Provider.TagsProvider.Clear().Wait();
-            var pro = Provider.NodesProvider;
+            INodesProvider pro = Provider.NodesProvider;
             Assert.IsNull(pro.Create(new Node { Name = null }).Result, "node name is null");
             Assert.IsNull(pro.Create(new Node { Name = "" }).Result, "node name is empty");
             Assert.IsNull(pro.Create(new Node { Name = "a", TagId = 0 }).Result, "no this tag but create node");
         }
 
-        void RelationBasic()
+        private void RelationBasic()
         {
-            var npro = Provider.NodesProvider;
+            INodesProvider npro = Provider.NodesProvider;
 
             npro.Clear();
             Assert.IsFalse(npro.GetAll().Result.Any(), "clear failed");
 
-            var pro = Provider.RelationsProvider;
+            IRelationsProvider pro = Provider.RelationsProvider;
 
-            var usernames = new string[] { "user" };
+            string[] usernames = new string[] { "user" };
 
             List<int> nodes = new List<int>();
 
             for (int i = 0; i < TestCount; i++)
             {
-                var data = new Node
+                Node data = new Node
                 {
                     Name = $"item {i}",
                     Content = $"item content {i}",
                     TagId = null,
                 };
                 string username = random.Choice(usernames);
-                var tid = npro.Create(data, username).Result;
+                int? tid = npro.Create(data, username).Result;
                 Assert.IsTrue(tid.HasValue, "create failed");
                 nodes.Add(tid.Value);
             }
@@ -154,7 +155,7 @@ namespace Test.Data
 
             for (int i = 0; i < TestCount; i++)
             {
-                var data = new Relation
+                Relation data = new Relation
                 {
                     From = random.Choice(nodes),
                     To = random.Choice(nodes),
@@ -165,13 +166,13 @@ namespace Test.Data
                 Assert.AreEqual(data, data.Clone());
 
                 {
-                    var tid = pro.Create(data, username).Result;
+                    int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
                     id = tid.Value;
 
                     Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
 
-                    var actual = pro.Get(id, username).Result;
+                    Relation actual = pro.Get(id, username).Result;
                     Valid(actual, username);
 
                     data.Id = id;
@@ -185,9 +186,9 @@ namespace Test.Data
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    var items = pro.Query(id, data.From, data.To, username).Result;
+                    IEnumerable<Relation> items = pro.Query(id, data.From, data.To, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
-                    var actual = items.First();
+                    Relation actual = items.First();
                     Valid(actual, username);
 
                     data.Id = id;
@@ -201,50 +202,50 @@ namespace Test.Data
                 }
             }
 
-            foreach (var user in usernames)
+            foreach (string user in usernames)
             {
-                var items = pro.GetAll(user).Result;
-                foreach (var v in items)
+                IEnumerable<Relation> items = pro.GetAll(user).Result;
+                foreach (Relation v in items)
                 {
                     Valid(v, user);
                 }
             }
         }
 
-        void RelationFailed()
+        private void RelationFailed()
         {
             Provider.NodesProvider.Clear().Wait();
             int id = Provider.NodesProvider.Create(new Node { Name = "name" }).Result.Value;
-            var pro = Provider.RelationsProvider;
+            IRelationsProvider pro = Provider.RelationsProvider;
             Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id + 1 }).Result);
             Assert.IsNull(pro.Create(new Relation { From = id, To = id + 1 }).Result);
             Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id }).Result);
         }
 
-        void RelationSpecial()
+        private void RelationSpecial()
         {
-            var npro = Provider.NodesProvider;
+            INodesProvider npro = Provider.NodesProvider;
 
             npro.Clear();
             Assert.IsFalse(npro.GetAll().Result.Any(), "clear failed");
 
-            var pro = Provider.RelationsProvider;
+            IRelationsProvider pro = Provider.RelationsProvider;
 
-            var usernames = new string[] { "user" };
+            string[] usernames = new string[] { "user" };
 
             List<(int, string)> nodes = new List<(int, string)>();
             Dictionary<int, HashSet<int>> adjs = new Dictionary<int, HashSet<int>>();
 
             for (int i = 0; i < TestCount; i++)
             {
-                var data = new Node
+                Node data = new Node
                 {
                     Name = $"item {i}",
                     Content = $"item content {i}",
                     TagId = null,
                 };
                 string username = random.Choice(usernames);
-                var tid = npro.Create(data, username).Result;
+                int? tid = npro.Create(data, username).Result;
                 Assert.IsTrue(tid.HasValue, "create failed");
                 nodes.Add((tid.Value, username));
                 adjs.Add(tid.Value, new HashSet<int>());
@@ -255,7 +256,7 @@ namespace Test.Data
 
             for (int i = 0; i < TestCount; i++)
             {
-                var data = new Relation
+                Relation data = new Relation
                 {
                     From = random.Choice(nodes).Item1,
                     To = random.Choice(nodes).Item1,
@@ -263,35 +264,35 @@ namespace Test.Data
                 string username = random.Choice(usernames);
 
                 {
-                    var tid = pro.Create(data, username).Result;
+                    int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
                     adjs[data.From].Add(data.To);
                     adjs[data.To].Add(data.From);
                 }
             }
 
-            foreach (var (id, user) in nodes)
+            foreach ((int id, string user) in nodes)
             {
-                var actual = pro.GetAdjacents(id, user).Result;
+                IEnumerable<Relation> actual = pro.GetAdjacents(id, user).Result;
                 CollectionAssert.AreEquivalent(adjs[id].ToArray(), new HashSet<int>(actual.Select(x => x.From ^ x.To ^ id)).ToArray());
             }
-            foreach (var (id, user) in nodes)
+            foreach ((int id, string user) in nodes)
             {
                 pro.ClearAdjacents(id, user).Wait();
                 Assert.IsFalse(pro.GetAdjacents(id, user).Result.Any());
             }
         }
 
-        void TagBasic()
+        private void TagBasic()
         {
-            var pro = Provider.TagsProvider;
+            ITagsProvider pro = Provider.TagsProvider;
 
             pro.Clear();
             Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
 
             for (int i = 0; i < TestCount; i++)
             {
-                var data = new Tag
+                Tag data = new Tag
                 {
                     Name = $"item {i}",
                     Color = random.NextString(),
@@ -302,16 +303,16 @@ namespace Test.Data
                 Assert.AreEqual(data, data.Clone());
 
                 {
-                    var tid = pro.Create(data, username).Result;
+                    int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
                     id = tid.Value;
 
                     Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
 
-                    var actual = pro.Get(id, username).Result;
+                    Tag actual = pro.Get(id, username).Result;
                     Valid(actual);
                     {
-                        var tname = pro.GetByName(data.Name, username).Result;
+                        Tag tname = pro.GetByName(data.Name, username).Result;
                         Assert.AreEqual(actual, tname);
                     }
 
@@ -326,9 +327,9 @@ namespace Test.Data
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    var items = pro.Query(id, data.Name, data.Color, username).Result;
+                    IEnumerable<Tag> items = pro.Query(id, data.Name, data.Color, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
-                    var actual = items.First();
+                    Tag actual = items.First();
                     Valid(actual);
 
                     data.Id = id;
@@ -342,17 +343,17 @@ namespace Test.Data
                 }
             }
 
-            foreach (var user in usernames)
+            foreach (string user in usernames)
             {
-                var items = pro.GetAll(user).Result;
-                foreach (var v in items)
+                IEnumerable<Tag> items = pro.GetAll(user).Result;
+                foreach (Tag v in items)
                 {
                     Valid(v);
                 }
             }
         }
 
-        void TagFailed()
+        private void TagFailed()
         {
         }
 

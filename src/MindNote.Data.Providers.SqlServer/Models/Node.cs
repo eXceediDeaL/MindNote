@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace MindNote.Data.Providers.SqlServer.Models
 {
@@ -34,7 +29,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public static Node FromModel(Data.Node data)
         {
-            var res = new Node
+            Node res = new Node
             {
                 Id = data.Id,
                 Name = data.Name,
