@@ -1,3 +1,5 @@
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -5,11 +7,15 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Share.Configuration;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
 
 namespace MindNote.Server.Host
 {
@@ -35,12 +41,68 @@ namespace MindNote.Server.Host
                 options.DefaultScheme = "Cookies";
                 options.DefaultChallengeScheme = "oidc";
             })
-            .AddCookie("Cookies")
+            .AddCookie("Cookies", options =>
+            {
+                options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+                {
+                    // Auto refresh token when auth cookies
+                    OnValidatePrincipal = async context =>
+                    {
+                        if (context.Properties?.Items[".Token.expires_at"] == null) return;
+                        var now = DateTimeOffset.UtcNow;
+
+                        var tokenExpireTime = DateTime.Parse(context.Properties.Items[".Token.expires_at"]).ToUniversalTime();
+                        var timeElapsed = now.Subtract(context.Properties.IssuedUtc.Value);
+                        var timeRemaining = tokenExpireTime.Subtract(now.DateTime);
+                        if (timeElapsed > timeRemaining)
+                        {
+                            var oldAccessToken = context.Properties.Items[".Token.access_token"];
+                            var oldRefreshToken = context.Properties.Items[".Token.refresh_token"];
+
+                            HttpClient httpclient = new HttpClient();
+
+                            var disco = await httpclient.GetDiscoveryDocumentAsync(server.Identity);
+                            if (disco.IsError) context.RejectPrincipal();
+
+                            var tokenResult = await httpclient.RequestRefreshTokenAsync(new RefreshTokenRequest
+                            {
+                                Address = disco.TokenEndpoint,
+
+                                ClientId = Helpers.ClientHelper.ClientID,
+                                ClientSecret = Helpers.ClientHelper.ClientSecret,
+
+                                RefreshToken = oldRefreshToken,
+                            });
+
+                            if (tokenResult.IsError) context.RejectPrincipal();
+
+                            var oldIdToken = context.Properties.Items[".Token.id_token"];
+
+                            var newAccessToken = tokenResult.AccessToken;
+                            var newRefreshToken = tokenResult.RefreshToken;
+
+                            var tokens = new List<AuthenticationToken>
+                                {
+                                    new AuthenticationToken {Name = OpenIdConnectParameterNames.IdToken, Value = oldIdToken},
+                                    new AuthenticationToken {Name = OpenIdConnectParameterNames.AccessToken, Value = newAccessToken},
+                                    new AuthenticationToken {Name = OpenIdConnectParameterNames.RefreshToken, Value = newRefreshToken}
+                                };
+
+                            var expiresAt = DateTime.UtcNow + TimeSpan.FromSeconds(tokenResult.ExpiresIn);
+                            tokens.Add(new AuthenticationToken { Name = "expires_at", Value = expiresAt.ToString("o", CultureInfo.InvariantCulture) });
+
+                            context.Properties.StoreTokens(tokens);
+                            context.ShouldRenew = true;
+                        }
+                    },
+                };
+            })
             .AddOpenIdConnect("oidc", options =>
             {
                 options.SignInScheme = "Cookies";
                 options.Authority = server.Identity;
                 options.RequireHttpsMetadata = false;
+                options.UseTokenLifetime = true;
 
                 options.ClientId = Helpers.ClientHelper.ClientID;
                 options.ClientSecret = Helpers.ClientHelper.ClientSecret;
@@ -54,6 +116,13 @@ namespace MindNote.Server.Host
                 options.Scope.Add("email");
                 options.Scope.Add("offline_access");
             });
+        }
+
+        public static void ConfigureClientServices(LinkedServerConfiguration server, IServiceCollection services)
+        {
+            services.AddHttpClient<INodesClient, NodesClient>(client => client.BaseAddress = new Uri(server.Api));
+            services.AddHttpClient<ITagsClient, TagsClient>(client => client.BaseAddress = new Uri(server.Api));
+            services.AddHttpClient<IRelationsClient, RelationsClient>(client => client.BaseAddress = new Uri(server.Api));
         }
 
         public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
@@ -74,10 +143,9 @@ namespace MindNote.Server.Host
             LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
             ConfigureIdentityServices(server, services);
 
+            ConfigureClientServices(server, services);
+
             services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();
-            services.AddScoped<INodesClient, NodesClient>(x => new NodesClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
-            services.AddScoped<ITagsClient, TagsClient>(x => new TagsClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
-            services.AddScoped<IRelationsClient, RelationsClient>(x => new RelationsClient(new System.Net.Http.HttpClient() { BaseAddress = new Uri(server.Api) }));
 
             ConfigureFinalServices(Configuration, services);
         }

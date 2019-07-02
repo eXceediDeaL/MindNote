@@ -1,0 +1,29 @@
+﻿@page
+@model IndexModel
+@inject MindNote.Client.SDK.Identity.IIdentityDataGetter IDData
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+    <li class="breadcrumb-item active">@IDData.GetClaimId(User)</li>
+</ul>
+
+<div class="row">
+    <div class="col-3">
+        <div class="card">
+            <img class="card-img-top" gravatar="@IDData.GetClaimEmail(User)" size="256" default="mp" />
+            <div class="card-body">
+                <h4 class="card-title">@IDData.GetClaimName(User)</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-9">
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

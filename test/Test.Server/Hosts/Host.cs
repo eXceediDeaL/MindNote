@@ -19,10 +19,15 @@ namespace Test.Server.Hosts
         {
             get
             {
-                List<string> res = new List<string>
+                List<string> res = new List<string>();
+
                 {
-                    "/Identity/Login",
-                };
+                    string[] sub = new string[]
+                    {
+                        "Index",
+                    };
+                    res.AddRange(sub.Select(x => "/Identity/Account/" + x));
+                }
 
                 {
                     string[] sub = new string[]

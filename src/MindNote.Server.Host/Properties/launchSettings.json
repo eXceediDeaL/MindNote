@@ -20,6 +20,8 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
+        "r:server:Identity": "http://id.mindnote.com",
+        "r:server:Api": "http://api.mindnote.com",
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:8100"

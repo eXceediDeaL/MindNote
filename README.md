@@ -17,15 +17,15 @@ Project Status:
 
 # Usage
 
-1. Install Docker and Docker-Compose
-2. Get `docker-compose.yml`
+1. Install Docker and Docker-Compose.
+2. Clone this repository.
+3. Enter the deploy directory is `docker/deploy`. 
+4. Specify the configuration in `config` directory.
+5. Use these commands to start:
 
 ```sh
-curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-compose-production.yml > docker-compose.yml
+docker-compose up -d
 ```
-
-3. Replace `http://localhost` in `docker-compose.yml` with your host URL.
-4. Use `docker-compose up` to start containers.
 
 It will create a MySQL container, an API server container, an identity server container, a host server container and a nginx server container for reverse proxy.
 

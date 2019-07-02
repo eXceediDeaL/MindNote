@@ -6,7 +6,6 @@ namespace MindNote.Server.Host.Pages
     {
         public void OnGet()
         {
-
         }
     }
 }

@@ -19,8 +19,6 @@ namespace MindNote.Server.Identity
 {
     public class Startup
     {
-        public static string ServerHostUrl { get; set; }
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -45,8 +43,6 @@ namespace MindNote.Server.Identity
 
         public static void ConfigureIdentityServices(LinkedServerConfiguration server,IConfiguration configuration, IServiceCollection services)
         {
-            ServerHostUrl = server.Host;
-
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -54,6 +50,12 @@ namespace MindNote.Server.Identity
             var idServer = services.AddIdentityServer(options =>
             {
                 options.PublicOrigin = server.Identity;
+                options.UserInteraction = new IdentityServer4.Configuration.UserInteractionOptions
+                {
+                    LoginUrl = "/Identity/Account/Login",
+                    LogoutUrl = "/Identity/Account/Logout",
+                    ErrorUrl = "/Identity/Account/Error",
+                };
             })
                 .AddDeveloperSigningCredential();
 

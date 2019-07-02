@@ -1,13 +1,12 @@
 {
     "Logging": {
-      "LogLevel": {
-        "Default": "Warning"
-      }
+        "LogLevel": {
+            "Default": "Warning"
+        }
     },
     "AllowedHosts": "*",
     "server": {
-      "Identity": "http://id.mindnote.com",
-      "Api": "http://api.mindnote.com"
+        "Identity": "http://id.mindnote.com",
+        "Api": "http://api.mindnote.com"
     }
-  }
-  
+}

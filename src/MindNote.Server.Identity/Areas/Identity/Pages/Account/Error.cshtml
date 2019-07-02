@@ -1,0 +1,31 @@
+﻿@page
+@model ErrorModel
+@using Microsoft.AspNetCore.Hosting
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment Environment
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request of authentication.</h2>
+
+@if (Model.Message?.RequestId != null)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.Message.RequestId</code>
+    </p>
+}
+
+@if (Model.Message?.Error != null)
+{
+    <p>
+        <strong>Error:</strong> <code>@Model.Message.Error</code>
+    </p>
+}
+
+@if (Environment.IsDevelopment() && Model.Message?.ErrorDescription != null)
+{
+    <p>
+        <strong>Description:</strong> <code>@Model.Message.ErrorDescription</code>
+    </p>
+}
