@@ -28,7 +28,7 @@ namespace MindNote.Server.Host
 
         public IConfiguration Configuration { get; }
 
-        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IdentityClientConfiguration idClient, IServiceCollection services)
         {
             services.AddAuthorization();
 
@@ -56,40 +56,13 @@ namespace MindNote.Server.Host
                         var timeRemaining = tokenExpireTime.Subtract(now.DateTime);
                         if (timeElapsed > timeRemaining)
                         {
-                            var oldAccessToken = context.Properties.Items[".Token.access_token"];
+                            // var oldAccessToken = context.Properties.Items[".Token.access_token"];
                             var oldRefreshToken = context.Properties.Items[".Token.refresh_token"];
-
-                            HttpClient httpclient = new HttpClient();
-
-                            var disco = await httpclient.GetDiscoveryDocumentAsync(server.Identity);
-                            if (disco.IsError) context.RejectPrincipal();
-
-                            var tokenResult = await httpclient.RequestRefreshTokenAsync(new RefreshTokenRequest
-                            {
-                                Address = disco.TokenEndpoint,
-
-                                ClientId = Helpers.ClientHelper.ClientID,
-                                ClientSecret = Helpers.ClientHelper.ClientSecret,
-
-                                RefreshToken = oldRefreshToken,
-                            });
-
-                            if (tokenResult.IsError) context.RejectPrincipal();
-
                             var oldIdToken = context.Properties.Items[".Token.id_token"];
 
-                            var newAccessToken = tokenResult.AccessToken;
-                            var newRefreshToken = tokenResult.RefreshToken;
-
-                            var tokens = new List<AuthenticationToken>
-                                {
-                                    new AuthenticationToken {Name = OpenIdConnectParameterNames.IdToken, Value = oldIdToken},
-                                    new AuthenticationToken {Name = OpenIdConnectParameterNames.AccessToken, Value = newAccessToken},
-                                    new AuthenticationToken {Name = OpenIdConnectParameterNames.RefreshToken, Value = newRefreshToken}
-                                };
-
-                            var expiresAt = DateTime.UtcNow + TimeSpan.FromSeconds(tokenResult.ExpiresIn);
-                            tokens.Add(new AuthenticationToken { Name = "expires_at", Value = expiresAt.ToString("o", CultureInfo.InvariantCulture) });
+                            HttpClient httpclient = new HttpClient { BaseAddress = new Uri(server.Identity) };
+                            var tokenClient = new Client.SDK.Identity.TokenClient(httpclient);
+                            var tokens = await tokenClient.RefreshToken(idClient.ClientId, idClient.ClientSecret, oldRefreshToken, oldIdToken);
 
                             context.Properties.StoreTokens(tokens);
                             context.ShouldRenew = true;
@@ -104,8 +77,8 @@ namespace MindNote.Server.Host
                 options.RequireHttpsMetadata = false;
                 options.UseTokenLifetime = true;
 
-                options.ClientId = Helpers.ClientHelper.ClientID;
-                options.ClientSecret = Helpers.ClientHelper.ClientSecret;
+                options.ClientId = idClient.ClientId;
+                options.ClientSecret = idClient.ClientSecret;
                 options.ResponseType = "code id_token";
                 options.SaveTokens = true;
                 options.GetClaimsFromUserInfoEndpoint = true;
@@ -140,8 +113,9 @@ namespace MindNote.Server.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
-            ConfigureIdentityServices(server, services);
+            var server = LinkedServerConfiguration.Load(Configuration);
+            var idClient = IdentityClientConfiguration.Load(Configuration);
+            ConfigureIdentityServices(server, idClient, services);
 
             ConfigureClientServices(server, services);
 

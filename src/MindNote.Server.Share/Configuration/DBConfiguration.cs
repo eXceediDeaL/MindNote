@@ -14,6 +14,6 @@ namespace MindNote.Server.Share.Configuration
 
         public DBType Type { get; set; }
 
-        public static DBConfiguration Load(IConfiguration configuration) => configuration.GetSection("db").Get<DBConfiguration>();
+        public static DBConfiguration Load(IConfiguration configuration) => configuration?.GetSection("db")?.Get<DBConfiguration>();
     }
 }

@@ -10,17 +10,13 @@ namespace Test.Server.Identities
     public class Identity
     {
         [DataTestMethod]
-        [DataRow("/Index")]
-        [DataRow("/Privacy")]
-        [DataRow("/Error")]
-        [DataRow("/Identity/Account/Register")]
-        [DataRow("/Identity/Account/Login")]
         [DataRow("/.well-known/openid-configuration")]
         public void Urls(string url)
         {
-            using (TestServer testServer = new TestServer(Program.CreateWebHostBuilder(Array.Empty<string>())))
+            TestUser user = Utils.DefaultUser;
+            using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
             {
-                using (System.Net.Http.HttpClient client = testServer.CreateClient())
+                using (System.Net.Http.HttpClient client = id.CreateClient())
                 {
                     System.Net.Http.HttpResponseMessage response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();

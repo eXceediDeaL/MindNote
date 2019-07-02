@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MindNote.Client.SDK.Identity;
 using MindNote.Data;
 using MindNote.Data.Providers;
 using MindNote.Server.API.Controllers;
@@ -64,47 +65,39 @@ namespace Test.Server.Apis
         [DataRow("/swagger/v1/swagger.json")]
         public void Urls(string url)
         {
-            using (TestServer testServer = new TestServer(MindNote.Server.API.Program.CreateWebHostBuilder(Array.Empty<string>())))
+            Utils.UseApiEnvironment((_, api, __) =>
             {
-                using (HttpClient client = testServer.CreateClient())
+                using (HttpClient client = api.CreateClient())
                 {
                     HttpResponseMessage response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
                 }
-            }
+            });
         }
 
         [DataTestMethod]
         [DynamicData(nameof(AuthGetUrls))]
         public void AuthGet(string url)
         {
-            IDataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            IdentityServer4.Test.TestUser user = Utils.DefaultUser;
-            using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
+            Utils.UseApiEnvironment((_, api, token) =>
             {
-                string token = id.GetBearerToken(user.Username, user.Password, SampleConfig.APIScope);
-                MockTokenIdentityDataGetter idData = new MockTokenIdentityDataGetter(token);
-                using (MockApiWebApplicationFactory testServer = new MockApiWebApplicationFactory(id.Server, provider, idData))
+                using (HttpClient client = api.CreateClient())
                 {
-                    using (HttpClient client = testServer.CreateClient())
-                    {
-                        HttpResponseMessage response = client.GetAsync(url).Result;
-                        Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+                    HttpResponseMessage response = client.GetAsync(url).Result;
+                    Assert.AreEqual(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
 
-                        client.SetBearerToken(token);
-                        response = client.GetAsync(url).Result;
-                        response.EnsureSuccessStatusCode();
-                    }
+                    client.SetBearerToken(token);
+                    response = client.GetAsync(url).Result;
+                    response.EnsureSuccessStatusCode();
                 }
-            }
+            });
         }
 
         [TestMethod]
         public void Nodes()
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            MockIdentityDataGetter idData = new MockIdentityDataGetter("id", "email@host", "user", "");
-            NodesController controller = new NodesController(provider, idData);
+            NodesController controller = new NodesController(provider, Utils.MockIdentityDataGetter);
             Assert.IsFalse(controller.GetAll().Result.Any());
             Assert.IsNull(controller.Get(0).Result);
             controller.Clear().Wait();
@@ -122,10 +115,9 @@ namespace Test.Server.Apis
         public void Relations()
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            MockIdentityDataGetter idData = new MockIdentityDataGetter("id", "email@host", "user", "");
-            int a = provider.NodesProvider.Create(new Node { Name = "node1" }, idData.GetClaimId(null)).Result.Value;
-            int b = provider.NodesProvider.Create(new Node { Name = "node2" }, idData.GetClaimId(null)).Result.Value;
-            RelationsController controller = new RelationsController(provider, idData);
+            int a = provider.NodesProvider.Create(new Node { Name = "node1" }, Utils.MockIdentityDataGetter.GetClaimId(null)).Result.Value;
+            int b = provider.NodesProvider.Create(new Node { Name = "node2" }, Utils.MockIdentityDataGetter.GetClaimId(null)).Result.Value;
+            RelationsController controller = new RelationsController(provider, Utils.MockIdentityDataGetter);
             Assert.IsFalse(controller.GetAll().Result.Any());
             Assert.IsNull(controller.Get(0).Result);
             controller.Clear().Wait();
@@ -147,8 +139,7 @@ namespace Test.Server.Apis
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
 
-            MockIdentityDataGetter idData = new MockIdentityDataGetter("id", "email@host", "user", "");
-            TagsController controller = new TagsController(provider, idData);
+            TagsController controller = new TagsController(provider, Utils.MockIdentityDataGetter);
             Assert.IsFalse(controller.GetAll().Result.Any());
             Assert.IsNull(controller.Get(0).Result);
             controller.Clear().Wait();

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MindNote.Client.SDK\MindNote.Client.SDK.csproj" />
     <ProjectReference Include="..\..\src\MindNote.Server.API\MindNote.Server.API.csproj" />
     <ProjectReference Include="..\..\src\MindNote.Server.Host\MindNote.Server.Host.csproj" />
     <ProjectReference Include="..\..\src\MindNote.Server.Identity\MindNote.Server.Identity.csproj" />

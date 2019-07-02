@@ -159,14 +159,17 @@ namespace MindNote.Server.API
             app.UseAuthentication();
 
             app.UseOpenApi();
+
+            var idClient = IdentityClientConfiguration.Load(configuration);
             app.UseSwaggerUi3(config =>
             {
                 config.OAuth2Client = new NSwag.AspNetCore.OAuth2ClientSettings
                 {
-                    ClientId = "server.api",
-                    ClientSecret = "secret",
+                    ClientId = idClient?.ClientId ?? "",
+                    ClientSecret = idClient?.ClientSecret ?? "",
                 };
             });
+
             app.UseReDoc();
 
             app.UseCors();

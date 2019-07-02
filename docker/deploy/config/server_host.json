@@ -8,5 +8,9 @@
     "server": {
         "Identity": "http://id.mindnote.com",
         "Api": "http://api.mindnote.com"
+    },
+    "identityClient": {
+        "ClientId": "server.host",
+        "ClientSecret": "secret"
     }
 }

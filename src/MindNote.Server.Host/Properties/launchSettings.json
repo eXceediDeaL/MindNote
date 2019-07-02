@@ -16,13 +16,22 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "MindNote.Server.Host(Local)": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:8100"
+    },
     "MindNote.Server.Host": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "r:server:Identity": "http://id.mindnote.com",
-        "r:server:Api": "http://api.mindnote.com",
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "identityClient:ClientId": "server.host.dev",
+        "server:Identity": "http://id.mindnote.com",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "server:Api": "http://api.mindnote.com"
       },
       "applicationUrl": "http://localhost:8100"
     }

@@ -62,42 +62,32 @@ namespace Test.Server.Hosts
         [DataRow("/Error")]
         public void Urls(string url)
         {
-            using (TestServer testServer = new TestServer(MindNote.Server.Host.Program.CreateWebHostBuilder(Array.Empty<string>())))
+            Utils.UseHostEnvironment((host, _) =>
             {
-                using (HttpClient client = testServer.CreateClient())
+                using (HttpClient client = host.CreateClient())
                 {
                     HttpResponseMessage response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
                 }
-            }
+            });
         }
 
         [DataTestMethod]
         [DynamicData(nameof(AuthGetUrls))]
         public void AuthGet(string url)
         {
-            IDataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            IdentityServer4.Test.TestUser user = Utils.DefaultUser;
-            using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
+            Utils.UseHostEnvironment((host, token) =>
             {
-                string token = id.GetBearerToken(user.Username, user.Password, SampleConfig.APIScope);
-                MockTokenIdentityDataGetter idData = new MockTokenIdentityDataGetter(token);
-                using (MockApiWebApplicationFactory api = new MockApiWebApplicationFactory(id.Server, provider, new IdentityDataGetter()))
+                using (HttpClient client = host.CreateClient())
                 {
-                    using (MockHostWebApplicationFactory<MindNote.Server.API.Startup> testServer = new MockHostWebApplicationFactory<MindNote.Server.API.Startup>(id.Server, api, idData))
-                    {
-                        using (HttpClient client = testServer.CreateClient())
-                        {
-                            HttpResponseMessage response = client.GetAsync(url).Result;
-                            Assert.IsFalse(response.IsSuccessStatusCode);
+                    HttpResponseMessage response = client.GetAsync(url).Result;
+                    Assert.IsFalse(response.IsSuccessStatusCode);
 
-                            client.SetBearerToken(token);
-                            response = client.GetAsync(url).Result;
-                            response.EnsureSuccessStatusCode();
-                        }
-                    }
+                    client.SetBearerToken(token);
+                    response = client.GetAsync(url).Result;
+                    response.EnsureSuccessStatusCode();
                 }
-            }
+            });
         }
     }
 }

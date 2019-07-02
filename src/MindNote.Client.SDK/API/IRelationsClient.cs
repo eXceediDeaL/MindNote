@@ -10,6 +10,8 @@ namespace MindNote.Client.SDK.API
 
         Task<IEnumerable<Relation>> GetAdjacents(string token, int nodeId);
 
+        Task<int?> ClearAdjacents(string token, int nodeId);
+
         Task<IEnumerable<Relation>> Query(string token, int? id, int? from, int? to);
 
         Task<Relation> Get(string token, int id);
@@ -81,6 +83,12 @@ namespace MindNote.Client.SDK.API
         {
             Client.SetBearerToken(token);
             return await Raw.UpdateAsync(id, data);
+        }
+
+        public async Task<int?> ClearAdjacents(string token, int nodeId)
+        {
+            Client.SetBearerToken(token);
+            return await Raw.ClearAdjacentsAsync(nodeId);
         }
     }
 }
