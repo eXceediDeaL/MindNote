@@ -1,3 +1,4 @@
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -42,7 +43,7 @@ namespace MindNote.Server.Identity
             });
         }
 
-        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server,IConfiguration configuration, IServiceCollection services)
         {
             ServerHostUrl = server.Host;
 
@@ -50,15 +51,29 @@ namespace MindNote.Server.Identity
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddIdentityServer(options =>
+            var idServer = services.AddIdentityServer(options =>
             {
                 options.PublicOrigin = server.Identity;
             })
-                .AddDeveloperSigningCredential()
-                .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients(server.Host))
-                .AddAspNetIdentity<IdentityUser>();
+                .AddDeveloperSigningCredential();
+
+            {
+                var idSection = configuration.GetSection("identityServer");
+                {
+                    var obj = idSection.GetSection("IdentityResources").Get<IdentityResource[]>();
+                    idServer.AddInMemoryIdentityResources(obj ?? SampleConfig.GetIdentityResources());
+                }
+                {
+                    var obj = idSection.GetSection("ApiResources").Get<ApiResource[]>();
+                    idServer.AddInMemoryApiResources(obj ?? SampleConfig.GetApiResources());
+                }
+                {
+                    var obj = idSection.GetSection("Clients").Get<Client[]>();
+                    idServer.AddInMemoryClients(obj ?? SampleConfig.GetClients(server.Host));
+                }
+            }
+
+            idServer.AddAspNetIdentity<IdentityUser>();
         }
 
         public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
@@ -92,7 +107,7 @@ namespace MindNote.Server.Identity
             ConfigureDBServices(db, services);
 
             LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
-            ConfigureIdentityServices(server, services);
+            ConfigureIdentityServices(server, Configuration, services);
 
             ConfigureFinalServices(Configuration, services);
         }

@@ -11,7 +11,6 @@ namespace MindNote.Client.SDK.API
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "12.3.1.0 (NJsonSchema v9.14.1.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class RawHelpersClient 
     {
-        private string _baseUrl = "http://localhost:8050";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
     
@@ -24,12 +23,6 @@ namespace MindNote.Client.SDK.API
                 UpdateJsonSerializerSettings(settings);
                 return settings;
             });
-        }
-    
-        public string BaseUrl 
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
     
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -50,7 +43,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task HeartbeatAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Helpers/Heartbeat");
+            urlBuilder_.Append("Helpers/Heartbeat");
     
             var client_ = _httpClient;
             try
@@ -139,7 +132,6 @@ namespace MindNote.Client.SDK.API
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "12.3.1.0 (NJsonSchema v9.14.1.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class RawNodesClient 
     {
-        private string _baseUrl = "http://localhost:8050";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
     
@@ -152,12 +144,6 @@ namespace MindNote.Client.SDK.API
                 UpdateJsonSerializerSettings(settings);
                 return settings;
             });
-        }
-    
-        public string BaseUrl 
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
     
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -178,7 +164,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Node>> GetAllAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Nodes/All");
+            urlBuilder_.Append("Nodes/All");
     
             var client_ = _httpClient;
             try
@@ -252,7 +238,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Node>> QueryAsync(int? id, string name, string content, int? tagId, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Nodes/Query?");
+            urlBuilder_.Append("Nodes/Query?");
             if (id != null) 
             {
                 urlBuilder_.Append("id=").Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -346,7 +332,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Nodes/{id}");
+            urlBuilder_.Append("Nodes/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -424,7 +410,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Nodes/{id}");
+            urlBuilder_.Append("Nodes/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -502,7 +488,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Nodes/{id}");
+            urlBuilder_.Append("Nodes/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -580,7 +566,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task ClearAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Nodes/Clear");
+            urlBuilder_.Append("Nodes/Clear");
     
             var client_ = _httpClient;
             try
@@ -642,7 +628,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<int?> CreateAsync(Node data, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Nodes");
+            urlBuilder_.Append("Nodes");
     
             var client_ = _httpClient;
             try
@@ -747,7 +733,6 @@ namespace MindNote.Client.SDK.API
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "12.3.1.0 (NJsonSchema v9.14.1.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class RawRelationsClient 
     {
-        private string _baseUrl = "http://localhost:8050";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
     
@@ -760,12 +745,6 @@ namespace MindNote.Client.SDK.API
                 UpdateJsonSerializerSettings(settings);
                 return settings;
             });
-        }
-    
-        public string BaseUrl 
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
     
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -786,7 +765,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Relation>> GetAllAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations/All");
+            urlBuilder_.Append("Relations/All");
     
             var client_ = _httpClient;
             try
@@ -863,7 +842,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("nodeId");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations/Adjacents/{nodeId}");
+            urlBuilder_.Append("Relations/Adjacents/{nodeId}");
             urlBuilder_.Replace("{nodeId}", System.Uri.EscapeDataString(ConvertToString(nodeId, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -928,6 +907,85 @@ namespace MindNote.Client.SDK.API
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<int?> ClearAdjacentsAsync(int nodeId)
+        {
+            return ClearAdjacentsAsync(nodeId, System.Threading.CancellationToken.None);
+        }
+    
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        public async System.Threading.Tasks.Task<int?> ClearAdjacentsAsync(int nodeId, System.Threading.CancellationToken cancellationToken)
+        {
+            if (nodeId == null)
+                throw new System.ArgumentNullException("nodeId");
+    
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("Relations/Adjacents/{nodeId}/Clear");
+            urlBuilder_.Replace("{nodeId}", System.Uri.EscapeDataString(ConvertToString(nodeId, System.Globalization.CultureInfo.InvariantCulture)));
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200") 
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            var result_ = default(int?); 
+                            try
+                            {
+                                result_ = Newtonsoft.Json.JsonConvert.DeserializeObject<int?>(responseData_, _settings.Value);
+                                return result_; 
+                            } 
+                            catch (System.Exception exception_) 
+                            {
+                                throw new SwaggerException("Could not deserialize the response body.", (int)response_.StatusCode, responseData_, headers_, exception_);
+                            }
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new SwaggerException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+            
+                        return default(int?);
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
         public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Relation>> QueryAsync(int? id, int? from, int? to)
         {
             return QueryAsync(id, from, to, System.Threading.CancellationToken.None);
@@ -938,7 +996,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Relation>> QueryAsync(int? id, int? from, int? to, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations/Query?");
+            urlBuilder_.Append("Relations/Query?");
             if (id != null) 
             {
                 urlBuilder_.Append("id=").Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1028,7 +1086,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations/{id}");
+            urlBuilder_.Append("Relations/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1106,7 +1164,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations/{id}");
+            urlBuilder_.Append("Relations/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1184,7 +1242,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations/{id}");
+            urlBuilder_.Append("Relations/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1262,7 +1320,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task ClearAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations/Clear");
+            urlBuilder_.Append("Relations/Clear");
     
             var client_ = _httpClient;
             try
@@ -1324,7 +1382,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<int?> CreateAsync(Relation data, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Relations");
+            urlBuilder_.Append("Relations");
     
             var client_ = _httpClient;
             try
@@ -1429,7 +1487,6 @@ namespace MindNote.Client.SDK.API
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "12.3.1.0 (NJsonSchema v9.14.1.0 (Newtonsoft.Json v11.0.0.0))")]
     public partial class RawTagsClient 
     {
-        private string _baseUrl = "http://localhost:8050";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
     
@@ -1442,12 +1499,6 @@ namespace MindNote.Client.SDK.API
                 UpdateJsonSerializerSettings(settings);
                 return settings;
             });
-        }
-    
-        public string BaseUrl 
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
         }
     
         protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
@@ -1468,7 +1519,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Tag>> GetAllAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags/All");
+            urlBuilder_.Append("Tags/All");
     
             var client_ = _httpClient;
             try
@@ -1542,7 +1593,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Tag>> QueryAsync(int? id, string name, string color, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags/Query?");
+            urlBuilder_.Append("Tags/Query?");
             if (id != null) 
             {
                 urlBuilder_.Append("id=").Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1632,7 +1683,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags/{id}");
+            urlBuilder_.Append("Tags/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1710,7 +1761,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags/{id}");
+            urlBuilder_.Append("Tags/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1788,7 +1839,7 @@ namespace MindNote.Client.SDK.API
                 throw new System.ArgumentNullException("id");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags/{id}");
+            urlBuilder_.Append("Tags/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
@@ -1866,7 +1917,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<Tag> GetByNameAsync(string name, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags?");
+            urlBuilder_.Append("Tags?");
             if (name != null) 
             {
                 urlBuilder_.Append("name=").Append(System.Uri.EscapeDataString(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1945,7 +1996,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task<int?> CreateAsync(Tag data, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags");
+            urlBuilder_.Append("Tags");
     
             var client_ = _httpClient;
             try
@@ -2022,7 +2073,7 @@ namespace MindNote.Client.SDK.API
         public async System.Threading.Tasks.Task ClearAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Tags/Clear");
+            urlBuilder_.Append("Tags/Clear");
     
             var client_ = _httpClient;
             try

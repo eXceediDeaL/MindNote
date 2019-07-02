@@ -10,6 +10,6 @@
     },
     "db": {
         "ConnectionString": "server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;",
-        "Type": "MySQL"
+        "Type": "MySql"
     }
 }

@@ -17,7 +17,6 @@
     },
     "MindNote.Server.Identity": {
       "commandName": "Project",
-      "commandLineArgs": "db:Type=MSSqlServer",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

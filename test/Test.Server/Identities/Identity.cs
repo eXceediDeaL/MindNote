@@ -34,7 +34,7 @@ namespace Test.Server.Identities
             TestUser user = Utils.DefaultUser;
             using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
             {
-                string token = id.GetBearerToken(user.Username, user.Password, Config.APIScope);
+                string token = id.GetBearerToken(user.Username, user.Password, SampleConfig.APIScope);
             }
         }
     }

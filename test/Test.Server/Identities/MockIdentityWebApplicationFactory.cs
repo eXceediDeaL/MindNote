@@ -32,15 +32,15 @@ namespace Test.Server.Identities
                     options.PublicOrigin = Utils.ServerConfiguration.Identity;
                 })
                  .AddDeveloperSigningCredential()
-                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                 .AddInMemoryApiResources(Config.GetApiResources())
+                 .AddInMemoryIdentityResources(SampleConfig.GetIdentityResources())
+                 .AddInMemoryApiResources(SampleConfig.GetApiResources())
                  .AddInMemoryClients(new[]{
                     new Client
                     {
                         ClientId=ClientId,
                         ClientSecrets = new [] { new Secret(ClientSecret.Sha256()) },
                         AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                        AllowedScopes = { Config.APIScope }
+                        AllowedScopes = { SampleConfig.APIScope }
                     }})
                  .AddTestUsers(users);
 

@@ -13,7 +13,7 @@ jobs:
         - dotnet restore -s https://api.nuget.org/v3/index.json
         - dotnet build
         - dotnet test
-        - powershell -c "OpenCover.Console.exe -register:user -target:\"dotnet.exe\" -targetargs:\"test\" -output:coverage.xml -filter:\"+[*]* -[*Moq]* -[xunit*]*\" -oldstyle"
+        - powershell -c "OpenCover.Console.exe -register:user -target:\"dotnet.exe\" -targetargs:\"test\" -output:coverage.xml -filter:\"+[*]* -[*Moq]* -[xunit*]* -[AutoGen*]*\" -oldstyle"
         - curl -s https://codecov.io/bash > codecov
         - chmod +x codecov
         - ./codecov -f "coverage.xml"

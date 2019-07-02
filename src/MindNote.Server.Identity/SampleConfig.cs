@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MindNote.Server.Identity
 {
-    public static class Config
+    public static class SampleConfig
     {
         public const string APIScope = "api";
 
@@ -27,14 +27,24 @@ namespace MindNote.Server.Identity
             };
         }
 
-        public static IEnumerable<Client> GetClients(string serverHostUrl)
+        public static IEnumerable<Client> GetClients(string serverHostUrl = null)
         {
-            return new List<Client>
+            var res = new List<Client>
             {
                 new Client
                 {
-                    ClientId = "server.host",
+                    ClientId="server.api",
                     ClientSecrets = new [] { new Secret("secret".Sha256()) },
+                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                    AllowedScopes = { APIScope }
+                }
+            };
+            if (serverHostUrl != null)
+            {
+                res.Add(new Client
+                {
+                    ClientId = "server.host",
+                    ClientSecrets = new[] { new Secret("secret".Sha256()) },
                     AllowedGrantTypes = GrantTypes.Hybrid,
                     RequireConsent = false,
 
@@ -52,15 +62,9 @@ namespace MindNote.Server.Identity
                         APIScope
                     },
                     AllowOfflineAccess = true
-                },
-                new Client
-                {
-                    ClientId="server.api",
-                    ClientSecrets = new [] { new Secret("secret".Sha256()) },
-                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                    AllowedScopes = { APIScope }
-                }
-            };
+                });
+            }
+            return res;
         }
     }
 }

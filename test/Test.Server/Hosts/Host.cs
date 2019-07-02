@@ -27,21 +27,24 @@ namespace Test.Server.Hosts
                 {
                     string[] sub = new string[]
                     {
-                        "Index"
+                        "Index",
+                        "Edit",
                     };
                     res.AddRange(sub.Select(x => "/Nodes/" + x));
                 }
                 {
                     string[] sub = new string[]
                     {
-                        "Index"
+                        "Index",
+                        "Edit",
                     };
                     res.AddRange(sub.Select(x => "/Relations/" + x));
                 }
                 {
                     string[] sub = new string[]
                     {
-                        "Index"
+                        "Index",
+                        "Edit",
                     };
                     res.AddRange(sub.Select(x => "/Tags/" + x));
                 }
@@ -72,7 +75,7 @@ namespace Test.Server.Hosts
             IdentityServer4.Test.TestUser user = Utils.DefaultUser;
             using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
             {
-                string token = id.GetBearerToken(user.Username, user.Password, Config.APIScope);
+                string token = id.GetBearerToken(user.Username, user.Password, SampleConfig.APIScope);
                 MockTokenIdentityDataGetter idData = new MockTokenIdentityDataGetter(token);
                 using (MockApiWebApplicationFactory api = new MockApiWebApplicationFactory(id.Server, provider, new IdentityDataGetter()))
                 {

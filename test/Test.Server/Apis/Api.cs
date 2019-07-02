@@ -82,7 +82,7 @@ namespace Test.Server.Apis
             IdentityServer4.Test.TestUser user = Utils.DefaultUser;
             using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
             {
-                string token = id.GetBearerToken(user.Username, user.Password, Config.APIScope);
+                string token = id.GetBearerToken(user.Username, user.Password, SampleConfig.APIScope);
                 MockTokenIdentityDataGetter idData = new MockTokenIdentityDataGetter(token);
                 using (MockApiWebApplicationFactory testServer = new MockApiWebApplicationFactory(id.Server, provider, idData))
                 {
