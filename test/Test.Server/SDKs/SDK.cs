@@ -17,21 +17,21 @@ namespace Test.Server.SDKs
     public class SDK
     {
         [TestMethod]
-        public void Nodes()
+        public void Notes()
         {
             Utils.UseApiEnvironment((_, api, token) =>
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    var client = new NodesClient(baseClient);
+                    var client = new NotesClient(baseClient);
 
                     Assert.IsFalse(client.GetAll(token).Result.Any());
                     Assert.IsNull(client.Get(token, 0).Result);
                     client.Clear(token).Wait();
                     {
-                        Node node = new Node { Name = "name" };
+                        Note node = new Note { Title = "name" };
                         int id = client.Create(token, node).Result.Value;
-                        Assert.AreEqual(node.Name, client.Query(token, id, null, null, null).Result.First().Name);
+                        Assert.AreEqual(node.Title, client.Query(token, id, null, null, null, null).Result.First().Title);
                         node.Content = "content";
                         Assert.IsTrue(client.Update(token, id, node).Result.HasValue);
                         Assert.IsTrue(client.Delete(token, id).Result.HasValue);
@@ -41,19 +41,19 @@ namespace Test.Server.SDKs
         }
 
         [TestMethod]
-        public void Tags()
+        public void Categories()
         {
             Utils.UseApiEnvironment((_, api, token) =>
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    var client = new TagsClient(baseClient);
+                    var client = new CategoriesClient(baseClient);
 
                     Assert.IsFalse(client.GetAll(token).Result.Any());
                     Assert.IsNull(client.Get(token, 0).Result);
                     client.Clear(token).Wait();
                     {
-                        Tag tag = new Tag { Name = "tag", Color = "black" };
+                        Category tag = new Category { Name = "tag", Color = "black" };
                         int id = client.Create(token, tag).Result.Value;
                         Assert.AreEqual(tag.Name, client.Query(token, id, null, null).Result.First().Name);
                         Assert.AreEqual(tag.Color, client.GetByName(token, tag.Name).Result.Color);
@@ -69,8 +69,8 @@ namespace Test.Server.SDKs
         public void Relations()
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            int a = provider.NodesProvider.Create(new MindNote.Data.Node { Name = "node1" }, Utils.DefaultUser.SubjectId).Result.Value;
-            int b = provider.NodesProvider.Create(new MindNote.Data.Node { Name = "node2" }, Utils.DefaultUser.SubjectId).Result.Value;
+            int a = provider.NotesProvider.Create(new MindNote.Data.Note { Title = "node1" }, Utils.DefaultUser.SubjectId).Result.Value;
+            int b = provider.NotesProvider.Create(new MindNote.Data.Note { Title = "node2" }, Utils.DefaultUser.SubjectId).Result.Value;
             Utils.UseApiEnvironment((_, api, token) =>
             {
                 using (var baseClient = api.CreateClient())

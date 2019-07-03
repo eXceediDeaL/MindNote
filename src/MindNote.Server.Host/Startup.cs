@@ -93,8 +93,8 @@ namespace MindNote.Server.Host
 
         public static void ConfigureClientServices(LinkedServerConfiguration server, IServiceCollection services)
         {
-            services.AddHttpClient<INodesClient, NodesClient>(client => client.BaseAddress = new Uri(server.Api));
-            services.AddHttpClient<ITagsClient, TagsClient>(client => client.BaseAddress = new Uri(server.Api));
+            services.AddHttpClient<INotesClient, NotesClient>(client => client.BaseAddress = new Uri(server.Api));
+            services.AddHttpClient<ICategoriesClient, CategoriesClient>(client => client.BaseAddress = new Uri(server.Api));
             services.AddHttpClient<IRelationsClient, RelationsClient>(client => client.BaseAddress = new Uri(server.Api));
         }
 

@@ -1,9 +1,9 @@
-// selectNodeIndex: -1 for no select
-// handlers.{onNodeMouseover,onNodeMousedown,onNodeMouseout,onNodeMouseup,onNodeDblclick}
-function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allowModifyLink, selectNodeIndex, maxNodeId, handlers) {
+// selectNoteIndex: -1 for no select
+// handlers.{onNoteMouseover,onNoteMousedown,onNoteMouseout,onNoteMouseup,onNoteDblclick}
+function showRelationsSvg(id, nodes, links, width, height, allowModifyNote, allowModifyLink, selectNoteIndex, maxNoteId, handlers) {
     const colors = (d) => d.color;
 
-    let lastNodeId = maxNodeId;
+    let lastNoteId = maxNoteId;
 
     var rawSvg = d3.select("#" + id)
         .on('contextmenu', () => { d3.event.preventDefault(); })
@@ -74,19 +74,19 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
     let circle = svg.append('svg:g').selectAll('g');
 
     // mouse event vars
-    let selectedNode = null;
+    let selectedNote = null;
     let selectedLink = null;
     let mousedownLink = null;
-    let mousedownNode = null;
-    let mouseupNode = null;
+    let mousedownNote = null;
+    let mouseupNote = null;
 
-    if (selectNodeIndex != -1) {
-        selectedNode = nodes[selectNodeIndex];
+    if (selectNoteIndex != -1) {
+        selectedNote = nodes[selectNoteIndex];
     }
 
     function resetMouseVars() {
-        mousedownNode = null;
-        mouseupNode = null;
+        mousedownNote = null;
+        mouseupNote = null;
         mousedownLink = null;
     }
 
@@ -137,7 +137,7 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
                 // select link
                 mousedownLink = d;
                 selectedLink = (mousedownLink === selectedLink) ? null : mousedownLink;
-                selectedNode = null;
+                selectedNote = null;
                 restart();
             })
             .merge(path);
@@ -148,7 +148,7 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
 
         // update existing nodes (reflexive & selected visual states)
         circle.selectAll('circle')
-            .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d)).brighter().toString() : colors(d))
+            .style('fill', (d) => (d === selectedNote) ? d3.rgb(colors(d)).brighter().toString() : colors(d))
             .classed('reflexive', (d) => d.reflexive);
 
         // remove old nodes
@@ -160,37 +160,37 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
         g.append('svg:circle')
             .attr('class', 'node')
             .attr('r', 12)
-            .style('fill', (d) => (d === selectedNode) ? d3.rgb(colors(d)).brighter().toString() : colors(d))
+            .style('fill', (d) => (d === selectedNote) ? d3.rgb(colors(d)).brighter().toString() : colors(d))
             .style('stroke', (d) => d3.rgb(colors(d)).darker().toString())
             .classed('reflexive', (d) => d.reflexive)
             .on('mouseover', function (d) {
-                if (handlers !== undefined && handlers.onNodeMouseover !== undefined) {
-                    handlers.onNodeMouseover(d);
+                if (handlers !== undefined && handlers.onNoteMouseover !== undefined) {
+                    handlers.onNoteMouseover(d);
                 }
 
-                if (!mousedownNode || d === mousedownNode) return;
+                if (!mousedownNote || d === mousedownNote) return;
                 // enlarge target node
                 d3.select(this).attr('transform', 'scale(1.1)');
             })
             .on('mouseout', function (d) {
-                if (handlers !== undefined && handlers.onNodeMouseout !== undefined) {
-                    handlers.onNodeMouseout(d);
+                if (handlers !== undefined && handlers.onNoteMouseout !== undefined) {
+                    handlers.onNoteMouseout(d);
                 }
 
-                if (!mousedownNode || d === mousedownNode) return;
+                if (!mousedownNote || d === mousedownNote) return;
                 // unenlarge target node
                 d3.select(this).attr('transform', '');
             })
             .on('mousedown', (d) => {
-                if (handlers !== undefined && handlers.onNodeMousedown !== undefined) {
-                    handlers.onNodeMousedown(d);
+                if (handlers !== undefined && handlers.onNoteMousedown !== undefined) {
+                    handlers.onNoteMousedown(d);
                 }
 
                 if (d3.event.ctrlKey) return;
 
                 // select node
-                mousedownNode = d;
-                selectedNode = (mousedownNode === selectedNode) ? null : mousedownNode;
+                mousedownNote = d;
+                selectedNote = (mousedownNote === selectedNote) ? null : mousedownNote;
                 selectedLink = null;
 
                 if (allowModifyLink === true) {
@@ -198,17 +198,17 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
                     dragLine
                         .style('marker-end', 'url(#end-arrow)')
                         .classed('hidden', false)
-                        .attr('d', `M${mousedownNode.x},${mousedownNode.y}L${mousedownNode.x},${mousedownNode.y}`);
+                        .attr('d', `M${mousedownNote.x},${mousedownNote.y}L${mousedownNote.x},${mousedownNote.y}`);
                 }
 
                 restart();
             })
             .on('mouseup', function (d) {
-                if (handlers !== undefined && handlers.onNodeMouseup !== undefined) {
-                    handlers.onNodeMouseup(d);
+                if (handlers !== undefined && handlers.onNoteMouseup !== undefined) {
+                    handlers.onNoteMouseup(d);
                 }
 
-                if (!mousedownNode || allowModifyLink === false) return;
+                if (!mousedownNote || allowModifyLink === false) return;
 
                 // needed by FF
                 dragLine
@@ -216,8 +216,8 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
                     .style('marker-end', '');
 
                 // check for drag-to-self
-                mouseupNode = d;
-                if (mouseupNode === mousedownNode) {
+                mouseupNote = d;
+                if (mouseupNote === mousedownNote) {
                     resetMouseVars();
                     return;
                 }
@@ -227,9 +227,9 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
 
                 // add link to graph (update if exists)
                 // NB: links are strictly source < target; arrows separately specified by booleans
-                const isRight = mousedownNode.id < mouseupNode.id;
-                const source = isRight ? mousedownNode : mouseupNode;
-                const target = isRight ? mouseupNode : mousedownNode;
+                const isRight = mousedownNote.id < mouseupNote.id;
+                const source = isRight ? mousedownNote : mouseupNote;
+                const target = isRight ? mouseupNote : mousedownNote;
 
                 const link = links.filter((l) => l.source === source && l.target === target)[0];
                 if (link) {
@@ -240,12 +240,12 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
 
                 // select new link
                 selectedLink = link;
-                selectedNode = null;
+                selectedNote = null;
                 restart();
             })
             .on('dblclick', function (d) {
-                if (handlers !== undefined && handlers.onNodeDblclick !== undefined) {
-                    handlers.onNodeDblclick(d);
+                if (handlers !== undefined && handlers.onNoteDblclick !== undefined) {
+                    handlers.onNoteDblclick(d);
                 }
             });
 
@@ -271,27 +271,27 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
 
         svg.classed('active', true);
 
-        if (d3.event.ctrlKey || mousedownNode || mousedownLink) return;
+        if (d3.event.ctrlKey || mousedownNote || mousedownLink) return;
 
-        if (allowModifyNode === false) return;
+        if (allowModifyNote === false) return;
 
         // insert new node at point
         const point = d3.mouse(this);
-        const node = { id: ++lastNodeId, reflexive: false, x: point[0], y: point[1] };
+        const node = { id: ++lastNoteId, reflexive: false, x: point[0], y: point[1] };
         nodes.push(node);
 
         restart();
     }
 
     function mousemove() {
-        if (!mousedownNode) return;
+        if (!mousedownNote) return;
 
         // update drag line
-        dragLine.attr('d', `M${mousedownNode.x},${mousedownNode.y}L${d3.mouse(this)[0]},${d3.mouse(this)[1]}`);
+        dragLine.attr('d', `M${mousedownNote.x},${mousedownNote.y}L${d3.mouse(this)[0]},${d3.mouse(this)[1]}`);
     }
 
     function mouseup() {
-        if (mousedownNode) {
+        if (mousedownNote) {
             // hide drag line
             dragLine
                 .classed('hidden', true)
@@ -305,7 +305,7 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
         resetMouseVars();
     }
 
-    function spliceLinksForNode(node) {
+    function spliceLinksForNote(node) {
         const toSplice = links.filter((l) => l.source === node || l.target === node);
         for (const l of toSplice) {
             links.splice(links.indexOf(l), 1);
@@ -327,19 +327,19 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
             return;
         }
 
-        if (!selectedNode && !selectedLink) return;
+        if (!selectedNote && !selectedLink) return;
 
         switch (d3.event.keyCode) {
             case 8: // backspace
             case 46: // delete
-                if (selectedNode && allowModifyNode === true) {
-                    nodes.splice(nodes.indexOf(selectedNode), 1);
-                    spliceLinksForNode(selectedNode);
+                if (selectedNote && allowModifyNote === true) {
+                    nodes.splice(nodes.indexOf(selectedNote), 1);
+                    spliceLinksForNote(selectedNote);
                 } else if (selectedLink && allowModifyLink === true) {
                     links.splice(links.indexOf(selectedLink), 1);
                 }
                 selectedLink = null;
-                selectedNode = null;
+                selectedNote = null;
                 restart();
                 break;
             case 66: // B
@@ -359,9 +359,9 @@ function showRelationsSvg(id, nodes, links, width, height, allowModifyNode, allo
                 restart();
                 break;
             case 82: // R
-                if (selectedNode && allowModifyNode === true) {
+                if (selectedNote && allowModifyNote === true) {
                     // toggle node reflexivity
-                    selectedNode.reflexive = !selectedNode.reflexive;
+                    selectedNote.reflexive = !selectedNote.reflexive;
                 } else if (selectedLink && allowModifyLink === true) {
                     // set link direction to right only
                     selectedLink.left = false;

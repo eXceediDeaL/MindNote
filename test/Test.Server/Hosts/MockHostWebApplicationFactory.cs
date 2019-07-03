@@ -44,8 +44,8 @@ namespace Test.Server.Hosts
 
                 // Mock Clients
                 services.AddSingleton<IIdentityDataGetter>(idData);
-                services.AddSingleton<INodesClient, NodesClient>(x => new NodesClient(apiServer.CreateClient()));
-                services.AddSingleton<ITagsClient, TagsClient>(x => new TagsClient(apiServer.CreateClient()));
+                services.AddSingleton<INotesClient, NotesClient>(x => new NotesClient(apiServer.CreateClient()));
+                services.AddSingleton<ICategoriesClient, CategoriesClient>(x => new CategoriesClient(apiServer.CreateClient()));
                 services.AddSingleton<IRelationsClient, RelationsClient>(x => new RelationsClient(apiServer.CreateClient()));
 
                 Startup.ConfigureFinalServices(null, services);

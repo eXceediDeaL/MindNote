@@ -4,16 +4,16 @@
     {
         public DataProvider()
         {
-            NodesProvider = new NodesProvider(this);
+            NotesProvider = new NotesProvider(this);
             RelationsProvider = new RelationsProvider(this);
-            TagsProvider = new TagsProvider(this);
+            CategoriesProvider = new CategoriesProvider(this);
         }
 
-        public INodesProvider NodesProvider { get; private set; }
+        public INotesProvider NotesProvider { get; private set; }
 
         public IRelationsProvider RelationsProvider { get; private set; }
 
-        public ITagsProvider TagsProvider { get; private set; }
+        public ICategoriesProvider CategoriesProvider { get; private set; }
     }
 
     internal struct Model<T>

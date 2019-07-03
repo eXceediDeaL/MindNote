@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "MindNote.Server.Host(Local)": {
+    "MindNote.Server.Host": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
@@ -24,7 +24,7 @@
       },
       "applicationUrl": "http://localhost:8100"
     },
-    "MindNote.Server.Host": {
+    "MindNote.Server.Host(Remote)": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

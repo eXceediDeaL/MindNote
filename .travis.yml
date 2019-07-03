@@ -3,7 +3,8 @@ jobs:
     # - os: windows
     # - os: osx
   include:
-    - os: windows
+    - name: windows
+      os: windows
       language: bash
       filter_secrets: false
       install:
@@ -13,10 +14,12 @@ jobs:
         - dotnet restore -s https://api.nuget.org/v3/index.json
         - dotnet build
         - powershell -c "dotnet test /p:CollectCoverage=true /p:CoverletOutput=../../coverage.json /p:MergeWith=../../coverage.json /maxcpucount:1"
+        - powershell -c "dotnet test ./test/Test.Data /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../../coverage.xml /p:MergeWith=../../coverage.json /maxcpucount:1"
         - curl -s https://codecov.io/bash > codecov
         - chmod +x codecov
-        - ./codecov -f "coverage.json"
-    - os: osx
+        - ./codecov -f "coverage.xml"
+    - name: osx
+      os: osx
       language: bash
       install:
         - brew cask install dotnet-sdk
@@ -25,10 +28,12 @@ jobs:
         - dotnet restore -s https://api.nuget.org/v3/index.json
         - dotnet build
         - dotnet test /p:CollectCoverage=true /p:CoverletOutput=../../coverage.json /p:MergeWith=../../coverage.json /maxcpucount:1
+        - dotnet test ./test/Test.Data /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../../coverage.xml /p:MergeWith=../../coverage.json /maxcpucount:1
         - curl -s https://codecov.io/bash > codecov
         - chmod +x codecov
-        - ./codecov -f "coverage.json"
-    - os: linux
+        - ./codecov -f "coverage.xml"
+    - name: linux
+      os: linux
       dist: xenial
       language: csharp
       mono: none
@@ -43,10 +48,11 @@ jobs:
       script:
         - dotnet build
         - dotnet test /p:CollectCoverage=true /p:CoverletOutput=../../coverage.json /p:MergeWith=../../coverage.json /maxcpucount:1
+        - dotnet test ./test/Test.Data /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../../coverage.xml /p:MergeWith=../../coverage.json /maxcpucount:1
         - curl -s https://codecov.io/bash > codecov
         - chmod +x codecov
         - ./codecov -f "coverage.json"
-    - name: build and run images
+    - name: docker
       os: linux
       dist: xenial
       language: csharp
@@ -68,7 +74,7 @@ jobs:
         - docker-compose stop && docker-compose logs -t
     - stage: deploy
       if: branch = master AND NOT (type = pull_request)
-      name: deploy master image
+      name: master image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker-compose build
@@ -81,7 +87,7 @@ jobs:
       - docker push $DOCKER_USERNAME/mindnote:host
     - stage: deploy
       if: NOT (branch = master) AND NOT (type = pull_request)
-      name: deploy dev image
+      name: dev image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker-compose build

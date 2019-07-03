@@ -28,39 +28,39 @@ namespace Test.Data
             usernames = Enumerable.Range(0, UserCount).Select(x => x.ToString()).ToArray();
         }
 
-        public void Valid(Node item, string userId)
+        public void Valid(Note item, string userId)
         {
-            if (item.TagId.HasValue)
+            if (item.CategoryId.HasValue)
             {
-                Assert.IsNotNull(Provider.TagsProvider.Get(item.TagId.Value, userId).Result, "no tag with from id {0}", item.TagId.Value);
+                Assert.IsNotNull(Provider.CategoriesProvider.Get(item.CategoryId.Value, userId).Result, "no tag with from id {0}", item.CategoryId.Value);
             }
         }
 
         public void Valid(Relation item, string userId)
         {
-            Assert.IsNotNull(Provider.NodesProvider.Get(item.From, userId).Result, "no node with from id {0}", item.From);
-            Assert.IsNotNull(Provider.NodesProvider.Get(item.To, userId).Result, "no node with to id {0}", item.To);
+            Assert.IsNotNull(Provider.NotesProvider.Get(item.From, userId).Result, "no node with from id {0}", item.From);
+            Assert.IsNotNull(Provider.NotesProvider.Get(item.To, userId).Result, "no node with to id {0}", item.To);
         }
 
-        public void Valid(Tag item)
+        public void Valid(Category item)
         {
             Assert.IsFalse(string.IsNullOrEmpty(item.Name), "name is null/empty");
         }
 
-        private void NodeBasic()
+        private void NoteBasic()
         {
-            INodesProvider pro = Provider.NodesProvider;
+            INotesProvider pro = Provider.NotesProvider;
 
             pro.Clear();
             Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
 
             for (int i = 0; i < TestCount; i++)
             {
-                Node data = new Node
+                Note data = new Note
                 {
-                    Name = $"item {i}",
+                    Title = $"item {i}",
                     Content = $"item content {i}",
-                    TagId = null,
+                    CategoryId = null,
                 };
                 string username = random.Choice(usernames);
                 int id = 0;
@@ -74,27 +74,28 @@ namespace Test.Data
 
                     Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
 
-                    Node actual = pro.Get(id, username).Result;
+                    Note actual = pro.Get(id, username).Result;
                     Valid(actual, username);
 
                     data.Id = id;
-                    Assert.AreEqual(data, actual, "get failed");
-                    Assert.AreEqual(data.GetHashCode(), actual.GetHashCode(), "get failed");
+                    Assert.AreEqual(data.Title, actual.Title, "get failed");
+                    Assert.AreEqual(data.Content, actual.Content, "get failed");
                 }
 
                 {
-                    data.Name = $"item {i} update";
+                    data.Title = $"item {i} update";
                     data.Content = $"item {i} update";
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    IEnumerable<Node> items = pro.Query(id, data.Name, data.Content, null, username).Result;
+                    IEnumerable<Note> items = pro.Query(id, data.Title, data.Content, null, null, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
-                    Node actual = items.First();
+                    Note actual = items.First();
                     Valid(actual, username);
 
                     data.Id = id;
-                    Assert.AreEqual(data, actual, "query failed");
+                    Assert.AreEqual(data.Title, actual.Title, "query failed");
+                    Assert.AreEqual(data.Content, actual.Content, "query failed");
                 }
 
                 if (random.NextDouble() < DeleteRate)
@@ -106,26 +107,26 @@ namespace Test.Data
 
             foreach (string user in usernames)
             {
-                IEnumerable<Node> items = pro.GetAll(user).Result;
-                foreach (Node v in items)
+                IEnumerable<Note> items = pro.GetAll(user).Result;
+                foreach (Note v in items)
                 {
                     Valid(v, user);
                 }
             }
         }
 
-        private void NodeFailed()
+        private void NoteFailed()
         {
-            Provider.TagsProvider.Clear().Wait();
-            INodesProvider pro = Provider.NodesProvider;
-            Assert.IsNull(pro.Create(new Node { Name = null }).Result, "node name is null");
-            Assert.IsNull(pro.Create(new Node { Name = "" }).Result, "node name is empty");
-            Assert.IsNull(pro.Create(new Node { Name = "a", TagId = 0 }).Result, "no this tag but create node");
+            Provider.CategoriesProvider.Clear().Wait();
+            INotesProvider pro = Provider.NotesProvider;
+            Assert.IsNull(pro.Create(new Note { Title = null }).Result, "node name is null");
+            Assert.IsNull(pro.Create(new Note { Title = "" }).Result, "node name is empty");
+            Assert.IsNull(pro.Create(new Note { Title = "a", CategoryId = 0 }).Result, "no this tag but create node");
         }
 
         private void RelationBasic()
         {
-            INodesProvider npro = Provider.NodesProvider;
+            INotesProvider npro = Provider.NotesProvider;
 
             npro.Clear();
             Assert.IsFalse(npro.GetAll().Result.Any(), "clear failed");
@@ -138,11 +139,11 @@ namespace Test.Data
 
             for (int i = 0; i < TestCount; i++)
             {
-                Node data = new Node
+                Note data = new Note
                 {
-                    Name = $"item {i}",
+                    Title = $"item {i}",
                     Content = $"item content {i}",
-                    TagId = null,
+                    CategoryId = null,
                 };
                 string username = random.Choice(usernames);
                 int? tid = npro.Create(data, username).Result;
@@ -214,8 +215,8 @@ namespace Test.Data
 
         private void RelationFailed()
         {
-            Provider.NodesProvider.Clear().Wait();
-            int id = Provider.NodesProvider.Create(new Node { Name = "name" }).Result.Value;
+            Provider.NotesProvider.Clear().Wait();
+            int id = Provider.NotesProvider.Create(new Note { Title = "name" }).Result.Value;
             IRelationsProvider pro = Provider.RelationsProvider;
             Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id + 1 }).Result);
             Assert.IsNull(pro.Create(new Relation { From = id, To = id + 1 }).Result);
@@ -224,7 +225,7 @@ namespace Test.Data
 
         private void RelationSpecial()
         {
-            INodesProvider npro = Provider.NodesProvider;
+            INotesProvider npro = Provider.NotesProvider;
 
             npro.Clear();
             Assert.IsFalse(npro.GetAll().Result.Any(), "clear failed");
@@ -238,11 +239,11 @@ namespace Test.Data
 
             for (int i = 0; i < TestCount; i++)
             {
-                Node data = new Node
+                Note data = new Note
                 {
-                    Name = $"item {i}",
+                    Title = $"item {i}",
                     Content = $"item content {i}",
-                    TagId = null,
+                    CategoryId = null,
                 };
                 string username = random.Choice(usernames);
                 int? tid = npro.Create(data, username).Result;
@@ -283,16 +284,16 @@ namespace Test.Data
             }
         }
 
-        private void TagBasic()
+        private void CategoryBasic()
         {
-            ITagsProvider pro = Provider.TagsProvider;
+            ICategoriesProvider pro = Provider.CategoriesProvider;
 
             pro.Clear();
             Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
 
             for (int i = 0; i < TestCount; i++)
             {
-                Tag data = new Tag
+                Category data = new Category
                 {
                     Name = $"item {i}",
                     Color = random.NextString(),
@@ -309,10 +310,10 @@ namespace Test.Data
 
                     Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
 
-                    Tag actual = pro.Get(id, username).Result;
+                    Category actual = pro.Get(id, username).Result;
                     Valid(actual);
                     {
-                        Tag tname = pro.GetByName(data.Name, username).Result;
+                        Category tname = pro.GetByName(data.Name, username).Result;
                         Assert.AreEqual(actual, tname);
                     }
 
@@ -327,9 +328,9 @@ namespace Test.Data
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    IEnumerable<Tag> items = pro.Query(id, data.Name, data.Color, username).Result;
+                    IEnumerable<Category> items = pro.Query(id, data.Name, data.Color, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
-                    Tag actual = items.First();
+                    Category actual = items.First();
                     Valid(actual);
 
                     data.Id = id;
@@ -345,22 +346,22 @@ namespace Test.Data
 
             foreach (string user in usernames)
             {
-                IEnumerable<Tag> items = pro.GetAll(user).Result;
-                foreach (Tag v in items)
+                IEnumerable<Category> items = pro.GetAll(user).Result;
+                foreach (Category v in items)
                 {
                     Valid(v);
                 }
             }
         }
 
-        private void TagFailed()
+        private void CategoryFailed()
         {
         }
 
-        public void NodeIndependent()
+        public void NoteIndependent()
         {
-            NodeBasic();
-            NodeFailed();
+            NoteBasic();
+            NoteFailed();
         }
 
         public void RelationIndependent()
@@ -370,10 +371,10 @@ namespace Test.Data
             RelationFailed();
         }
 
-        public void TagIndependent()
+        public void CategoryIndependent()
         {
-            TagBasic();
-            TagFailed();
+            CategoryBasic();
+            CategoryFailed();
         }
     }
 }

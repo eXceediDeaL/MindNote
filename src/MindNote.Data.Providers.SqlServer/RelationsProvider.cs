@@ -31,7 +31,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<int?> Create(Relation data, string userId = null)
         {
-            if ((await parent.NodesProvider.Get(data.From, userId) == null) || (await parent.NodesProvider.Get(data.To, userId) == null))
+            if ((await parent.NotesProvider.Get(data.From, userId) == null) || (await parent.NotesProvider.Get(data.To, userId) == null))
             {
                 return null;
             }
@@ -70,9 +70,9 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public async Task<IEnumerable<Relation>> GetAdjacents(int nodeId, string userId = null)
+        public async Task<IEnumerable<Relation>> GetAdjacents(int noteId, string userId = null)
         {
-            IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == nodeId || x.To == nodeId);
+            IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == noteId || x.To == noteId);
             if (userId != null)
             {
                 query = query.Where(x => x.UserId == userId);
@@ -81,9 +81,9 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<int?> ClearAdjacents(int nodeId, string userId = null)
+        public async Task<int?> ClearAdjacents(int noteId, string userId = null)
         {
-            IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == nodeId || x.To == nodeId);
+            IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == noteId || x.To == noteId);
             if (userId != null)
             {
                 query = query.Where(x => x.UserId == userId);
@@ -91,7 +91,7 @@ namespace MindNote.Data.Providers.SqlServer
 
             context.Relations.RemoveRange(query);
             await context.SaveChangesAsync();
-            return nodeId;
+            return noteId;
         }
 
         public async Task<IEnumerable<Relation>> GetAll(string userId = null)

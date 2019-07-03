@@ -35,7 +35,7 @@ namespace Test.Server.Hosts
                         "Index",
                         "Edit",
                     };
-                    res.AddRange(sub.Select(x => "/Nodes/" + x));
+                    res.AddRange(sub.Select(x => "/Notes/" + x));
                 }
                 {
                     string[] sub = new string[]
@@ -51,7 +51,7 @@ namespace Test.Server.Hosts
                         "Index",
                         "Edit",
                     };
-                    res.AddRange(sub.Select(x => "/Tags/" + x));
+                    res.AddRange(sub.Select(x => "/Categories/" + x));
                 }
                 return res.Select(x => new object[] { x });
             }

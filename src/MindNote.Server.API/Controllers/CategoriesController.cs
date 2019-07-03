@@ -13,45 +13,39 @@ namespace MindNote.Server.API.Controllers
     [ApiController]
     [Authorize]
     [EnableCors]
-    public class RelationsController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
-        private readonly IRelationsProvider provider;
+        private readonly ICategoriesProvider provider;
         private readonly IIdentityDataGetter identityDataGetter;
 
-        public RelationsController(IDataProvider provider, IIdentityDataGetter identityDataGetter)
+        public CategoriesController(IDataProvider provider, IIdentityDataGetter identityDataGetter)
         {
-            this.provider = provider.RelationsProvider;
+            this.provider = provider.CategoriesProvider;
             this.identityDataGetter = identityDataGetter;
         }
 
         [HttpGet("All")]
-        public async Task<IEnumerable<Relation>> GetAll()
+        public async Task<IEnumerable<Category>> GetAll()
         {
             return await provider.GetAll(identityDataGetter.GetClaimId(User));
         }
 
-        [HttpGet("Adjacents/{noteId}")]
-        public async Task<IEnumerable<Relation>> GetAdjacents(int noteId)
-        {
-            return await provider.GetAdjacents(noteId, identityDataGetter.GetClaimId(User));
-        }
-
-        [HttpPut("Adjacents/{noteId}/Clear")]
-        public async Task<int?> ClearAdjacents(int noteId)
-        {
-            return await provider.ClearAdjacents(noteId, identityDataGetter.GetClaimId(User));
-        }
-
         [HttpGet("Query")]
-        public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to)
+        public async Task<IEnumerable<Category>> Query(int? id, string name, string color)
         {
-            return await provider.Query(id, from, to, identityDataGetter.GetClaimId(User));
+            return await provider.Query(id, name, color, identityDataGetter.GetClaimId(User));
         }
 
         [HttpGet("{id}")]
-        public async Task<Relation> Get(int id)
+        public async Task<Category> Get(int id)
         {
             return await provider.Get(id, identityDataGetter.GetClaimId(User));
+        }
+
+        [HttpGet]
+        public async Task<Category> GetByName(string name)
+        {
+            return await provider.GetByName(name, identityDataGetter.GetClaimId(User));
         }
 
         [HttpDelete("{id}")]
@@ -67,13 +61,13 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<int?> Update(int id, Relation data)
+        public async Task<int?> Update(int id, Category data)
         {
             return await provider.Update(id, data, identityDataGetter.GetClaimId(User));
         }
 
         [HttpPost]
-        public async Task<int?> Create([FromBody] Relation data)
+        public async Task<int?> Create([FromBody] Category data)
         {
             return await provider.Create(data, identityDataGetter.GetClaimId(User));
         }

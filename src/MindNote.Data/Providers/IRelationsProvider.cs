@@ -7,8 +7,8 @@ namespace MindNote.Data.Providers
     {
         Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId = null);
 
-        Task<IEnumerable<Relation>> GetAdjacents(int nodeId, string userId = null);
+        Task<IEnumerable<Relation>> GetAdjacents(int noteId, string userId = null);
 
-        Task<int?> ClearAdjacents(int nodeId, string userId = null);
+        Task<int?> ClearAdjacents(int noteId, string userId = null);
     }
 }

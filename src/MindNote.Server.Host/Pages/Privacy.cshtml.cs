@@ -12,12 +12,12 @@ namespace MindNote.Server.Host.Pages
     [Authorize]
     public class PrivacyModel : PageModel
     {
-        private readonly ITagsClient tagsClient;
-        private readonly INodesClient nodesClient;
+        private readonly ICategoriesClient tagsClient;
+        private readonly INotesClient nodesClient;
         private readonly IIdentityDataGetter idData;
         private readonly IRelationsClient relationsClient;
 
-        public PrivacyModel(ITagsClient tagsClient, INodesClient nodesClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
+        public PrivacyModel(ICategoriesClient tagsClient, INotesClient nodesClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
         {
             this.tagsClient = tagsClient;
             this.nodesClient = nodesClient;
@@ -33,20 +33,20 @@ namespace MindNote.Server.Host.Pages
         {
             string token = await idData.GetAccessToken(HttpContext);
 
-            List<Tag> tags = new List<Tag>();
+            List<Category> tags = new List<Category>();
 
             for (int i = 1; i <= 5; i++)
             {
-                Tag t = new Tag { Name = $"tag{i}", Color = RandomHelper.Color() };
+                Category t = new Category { Name = $"category{i}", Color = RandomHelper.Color() };
                 t.Id = (await tagsClient.Create(token, t)).Value;
                 tags.Add(t);
             }
 
-            List<Node> nodes = new List<Node>();
+            List<Note> nodes = new List<Note>();
 
             for (int i = 1; i <= 10; i++)
             {
-                Node t = new Node { Name = $"Node {i}", Content = $"Contents of node {i}.", TagId = RandomHelper.Choice(tags).Id };
+                Note t = new Note { Title = $"Note {i}", Content = $"Contents of note {i}.", CategoryId = RandomHelper.Choice(tags).Id };
                 t.Id = (await nodesClient.Create(token, t)).Value;
                 nodes.Add(t);
             }

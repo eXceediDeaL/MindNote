@@ -24,18 +24,11 @@ namespace Test.Server.Apis
                 {
                     string[] sub = new string[]
                     {
-                    "Heartbeat",
-                    };
-                    res.AddRange(sub.Select(x => "/Helpers/" + x));
-                }
-                {
-                    string[] sub = new string[]
-                    {
                     "All",
                     "Query",
                     "0"
                     };
-                    res.AddRange(sub.Select(x => "/Nodes/" + x));
+                    res.AddRange(sub.Select(x => "/Notes/" + x));
                 }
                 {
                     string[] sub = new string[]
@@ -54,7 +47,7 @@ namespace Test.Server.Apis
                     "Query",
                     "0"
                     };
-                    res.AddRange(sub.Select(x => "/Tags/" + x));
+                    res.AddRange(sub.Select(x => "/Categories/" + x));
                 }
                 return res.Select(x => new object[] { x });
             }
@@ -97,14 +90,14 @@ namespace Test.Server.Apis
         public void Nodes()
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            NodesController controller = new NodesController(provider, Utils.MockIdentityDataGetter);
+            NotesController controller = new NotesController(provider, Utils.MockIdentityDataGetter);
             Assert.IsFalse(controller.GetAll().Result.Any());
             Assert.IsNull(controller.Get(0).Result);
             controller.Clear().Wait();
             {
-                Node node = new Node { Name = "name" };
+                Note node = new Note { Title = "name" };
                 int id = controller.Create(node).Result.Value;
-                Assert.AreEqual(node.Name, controller.Query(id, null, null, null).Result.First().Name);
+                Assert.AreEqual(node.Title, controller.Query(id, null, null, null, null).Result.First().Title);
                 node.Content = "content";
                 Assert.IsTrue(controller.Update(id, node).Result.HasValue);
                 Assert.IsTrue(controller.Delete(id).Result.HasValue);
@@ -115,8 +108,8 @@ namespace Test.Server.Apis
         public void Relations()
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            int a = provider.NodesProvider.Create(new Node { Name = "node1" }, Utils.MockIdentityDataGetter.GetClaimId(null)).Result.Value;
-            int b = provider.NodesProvider.Create(new Node { Name = "node2" }, Utils.MockIdentityDataGetter.GetClaimId(null)).Result.Value;
+            int a = provider.NotesProvider.Create(new Note { Title = "node1" }, Utils.MockIdentityDataGetter.GetClaimId(null)).Result.Value;
+            int b = provider.NotesProvider.Create(new Note { Title = "node2" }, Utils.MockIdentityDataGetter.GetClaimId(null)).Result.Value;
             RelationsController controller = new RelationsController(provider, Utils.MockIdentityDataGetter);
             Assert.IsFalse(controller.GetAll().Result.Any());
             Assert.IsNull(controller.Get(0).Result);
@@ -139,12 +132,12 @@ namespace Test.Server.Apis
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
 
-            TagsController controller = new TagsController(provider, Utils.MockIdentityDataGetter);
+            CategoriesController controller = new CategoriesController(provider, Utils.MockIdentityDataGetter);
             Assert.IsFalse(controller.GetAll().Result.Any());
             Assert.IsNull(controller.Get(0).Result);
             controller.Clear().Wait();
             {
-                Tag tag = new Tag { Name = "tag", Color = "black" };
+                Category tag = new Category { Name = "tag", Color = "black" };
                 int id = controller.Create(tag).Result.Value;
                 Assert.AreEqual(tag.Name, controller.Query(id, null, null).Result.First().Name);
                 Assert.AreEqual(tag.Color, controller.GetByName(tag.Name).Result.Color);

@@ -33,7 +33,7 @@
             document.getElementById("__graphViewPartial_lblNodeName").innerHTML = tip;
         },
         onNodeDblclick: (d) => {
-            window.location.href = "/Nodes/View?id=" + d.id.toString();
+            window.location.href = "/Notes/View?id=" + d.id.toString();
         },
     };
     showRelationsSvg("__graphViewPartial_svg", graph.nodes, graph.links, w, h, false, false, @Model.SelectNodeIndex, 0, handlers);

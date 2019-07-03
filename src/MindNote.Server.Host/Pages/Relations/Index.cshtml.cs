@@ -15,11 +15,11 @@ namespace MindNote.Server.Host.Pages.Relations
     public class IndexModel : PageModel
     {
         private readonly IRelationsClient client;
-        private readonly INodesClient nodesClient;
+        private readonly INotesClient nodesClient;
         private readonly IIdentityDataGetter idData;
-        private readonly ITagsClient tagsClient;
+        private readonly ICategoriesClient tagsClient;
 
-        public IndexModel(IRelationsClient client, INodesClient nodesClient, ITagsClient tagsClient, IIdentityDataGetter idData)
+        public IndexModel(IRelationsClient client, INotesClient nodesClient, ICategoriesClient tagsClient, IIdentityDataGetter idData)
         {
             this.client = client;
             this.nodesClient = nodesClient;

@@ -13,43 +13,31 @@ namespace MindNote.Server.API.Controllers
     [ApiController]
     [Authorize]
     [EnableCors]
-    public class RelationsController : ControllerBase
+    public class NotesController : ControllerBase
     {
-        private readonly IRelationsProvider provider;
+        private readonly INotesProvider provider;
         private readonly IIdentityDataGetter identityDataGetter;
 
-        public RelationsController(IDataProvider provider, IIdentityDataGetter identityDataGetter)
+        public NotesController(IDataProvider provider, IIdentityDataGetter identityDataGetter)
         {
-            this.provider = provider.RelationsProvider;
+            this.provider = provider.NotesProvider;
             this.identityDataGetter = identityDataGetter;
         }
 
         [HttpGet("All")]
-        public async Task<IEnumerable<Relation>> GetAll()
+        public async Task<IEnumerable<Note>> GetAll()
         {
             return await provider.GetAll(identityDataGetter.GetClaimId(User));
         }
 
-        [HttpGet("Adjacents/{noteId}")]
-        public async Task<IEnumerable<Relation>> GetAdjacents(int noteId)
-        {
-            return await provider.GetAdjacents(noteId, identityDataGetter.GetClaimId(User));
-        }
-
-        [HttpPut("Adjacents/{noteId}/Clear")]
-        public async Task<int?> ClearAdjacents(int noteId)
-        {
-            return await provider.ClearAdjacents(noteId, identityDataGetter.GetClaimId(User));
-        }
-
         [HttpGet("Query")]
-        public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to)
+        public async Task<IEnumerable<Note>> Query(int? id, string name, string content, int? categoryId, string keyword)
         {
-            return await provider.Query(id, from, to, identityDataGetter.GetClaimId(User));
+            return await provider.Query(id, name, content, categoryId, keyword, identityDataGetter.GetClaimId(User));
         }
 
         [HttpGet("{id}")]
-        public async Task<Relation> Get(int id)
+        public async Task<Note> Get(int id)
         {
             return await provider.Get(id, identityDataGetter.GetClaimId(User));
         }
@@ -67,13 +55,13 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<int?> Update(int id, Relation data)
+        public async Task<int?> Update(int id, Note data)
         {
             return await provider.Update(id, data, identityDataGetter.GetClaimId(User));
         }
 
         [HttpPost]
-        public async Task<int?> Create([FromBody] Relation data)
+        public async Task<int?> Create([FromBody] Note data)
         {
             return await provider.Create(data, identityDataGetter.GetClaimId(User));
         }
