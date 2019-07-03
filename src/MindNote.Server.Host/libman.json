@@ -43,46 +43,6 @@
       "destination": "wwwroot/lib/markdown-it-footnote/"
     },
     {
-      "provider": "jsdelivr",
-      "library": "markdown-it-sup@1.0.0",
-      "destination": "wwwroot/lib/markdown-it-sup/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "markdown-it-sub@1.0.0",
-      "destination": "wwwroot/lib/markdown-it-sub/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "markdown-it-deflist@2.0.3",
-      "destination": "wwwroot/lib/markdown-it-deflist/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "markdown-it-abbr@1.0.4",
-      "destination": "wwwroot/lib/markdown-it-abbr/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "markdown-it-container@2.0.0",
-      "destination": "wwwroot/lib/markdown-it-container/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "markdown-it-ins@2.0.0",
-      "destination": "wwwroot/lib/markdown-it-ins/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "markdown-it-mark@2.0.0",
-      "destination": "wwwroot/lib/markdown-it-mark/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "markdown-it-task-lists@2.1.1",
-      "destination": "wwwroot/lib/markdown-it-task-lists/"
-    },
-    {
       "library": "github-markdown-css@3.0.1",
       "destination": "wwwroot/lib/github-markdown-css/"
     }

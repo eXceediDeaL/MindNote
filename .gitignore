@@ -5,6 +5,7 @@
 /resources/*
 /temp/*
 tempkey.rsa
+coverage.json
 
 # User-specific files
 *.suo

@@ -2,10 +2,14 @@
 using IdentityServer4.Models;
 using IdentityServer4.Test;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Server.Identity;
+using System;
 using System.Collections.Generic;
 
 namespace Test.Server.Identities
@@ -27,9 +31,24 @@ namespace Test.Server.Identities
             {
                 // Mock DB and IdentityServices
 
+                services.AddDbContext<MindNote.Server.Identity.Data.ApplicationDbContext>(options =>
+                {
+                    options.UseInMemoryDatabase(Guid.NewGuid().ToString());
+                });
+
+                services.AddDefaultIdentity<IdentityUser>()
+                    .AddDefaultUI(UIFramework.Bootstrap4)
+                    .AddEntityFrameworkStores<MindNote.Server.Identity.Data.ApplicationDbContext>();
+
                 services.AddIdentityServer(options =>
                 {
                     options.PublicOrigin = Utils.ServerConfiguration.Identity;
+                    options.UserInteraction = new IdentityServer4.Configuration.UserInteractionOptions
+                    {
+                        LoginUrl = "/Identity/Account/Login",
+                        LogoutUrl = "/Identity/Account/Logout",
+                        ErrorUrl = "/Identity/Account/Error",
+                    };
                 })
                  .AddDeveloperSigningCredential()
                  .AddInMemoryIdentityResources(SampleConfig.GetIdentityResources())

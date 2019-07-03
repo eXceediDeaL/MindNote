@@ -10,6 +10,11 @@ namespace Test.Server.Identities
     public class Identity
     {
         [DataTestMethod]
+        [DataRow("/Index")]
+        [DataRow("/Privacy")]
+        [DataRow("/Error")]
+        [DataRow("/Identity/Account/Error")]
+        [DataRow("/Identity/Account/Logout")]
         [DataRow("/.well-known/openid-configuration")]
         public void Urls(string url)
         {

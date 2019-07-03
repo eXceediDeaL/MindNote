@@ -144,6 +144,8 @@ namespace MindNote.Server.Identity
             app.UseIdentityServer();
 
             app.UseMvc();
+
+            InitializeDatabase(app.ApplicationServices).Wait();
         }
 
         private static async Task InitializeDatabase(IServiceProvider provider)
@@ -173,8 +175,6 @@ namespace MindNote.Server.Identity
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             ConfigureApp(Configuration, app, env);
-
-            InitializeDatabase(app.ApplicationServices).Wait();
         }
     }
 }
