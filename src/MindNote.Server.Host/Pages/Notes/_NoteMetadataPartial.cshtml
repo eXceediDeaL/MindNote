@@ -1,6 +1,6 @@
 ﻿@model NotesViewModel
 
-<div class="card-subtitle mb-2" style="color:#999">
+<div style="color:#999">
     <small>
         <item-time creation-time="@Model.Data.CreationTime" modification-time="@Model.Data.ModificationTime"></item-time>
     </small>
@@ -9,6 +9,10 @@
         <a asp-page="/Categories/View" asp-route-id="@Model.Category.Id" style="color: #555;">
             <category-display value="@Model.Category"></category-display>
         </a>
+    </small>
+    <small class="m-1">|</small>
+    <small>
+        <keywords-display keywords="@Model.Data.Keywords"></keywords-display>
     </small>
     <small class="m-1">|</small>
     <small>

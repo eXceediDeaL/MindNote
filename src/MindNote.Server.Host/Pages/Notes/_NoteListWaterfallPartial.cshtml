@@ -1,0 +1,22 @@
+﻿@model NoteListViewModel
+
+<div class="card-columns waterfall-card-columns">
+    @foreach (var item in Model.Data)
+    {
+        <div class="card mt-4 border-0">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <a asp-page="./View" asp-route-id="@item.Data.Id" style="color: black">@item.Data.Title</a>
+                </h4>
+                <div class="card-subtitle mb-4">
+                    <partial name="/Pages/Notes/_NoteMetadataPartial.cshtml" model="item" />
+                </div>
+
+                <p class="card-text mb-4">
+                    <text-clipper text="@item.Data.Content"></text-clipper>
+                </p>
+                <a asp-page="./View" asp-route-id="@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
+            </div>
+        </div>
+    }
+</div>

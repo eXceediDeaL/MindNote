@@ -26,7 +26,8 @@ namespace Test.Server.Apis
                     {
                     "All",
                     "Query",
-                    "0"
+                    "0",
+                    "1"
                     };
                     res.AddRange(sub.Select(x => "/Notes/" + x));
                 }
@@ -36,7 +37,9 @@ namespace Test.Server.Apis
                     "All",
                     "Query",
                     "0",
+                    "1",
                     "Adjacents/0",
+                    "Adjacents/1",
                     };
                     res.AddRange(sub.Select(x => "/Relations/" + x));
                 }
@@ -45,7 +48,8 @@ namespace Test.Server.Apis
                     {
                     "All",
                     "Query",
-                    "0"
+                    "0",
+                    "1"
                     };
                     res.AddRange(sub.Select(x => "/Categories/" + x));
                 }
@@ -83,7 +87,7 @@ namespace Test.Server.Apis
                     response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
                 }
-            });
+            }, Utils.SampleOneUserDataProvider(Utils.DefaultUser.SubjectId));
         }
 
         [TestMethod]

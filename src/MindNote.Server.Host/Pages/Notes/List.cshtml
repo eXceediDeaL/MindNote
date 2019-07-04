@@ -21,72 +21,74 @@
     </form>
 </div>
 
-<table class="table table-hover" style="margin-top:10px; table-layout:fixed;">
-    <thead>
-        <tr>
-            <th style="width:6%">
-                Id
-            </th>
-            <th style="width:10%">
-                Name
-            </th>
-            <th>
-                Content
-            </th>
-            <th style="width:15%">
-                Category
-            </th>
-            <th style="width:15%">
-                Keywords
-            </th>
-            <th style="width:10%">
-                Operations
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Data)
-        {
+<div style="margin-top:10px;">
+    <table class="table table-hover" style="table-layout:fixed;">
+        <thead>
             <tr>
-                <td>
-                    @item.Data.Id
-                </td>
-                <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    <a asp-page="./View" asp-route-id="@item.Data.Id">@item.Data.Title</a>
-                </td>
-                <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    @item.Data.Content
-                </td>
-                <td>
-                    @if (item.Category != null)
-                    {
-                        <a asp-page="/Categories/View" asp-route-id="@item.Category.Id">
-                            <category-display value="@item.Category"></category-display>
-                        </a>
-                    }
-                </td>
-                <td>
-                    @if (item.Data.Keywords != null)
-                    {
-                        @(string.Join(';', item.Data.Keywords))
-                    }
-                </td>
-                <td>
-                    <div class="row" style="margin-left:0px">
-                        <form method="post" style="margin-left:0px">
-                            <input type="hidden" asp-for="PostData.Data.Id" value="@item.Data.Id" />
-                            <div class="btn-group-sm">
-                                <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <button asp-page-handler="Delete" asp-route-id="@item.Data.Id" class="btn btn-outline-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </td>
+                <th style="width:6%">
+                    Id
+                </th>
+                <th style="width:10%">
+                    Name
+                </th>
+                <th>
+                    Content
+                </th>
+                <th style="width:15%">
+                    Category
+                </th>
+                <th style="width:15%">
+                    Keywords
+                </th>
+                <th style="width:10%">
+                    Operations
+                </th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data.Data)
+            {
+                <tr>
+                    <td>
+                        @item.Data.Id
+                    </td>
+                    <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <a asp-page="./View" asp-route-id="@item.Data.Id">@item.Data.Title</a>
+                    </td>
+                    <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        @item.Data.Content
+                    </td>
+                    <td>
+                        @if (item.Category != null)
+                        {
+                            <a asp-page="/Categories/View" asp-route-id="@item.Category.Id">
+                                <category-display value="@item.Category"></category-display>
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Data.Keywords != null)
+                        {
+                            @(string.Join(';', item.Data.Keywords))
+                        }
+                    </td>
+                    <td>
+                        <div class="row" style="margin-left:0px">
+                            <form method="post" style="margin-left:0px">
+                                <input type="hidden" asp-for="PostData.Data.Id" value="@item.Data.Id" />
+                                <div class="btn-group-sm">
+                                    <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <button asp-page-handler="Delete" asp-route-id="@item.Data.Id" class="btn btn-outline-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

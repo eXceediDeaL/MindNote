@@ -5,22 +5,13 @@
     ViewData["Id"] = "Notes";
 }
 
-<div class="card-columns" style="column-count: 1">
-    @foreach (var item in Model.Data)
-    {
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">
-                    <a asp-page="./View" asp-route-id="@item.Data.Id" style="color: black">@item.Data.Title</a>
-                </h4>
-                <partial name="_NoteMetadataPartial" model="item"/>
-                <p class="card-text">
-                    <text-clipper text="@item.Data.Content"></text-clipper>
-                </p>
-                <a asp-page="./View" asp-route-id="@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
-            </div>
-        </div>
-    }
+<div>
+    <style>
+        .card-columns {
+            column-count: 1;
+        }
+    </style>
+    <partial name="_NoteListWaterfallPartial" model="Model.Data" />
 </div>
 
 <div class="corner">

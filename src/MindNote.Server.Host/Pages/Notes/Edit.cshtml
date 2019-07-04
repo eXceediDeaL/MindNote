@@ -62,8 +62,15 @@
         <select class="form-control" asp-for="PostData.Data.CategoryId" asp-items="Model.CategorySelector"></select>
         <span asp-validation-for="PostData.Data.CategoryId" class="text-danger"></span>
     </div>
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Keywords</span>
+        </div>
+        <input class="form-control" asp-for="PostData.EditKeywords" value="@(Model.Data.Data.Keywords == null ? "" : string.Join(';', Model.Data.Data.Keywords))" />
+        <span asp-validation-for="PostData.EditKeywords" class="text-danger"></span>
+    </div>
     <style>
-        div textarea {
+        textarea {
             min-height: 500px;
         }
     </style>

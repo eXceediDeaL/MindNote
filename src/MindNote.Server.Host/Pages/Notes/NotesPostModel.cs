@@ -15,5 +15,7 @@ namespace MindNote.Server.Host.Pages.Notes
         public string QueryKeyword { get; set; }
 
         public Note Data { get; set; }
+
+        public string EditKeywords { get; set; }
     }
 }

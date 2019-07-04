@@ -41,7 +41,7 @@ namespace MindNote.Server.Identity
             });
         }
 
-        public static void ConfigureIdentityServices(LinkedServerConfiguration server,IConfiguration configuration, IServiceCollection services)
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IConfiguration configuration, IServiceCollection services)
         {
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)

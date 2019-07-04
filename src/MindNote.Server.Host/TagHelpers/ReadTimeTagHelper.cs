@@ -26,7 +26,7 @@ namespace MindNote.Server.Host.TagHelpers
                 TagBuilder count = new TagBuilder("span");
                 count.Attributes["style"] = "margin-left: 5px";
                 int time = (int)Math.Round(Text.Length / (double)CharPerMinute);
-                if(time <= 1)
+                if (time <= 1)
                 {
                     count.InnerHtml.Append($"1 minute");
                 }

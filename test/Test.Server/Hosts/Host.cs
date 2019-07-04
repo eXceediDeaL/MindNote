@@ -33,7 +33,10 @@ namespace Test.Server.Hosts
                     string[] sub = new string[]
                     {
                         "Index",
+                        "List",
                         "Edit",
+                        "Edit?id=1",
+                        "View?id=1",
                     };
                     res.AddRange(sub.Select(x => "/Notes/" + x));
                 }
@@ -42,6 +45,7 @@ namespace Test.Server.Hosts
                     {
                         "Index",
                         "Edit",
+                        "Edit?id=1",
                     };
                     res.AddRange(sub.Select(x => "/Relations/" + x));
                 }
@@ -50,6 +54,8 @@ namespace Test.Server.Hosts
                     {
                         "Index",
                         "Edit",
+                        "Edit?id=1",
+                        "View?id=1",
                     };
                     res.AddRange(sub.Select(x => "/Categories/" + x));
                 }
@@ -60,6 +66,7 @@ namespace Test.Server.Hosts
         [DataTestMethod]
         [DataRow("/Index")]
         [DataRow("/Error")]
+        [DataRow("/Privacy")]
         public void Urls(string url)
         {
             Utils.UseHostEnvironment((host, _) =>
@@ -87,7 +94,7 @@ namespace Test.Server.Hosts
                     response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
                 }
-            });
+            }, Utils.SampleOneUserDataProvider(Utils.DefaultUser.SubjectId));
         }
     }
 }

@@ -112,7 +112,7 @@ namespace MindNote.Data.Providers.SqlServer
             raw.Keywords = value.Keywords;
 
             raw.ModificationTime = DateTimeOffset.Now;
-            
+
             context.Notes.Update(raw);
             await context.SaveChangesAsync();
             return raw.Id;

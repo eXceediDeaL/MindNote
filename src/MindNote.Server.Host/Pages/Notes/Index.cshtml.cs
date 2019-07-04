@@ -28,7 +28,7 @@ namespace MindNote.Server.Host.Pages.Notes
 
         public List<SelectListItem> CategorySelector { get; private set; }
 
-        public IList<NotesViewModel> Data { get; set; }
+        public NoteListViewModel Data { get; set; }
 
         private async Task<IList<NotesViewModel>> GenData(IList<Note> nodes, string token)
         {
@@ -61,7 +61,7 @@ namespace MindNote.Server.Host.Pages.Notes
 
             await GenTagSelector(token);
             IEnumerable<Note> ms = await client.GetAll(token);
-            Data = await GenData(ms.ToList(), token);
+            Data = new NoteListViewModel { Data = await GenData(ms.ToList(), token) };
         }
 
         [BindProperty]
@@ -75,11 +75,11 @@ namespace MindNote.Server.Host.Pages.Notes
             {
                 await GenTagSelector(token);
                 IEnumerable<Note> ms = await client.Query(token, PostData.QueryId, PostData.QueryTitle, PostData.QueryContent, PostData.QueryCategoryId, PostData.QueryKeyword);
-                Data = await GenData(ms.ToList(), token);
+                Data = new NoteListViewModel { Data = await GenData(ms.ToList(), token) };
             }
             catch
             {
-                Data = Array.Empty<NotesViewModel>();
+                Data = new NoteListViewModel { Data = Array.Empty<NotesViewModel>() };
             }
             return Page();
         }

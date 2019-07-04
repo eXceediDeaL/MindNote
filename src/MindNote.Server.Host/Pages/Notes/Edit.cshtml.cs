@@ -97,6 +97,7 @@ namespace MindNote.Server.Host.Pages.Notes
 
             try
             {
+                PostData.Data.Keywords = PostData.EditKeywords?.Split(';');
                 await client.Update(token, PostData.Data.Id, PostData.Data);
                 return RedirectToPage(new { id = PostData.Data.Id });
             }
@@ -112,6 +113,7 @@ namespace MindNote.Server.Host.Pages.Notes
 
             try
             {
+                PostData.Data.Keywords = PostData.EditKeywords?.Split(';');
                 int? id = await client.Create(token, PostData.Data);
                 return RedirectToPage(new { id });
             }

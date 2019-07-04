@@ -35,13 +35,13 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
             };
-            if(Keywords == null)
+            if (Keywords == null)
             {
                 res.Keywords = Array.Empty<string>();
             }
             else
             {
-                res.Keywords = Keywords.Split(';').Select(x => x.Trim()).ToArray();
+                res.Keywords = Keywords.Split(';').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)).ToArray();
             }
             return res;
         }
@@ -63,7 +63,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
             }
             else
             {
-                res.Keywords = string.Join(';', data.Keywords.Select(x => x.Trim()));
+                res.Keywords = string.Join(';', data.Keywords.Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)));
             }
             return res;
         }

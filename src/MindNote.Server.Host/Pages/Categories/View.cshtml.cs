@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Host.Helpers;
+using MindNote.Server.Host.Pages.Notes;
 using MindNote.Server.Host.Pages.Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,6 +29,8 @@ namespace MindNote.Server.Host.Pages.Categories
 
         public CategoriesViewModel Data { get; set; }
 
+        public NoteListViewModel Notes { get; set; }
+
         [BindProperty]
         public CategoriesPostModel PostData { get; set; }
 
@@ -40,9 +43,18 @@ namespace MindNote.Server.Host.Pages.Categories
             try
             {
                 Data = new CategoriesViewModel { Data = await client.Get(token, id) };
+                var notes = await nodesClient.Query(token, null, null, null, id, null);
+                {
+                    List<NotesViewModel> noteViews = new List<NotesViewModel>();
+                    foreach (Note v in notes)
+                    {
+                        noteViews.Add(new NotesViewModel { Data = v, Category = Data.Data });
+                    }
+                    Notes = new NoteListViewModel { Data = noteViews };
+                }
                 {
                     Dictionary<int, Relation> rs = new Dictionary<int, Relation>();
-                    foreach (Note v in await nodesClient.Query(token, null, null, null, id, null))
+                    foreach (Note v in notes)
                     {
                         foreach (Relation r in await relationsClient.GetAdjacents(token, v.Id))
                         {

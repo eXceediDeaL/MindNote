@@ -20,10 +20,21 @@
         </div>
     </div>
     <div class="col-9">
-
+        <div class="row" style="margin-left:0px">
+            <form method="post">
+                <button type="submit" asp-page-handler="Initialize" class="btn btn-outline-primary">
+                    Initialize
+                </button>
+            </form>
+            <form method="post" style="margin-left:10px">
+                <button type="submit" asp-page-handler="Clear" class="btn btn-outline-danger">
+                    Clear
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<partial name="_ValidationScriptsPartial" />
 }
