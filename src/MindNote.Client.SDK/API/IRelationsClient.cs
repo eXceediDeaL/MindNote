@@ -39,55 +39,55 @@ namespace MindNote.Client.SDK.API
 
         public async Task Clear(string token)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             await Raw.ClearAsync();
         }
 
         public async Task<int?> Create(string token, Relation data)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.CreateAsync(data);
         }
 
         public async Task<int?> Delete(string token, int id)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.DeleteAsync(id);
         }
 
         public async Task<Relation> Get(string token, int id)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetAsync(id);
         }
 
         public async Task<IEnumerable<Relation>> GetAll(string token)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetAllAsync();
         }
 
         public async Task<IEnumerable<Relation>> Query(string token, int? id, int? from, int? to)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.QueryAsync(id, from, to);
         }
 
         public async Task<IEnumerable<Relation>> GetAdjacents(string token, int nodeId)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetAdjacentsAsync(nodeId);
         }
 
         public async Task<int?> Update(string token, int id, Relation data)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.UpdateAsync(id, data);
         }
 
         public async Task<int?> ClearAdjacents(string token, int nodeId)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.ClearAdjacentsAsync(nodeId);
         }
     }

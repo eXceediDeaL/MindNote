@@ -16,7 +16,7 @@ namespace MindNote.Data.Providers.InMemory
             this.parent = parent;
         }
 
-        public Task Clear(string userId = null)
+        public Task Clear(string userId)
         {
             IEnumerable<Category> query = GetAll(userId).Result;
             foreach (int v in query.Select(x => x.Id))
@@ -27,7 +27,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.CompletedTask;
         }
 
-        public Task<int?> Create(Category data, string userId = null)
+        public Task<int?> Create(Category data, string userId)
         {
             Model<Category> raw = new Model<Category>
             {
@@ -39,7 +39,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult<int?>(raw.Data.Id);
         }
 
-        public Task<int?> Delete(int id, string userId = null)
+        public Task<int?> Delete(int id, string userId)
         {
             if (Data.TryGetValue(id, out Model<Category> value))
             {
@@ -52,13 +52,13 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult<int?>(null);
         }
 
-        public Task<Category> Get(int id, string userId = null)
+        public Task<Category> Get(int id, string userId)
         {
             IEnumerable<Category> query = GetAll(userId).Result;
             return Task.FromResult(query.Where(x => x.Id == id).Select(x => (Category)x.Clone()).FirstOrDefault());
         }
 
-        public Task<IEnumerable<Category>> GetAll(string userId = null)
+        public Task<IEnumerable<Category>> GetAll(string userId)
         {
             IEnumerable<Model<Category>> query = Data.Values.AsEnumerable();
             if (userId != null)
@@ -69,7 +69,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult(query.Select(x => (Category)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId = null)
+        public Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId)
         {
             IEnumerable<Model<Category>> query = Data.Values.AsEnumerable();
             if (userId != null)
@@ -95,7 +95,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult(query.Select(x => (Category)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<int?> Update(int id, Category data, string userId = null)
+        public Task<int?> Update(int id, Category data, string userId)
         {
             if (Data.TryGetValue(id, out Model<Category> value))
             {
@@ -109,7 +109,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult<int?>(null);
         }
 
-        public Task<Category> GetByName(string name, string userId = null)
+        public Task<Category> GetByName(string name, string userId)
         {
             IEnumerable<Category> query = GetAll(userId).Result;
             return Task.FromResult(query.Where(x => x.Name == name).Select(x => (Category)x.Clone()).FirstOrDefault());

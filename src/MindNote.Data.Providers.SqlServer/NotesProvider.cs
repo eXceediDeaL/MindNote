@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MindNote.Data.Providers.Queries;
 using MindNote.Data.Providers.SqlServer.Models;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace MindNote.Data.Providers.SqlServer
             parent = dataProvider;
         }
 
-        public async Task Clear(string userId = null)
+        public async Task Clear(string userId)
         {
             await parent.RelationsProvider.Clear(userId);
             IQueryable<Models.Note> query = context.Notes.AsQueryable();
@@ -31,7 +32,7 @@ namespace MindNote.Data.Providers.SqlServer
             await context.SaveChangesAsync();
         }
 
-        public async Task<int?> Create(Note data, string userId = null)
+        public async Task<int?> Create(Note data, string userId)
         {
             if (string.IsNullOrEmpty(data.Title))
             {
@@ -58,7 +59,7 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task<int?> Delete(int id, string userId = null)
+        public async Task<int?> Delete(int id, string userId)
         {
             Models.Note raw = await context.Notes.FindAsync(id);
             if (raw == null || (userId != null && raw.UserId != userId))
@@ -75,7 +76,7 @@ namespace MindNote.Data.Providers.SqlServer
             return id;
         }
 
-        public async Task<Note> Get(int id, string userId = null)
+        public async Task<Note> Get(int id, string userId)
         {
             IQueryable<Models.Note> query = context.Notes.Where(x => x.Id == id);
             if (userId != null)
@@ -86,7 +87,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public async Task<IEnumerable<Note>> GetAll(string userId = null)
+        public async Task<IEnumerable<Note>> GetAll(string userId)
         {
             IQueryable<Models.Note> query = context.Notes.AsQueryable();
             if (userId != null)
@@ -97,7 +98,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<int?> Update(int id, Note data, string userId = null)
+        public async Task<int?> Update(int id, Note data, string userId)
         {
             Models.Note raw = await context.Notes.FindAsync(id);
             if (raw == null || (userId != null && raw.UserId != userId))
@@ -118,7 +119,7 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword = null, string userId = null)
+        public async Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId)
         {
             IQueryable<Models.Note> query = context.Notes.AsQueryable();
             if (userId != null)
@@ -145,6 +146,21 @@ namespace MindNote.Data.Providers.SqlServer
             if (categoryId.HasValue)
             {
                 query = query.Where(item => item.CategoryId == categoryId.Value);
+            }
+            if (offset.HasValue && offset.Value >= 0)
+            {
+                query = query.Skip(offset.Value);
+            }
+            if (count.HasValue && count.Value >= 0)
+            {
+                query = query.Take(count.Value);
+            }
+            if (targets != null)
+            {
+                if (targets.Contains(NoteTargets.Count))
+                {
+                    return Enumerable.Range(0, await query.CountAsync()).Select(x => (Note)null).ToArray();
+                }
             }
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }

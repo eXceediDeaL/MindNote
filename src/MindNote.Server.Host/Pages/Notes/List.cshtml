@@ -31,9 +31,6 @@
                 <th style="width:10%">
                     Name
                 </th>
-                <th>
-                    Content
-                </th>
                 <th style="width:15%">
                     Category
                 </th>
@@ -54,9 +51,6 @@
                     </td>
                     <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         <a asp-page="./View" asp-route-id="@item.Data.Id">@item.Data.Title</a>
-                    </td>
-                    <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        @item.Data.Content
                     </td>
                     <td>
                         @if (item.Category != null)

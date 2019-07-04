@@ -37,49 +37,49 @@ namespace MindNote.Client.SDK.API
 
         public async Task Clear(string token)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             await Raw.ClearAsync();
         }
 
         public async Task<int?> Create(string token, Category data)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.CreateAsync(data);
         }
 
         public async Task<int?> Delete(string token, int id)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.DeleteAsync(id);
         }
 
         public async Task<Category> Get(string token, int id)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetAsync(id);
         }
 
         public async Task<IEnumerable<Category>> GetAll(string token)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetAllAsync();
         }
 
         public async Task<IEnumerable<Category>> Query(string token, int? id, string name, string color)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.QueryAsync(id, name, color);
         }
 
         public async Task<Category> GetByName(string token, string name)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetByNameAsync(name);
         }
 
         public async Task<int?> Update(string token, int id, Category data)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.UpdateAsync(id, data);
         }
     }

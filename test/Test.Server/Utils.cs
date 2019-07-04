@@ -86,7 +86,7 @@ namespace Test.Server
             }
             for (int i = 0; i < 10; i++)
             {
-                var c = res.RelationsProvider.Create(new MindNote.Data.Relation
+                _ = res.RelationsProvider.Create(new MindNote.Data.Relation
                 {
                     From = noteid[i % noteid.Count],
                     To = noteid[(i + 1) % noteid.Count],

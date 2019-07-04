@@ -8,7 +8,7 @@ namespace MindNote.Client.SDK.API
     {
         Task<IEnumerable<Note>> GetAll(string token);
 
-        Task<IEnumerable<Note>> Query(string token, int? id, string name, string content, int? categoryId, string keyword);
+        Task<IEnumerable<Note>> Query(string token, int? id, string name, string content, int? categoryId, string keyword, int? offset, int? count, string targets);
 
         Task<Note> Get(string token, int id);
 
@@ -35,43 +35,43 @@ namespace MindNote.Client.SDK.API
 
         public async Task Clear(string token)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             await Raw.ClearAsync();
         }
 
         public async Task<int?> Create(string token, Note data)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.CreateAsync(data);
         }
 
         public async Task<int?> Delete(string token, int id)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.DeleteAsync(id);
         }
 
         public async Task<Note> Get(string token, int id)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetAsync(id);
         }
 
         public async Task<IEnumerable<Note>> GetAll(string token)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.GetAllAsync();
         }
 
-        public async Task<IEnumerable<Note>> Query(string token, int? id, string name, string content, int? categoryId, string keyword)
+        public async Task<IEnumerable<Note>> Query(string token, int? id, string name, string content, int? categoryId, string keyword, int? offset, int? count, string targets)
         {
-            Client.SetBearerToken(token);
-            return await Raw.QueryAsync(id, name, content, categoryId, keyword);
+            if (token != null) Client.SetBearerToken(token);
+            return await Raw.QueryAsync(id, name, content, categoryId, keyword, offset, count, targets);
         }
 
         public async Task<int?> Update(string token, int id, Note data)
         {
-            Client.SetBearerToken(token);
+            if (token != null) Client.SetBearerToken(token);
             return await Raw.UpdateAsync(id, data);
         }
     }

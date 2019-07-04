@@ -31,7 +31,7 @@ namespace MindNote.Server.Identity.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetAsync(string logoutId)
         {
-            if (User?.Identity.IsAuthenticated != true || string.IsNullOrEmpty(logoutId))
+            if (!User.Identity.IsAuthenticated || string.IsNullOrEmpty(logoutId))
             {
                 return Page();
             }
@@ -43,7 +43,7 @@ namespace MindNote.Server.Identity.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            if (User?.Identity.IsAuthenticated == true)
+            if (User.Identity.IsAuthenticated)
             {
                 await _signInManager.SignOutAsync();
                 await _events.RaiseAsync(new UserLogoutSuccessEvent(User.GetSubjectId(), User.GetDisplayName()));

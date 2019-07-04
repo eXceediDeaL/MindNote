@@ -43,7 +43,7 @@ namespace MindNote.Server.Host.Pages.Categories
             try
             {
                 Data = new CategoriesViewModel { Data = await client.Get(token, id) };
-                var notes = await nodesClient.Query(token, null, null, null, id, null);
+                var notes = await nodesClient.Query(token, null, null, null, id, null, null, null, null);
                 {
                     List<NotesViewModel> noteViews = new List<NotesViewModel>();
                     foreach (Note v in notes)

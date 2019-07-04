@@ -17,7 +17,7 @@ namespace MindNote.Data.Providers.SqlServer
             parent = dataProvider;
         }
 
-        public async Task Clear(string userId = null)
+        public async Task Clear(string userId)
         {
             IQueryable<Models.Relation> query = context.Relations.AsQueryable();
             if (userId != null)
@@ -29,7 +29,7 @@ namespace MindNote.Data.Providers.SqlServer
             await context.SaveChangesAsync();
         }
 
-        public async Task<int?> Create(Relation data, string userId = null)
+        public async Task<int?> Create(Relation data, string userId)
         {
             if ((await parent.NotesProvider.Get(data.From, userId) == null) || (await parent.NotesProvider.Get(data.To, userId) == null))
             {
@@ -46,7 +46,7 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task<int?> Delete(int id, string userId = null)
+        public async Task<int?> Delete(int id, string userId)
         {
             Models.Relation raw = await context.Relations.FindAsync(id);
             if (raw == null || (userId != null && raw.UserId != userId))
@@ -59,7 +59,7 @@ namespace MindNote.Data.Providers.SqlServer
             return id;
         }
 
-        public async Task<Relation> Get(int id, string userId = null)
+        public async Task<Relation> Get(int id, string userId)
         {
             IQueryable<Models.Relation> query = context.Relations.Where(x => x.Id == id);
             if (userId != null)
@@ -70,7 +70,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public async Task<IEnumerable<Relation>> GetAdjacents(int noteId, string userId = null)
+        public async Task<IEnumerable<Relation>> GetAdjacents(int noteId, string userId)
         {
             IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == noteId || x.To == noteId);
             if (userId != null)
@@ -81,7 +81,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<int?> ClearAdjacents(int noteId, string userId = null)
+        public async Task<int?> ClearAdjacents(int noteId, string userId)
         {
             IQueryable<Models.Relation> query = context.Relations.Where(x => x.From == noteId || x.To == noteId);
             if (userId != null)
@@ -94,7 +94,7 @@ namespace MindNote.Data.Providers.SqlServer
             return noteId;
         }
 
-        public async Task<IEnumerable<Relation>> GetAll(string userId = null)
+        public async Task<IEnumerable<Relation>> GetAll(string userId)
         {
             IQueryable<Models.Relation> query = context.Relations.AsQueryable();
             if (userId != null)
@@ -105,7 +105,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<int?> Update(int id, Relation data, string userId = null)
+        public async Task<int?> Update(int id, Relation data, string userId)
         {
             Models.Relation raw = await context.Relations.FindAsync(id);
             if (raw == null || (userId != null && raw.UserId != userId))
@@ -121,7 +121,7 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId = null)
+        public async Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId)
         {
             IQueryable<Models.Relation> query = context.Relations.AsQueryable();
             if (userId != null)

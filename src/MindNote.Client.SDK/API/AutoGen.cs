@@ -783,14 +783,14 @@ namespace MindNote.Client.SDK.API
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Note>> QueryAsync(int? id, string name, string content, int? categoryId, string keyword)
+        public System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Note>> QueryAsync(int? id, string name, string content, int? categoryId, string keyword, int? offset, int? count, string targets)
         {
-            return QueryAsync(id, name, content, categoryId, keyword, System.Threading.CancellationToken.None);
+            return QueryAsync(id, name, content, categoryId, keyword, offset, count, targets, System.Threading.CancellationToken.None);
         }
     
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Note>> QueryAsync(int? id, string name, string content, int? categoryId, string keyword, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Note>> QueryAsync(int? id, string name, string content, int? categoryId, string keyword, int? offset, int? count, string targets, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("Notes/Query?");
@@ -813,6 +813,18 @@ namespace MindNote.Client.SDK.API
             if (keyword != null) 
             {
                 urlBuilder_.Append("keyword=").Append(System.Uri.EscapeDataString(ConvertToString(keyword, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (offset != null) 
+            {
+                urlBuilder_.Append("offset=").Append(System.Uri.EscapeDataString(ConvertToString(offset, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (count != null) 
+            {
+                urlBuilder_.Append("count=").Append(System.Uri.EscapeDataString(ConvertToString(count, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (targets != null) 
+            {
+                urlBuilder_.Append("targets=").Append(System.Uri.EscapeDataString(ConvertToString(targets, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
     

@@ -31,7 +31,7 @@ namespace Test.Server.SDKs
                     {
                         Note node = new Note { Title = "name" };
                         int id = client.Create(token, node).Result.Value;
-                        Assert.AreEqual(node.Title, client.Query(token, id, null, null, null, null).Result.First().Title);
+                        Assert.AreEqual(node.Title, client.Query(token, id, null, null, null, null, null, null, null).Result.First().Title);
                         node.Content = "content";
                         Assert.IsTrue(client.Update(token, id, node).Result.HasValue);
                         Assert.IsTrue(client.Delete(token, id).Result.HasValue);

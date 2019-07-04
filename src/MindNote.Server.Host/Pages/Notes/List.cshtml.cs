@@ -74,7 +74,7 @@ namespace MindNote.Server.Host.Pages.Notes
             try
             {
                 await GenTagSelector(token);
-                IEnumerable<Note> ms = await client.Query(token, PostData.QueryId, PostData.QueryTitle, PostData.QueryContent, PostData.QueryCategoryId, PostData.QueryKeyword);
+                IEnumerable<Note> ms = await client.Query(token, PostData.QueryId, PostData.QueryTitle, PostData.QueryContent, PostData.QueryCategoryId, PostData.QueryKeyword, null, null, null);
                 Data = new NoteListViewModel { Data = await GenData(ms.ToList(), token) };
             }
             catch

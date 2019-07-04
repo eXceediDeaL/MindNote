@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MindNote.Data.Providers.Queries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,7 +18,7 @@ namespace MindNote.Data.Providers.InMemory
             this.parent = parent;
         }
 
-        public Task Clear(string userId = null)
+        public Task Clear(string userId)
         {
             IEnumerable<Note> query = GetAll(userId).Result;
             foreach (int v in query.Select(x => x.Id))
@@ -29,7 +30,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.CompletedTask;
         }
 
-        public async Task<int?> Create(Note data, string userId = null)
+        public async Task<int?> Create(Note data, string userId)
         {
             if (string.IsNullOrEmpty(data.Title))
             {
@@ -55,7 +56,7 @@ namespace MindNote.Data.Providers.InMemory
             return raw.Data.Id;
         }
 
-        public Task<int?> Delete(int id, string userId = null)
+        public Task<int?> Delete(int id, string userId)
         {
             if (Data.TryGetValue(id, out Model<Note> value))
             {
@@ -69,13 +70,13 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult<int?>(null);
         }
 
-        public Task<Note> Get(int id, string userId = null)
+        public Task<Note> Get(int id, string userId)
         {
             IEnumerable<Note> query = GetAll(userId).Result;
             return Task.FromResult(query.Where(x => x.Id == id).Select(x => (Note)x.Clone()).FirstOrDefault());
         }
 
-        public Task<IEnumerable<Note>> GetAll(string userId = null)
+        public Task<IEnumerable<Note>> GetAll(string userId)
         {
             IEnumerable<Model<Note>> query = Data.Values.AsEnumerable();
             if (userId != null)
@@ -86,7 +87,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult(query.Select(x => (Note)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword = null, string userId = null)
+        public Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId)
         {
             IEnumerable<Model<Note>> query = Data.Values.AsEnumerable();
             if (userId != null)
@@ -119,10 +120,27 @@ namespace MindNote.Data.Providers.InMemory
                 query = query.Where(x => x.Data.CategoryId == categoryId.Value);
             }
 
+            if (offset.HasValue && offset.Value >= 0)
+            {
+                query = query.Skip(offset.Value);
+            }
+
+            if (count.HasValue && count.Value >= 0)
+            {
+                query = query.Take(count.Value);
+            }
+
+            if (targets != null)
+            {
+                if (targets.Contains(NoteTargets.Count))
+                {
+                    return Task.FromResult(query.Select(x => (Note)null).ToArray().AsEnumerable());
+                }
+            }
             return Task.FromResult(query.Select(x => (Note)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<int?> Update(int id, Note data, string userId = null)
+        public Task<int?> Update(int id, Note data, string userId)
         {
             if (Data.TryGetValue(id, out Model<Note> value))
             {

@@ -31,9 +31,9 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpGet("Query")]
-        public async Task<IEnumerable<Note>> Query(int? id, string name, string content, int? categoryId, string keyword)
+        public async Task<IEnumerable<Note>> Query(int? id, string name, string content, int? categoryId, string keyword, int? offset, int? count, string targets)
         {
-            return await provider.Query(id, name, content, categoryId, keyword, identityDataGetter.GetClaimId(User));
+            return await provider.Query(id, name, content, categoryId, keyword, offset, count, targets, identityDataGetter.GetClaimId(User));
         }
 
         [HttpGet("{id}")]

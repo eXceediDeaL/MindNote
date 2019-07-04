@@ -101,7 +101,7 @@ namespace Test.Server.Apis
             {
                 Note node = new Note { Title = "name" };
                 int id = controller.Create(node).Result.Value;
-                Assert.AreEqual(node.Title, controller.Query(id, null, null, null, null).Result.First().Title);
+                Assert.AreEqual(node.Title, controller.Query(id, null, null, null, null, null, null, null).Result.First().Title);
                 node.Content = "content";
                 Assert.IsTrue(controller.Update(id, node).Result.HasValue);
                 Assert.IsTrue(controller.Delete(id).Result.HasValue);

@@ -47,13 +47,23 @@ namespace Test.Data
             Assert.IsFalse(string.IsNullOrEmpty(item.Name), "name is null/empty");
         }
 
+        public void Clear()
+        {
+            foreach (var username in usernames)
+            {
+                Provider.NotesProvider.Clear(username);
+                Assert.IsFalse(Provider.NotesProvider.GetAll(username).Result.Any(), "clear failed");
+                Provider.RelationsProvider.Clear(username);
+                Assert.IsFalse(Provider.RelationsProvider.GetAll(username).Result.Any(), "clear failed");
+                Provider.CategoriesProvider.Clear(username);
+                Assert.IsFalse(Provider.CategoriesProvider.GetAll(username).Result.Any(), "clear failed");
+            }
+        }
+
         private void NoteBasic()
         {
             INotesProvider pro = Provider.NotesProvider;
-
-            pro.Clear();
-            Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
-
+            Clear();
             for (int i = 0; i < TestCount; i++)
             {
                 Note data = new Note
@@ -63,6 +73,7 @@ namespace Test.Data
                     CategoryId = null,
                 };
                 string username = random.Choice(usernames);
+
                 Assert.AreEqual(data, data.Clone(), "clone failed");
 
                 int id;
@@ -71,7 +82,7 @@ namespace Test.Data
                     Assert.IsTrue(tid.HasValue, "create failed");
                     id = tid.Value;
 
-                    Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
+                    Assert.IsNotNull(pro.Get(id, username), "get after create failed");
 
                     Note actual = pro.Get(id, username).Result;
                     Valid(actual, username);
@@ -87,7 +98,7 @@ namespace Test.Data
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    IEnumerable<Note> items = pro.Query(id, data.Title, data.Content, null, null, username).Result;
+                    IEnumerable<Note> items = pro.Query(id, data.Title, data.Content, null, null, null, null, null, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
                     Note actual = items.First();
                     Valid(actual, username);
@@ -100,7 +111,7 @@ namespace Test.Data
                 if (random.NextDouble() < DeleteRate)
                 {
                     Assert.IsNotNull(pro.Delete(id, username).Result, "delete failed");
-                    Assert.IsNull(pro.Get(id).Result, "get after delete failed");
+                    Assert.IsNull(pro.Get(id, username).Result, "get after delete failed");
                 }
             }
 
@@ -116,19 +127,19 @@ namespace Test.Data
 
         private void NoteFailed()
         {
-            Provider.CategoriesProvider.Clear().Wait();
+            string username = random.Choice(usernames);
+            Provider.CategoriesProvider.Clear(username).Wait();
             INotesProvider pro = Provider.NotesProvider;
-            Assert.IsNull(pro.Create(new Note { Title = null }).Result, "node name is null");
-            Assert.IsNull(pro.Create(new Note { Title = "" }).Result, "node name is empty");
-            Assert.IsNull(pro.Create(new Note { Title = "a", CategoryId = 0 }).Result, "no this tag but create node");
+            Assert.IsNull(pro.Create(new Note { Title = null }, username).Result, "node name is null");
+            Assert.IsNull(pro.Create(new Note { Title = "" }, username).Result, "node name is empty");
+            Assert.IsNull(pro.Create(new Note { Title = "a", CategoryId = 0 }, username).Result, "no this tag but create node");
         }
 
         private void RelationBasic()
         {
-            INotesProvider npro = Provider.NotesProvider;
+            Clear();
 
-            npro.Clear();
-            Assert.IsFalse(npro.GetAll().Result.Any(), "clear failed");
+            INotesProvider npro = Provider.NotesProvider;
 
             IRelationsProvider pro = Provider.RelationsProvider;
 
@@ -150,9 +161,6 @@ namespace Test.Data
                 nodes.Add(tid.Value);
             }
 
-            pro.Clear();
-            Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
-
             for (int i = 0; i < TestCount; i++)
             {
                 Relation data = new Relation
@@ -169,7 +177,7 @@ namespace Test.Data
                     Assert.IsTrue(tid.HasValue, "create failed");
                     id = tid.Value;
 
-                    Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
+                    Assert.IsNotNull(pro.Get(id, username), "get after create failed");
 
                     Relation actual = pro.Get(id, username).Result;
                     Valid(actual, username);
@@ -197,7 +205,7 @@ namespace Test.Data
                 if (random.NextDouble() < DeleteRate)
                 {
                     Assert.IsNotNull(pro.Delete(id, username).Result, "delete failed");
-                    Assert.IsNull(pro.Get(id).Result, "get after delete failed");
+                    Assert.IsNull(pro.Get(id, username).Result, "get after delete failed");
                 }
             }
 
@@ -213,20 +221,20 @@ namespace Test.Data
 
         private void RelationFailed()
         {
-            Provider.NotesProvider.Clear().Wait();
-            int id = Provider.NotesProvider.Create(new Note { Title = "name" }).Result.Value;
+            string username = random.Choice(usernames);
+            Provider.CategoriesProvider.Clear(username).Wait();
+            int id = Provider.NotesProvider.Create(new Note { Title = "name" }, username).Result.Value;
             IRelationsProvider pro = Provider.RelationsProvider;
-            Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id + 1 }).Result);
-            Assert.IsNull(pro.Create(new Relation { From = id, To = id + 1 }).Result);
-            Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id }).Result);
+            Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id + 1 }, username).Result);
+            Assert.IsNull(pro.Create(new Relation { From = id, To = id + 1 }, username).Result);
+            Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id }, username).Result);
         }
 
         private void RelationSpecial()
         {
-            INotesProvider npro = Provider.NotesProvider;
+            Clear();
 
-            npro.Clear();
-            Assert.IsFalse(npro.GetAll().Result.Any(), "clear failed");
+            INotesProvider npro = Provider.NotesProvider;
 
             IRelationsProvider pro = Provider.RelationsProvider;
 
@@ -249,9 +257,6 @@ namespace Test.Data
                 nodes.Add((tid.Value, username));
                 adjs.Add(tid.Value, new HashSet<int>());
             }
-
-            pro.Clear();
-            Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
 
             for (int i = 0; i < TestCount; i++)
             {
@@ -284,10 +289,9 @@ namespace Test.Data
 
         private void CategoryBasic()
         {
-            ICategoriesProvider pro = Provider.CategoriesProvider;
+            Clear();
 
-            pro.Clear();
-            Assert.IsFalse(pro.GetAll().Result.Any(), "clear failed");
+            ICategoriesProvider pro = Provider.CategoriesProvider;
 
             for (int i = 0; i < TestCount; i++)
             {
@@ -337,7 +341,7 @@ namespace Test.Data
                 if (random.NextDouble() < DeleteRate)
                 {
                     Assert.IsNotNull(pro.Delete(id, username).Result, "delete failed");
-                    Assert.IsNull(pro.Get(id).Result, "get after delete failed");
+                    Assert.IsNull(pro.Get(id, username).Result, "get after delete failed");
                 }
             }
 

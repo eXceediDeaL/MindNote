@@ -26,7 +26,7 @@ namespace MindNote.Data.Providers.SqlServer
             }
         }
 
-        public async Task Clear(string userId = null)
+        public async Task Clear(string userId)
         {
             IQueryable<Models.Category> query = context.Categories.AsQueryable();
             IQueryable<Models.Note> queryNode = context.Notes.AsQueryable();
@@ -40,7 +40,7 @@ namespace MindNote.Data.Providers.SqlServer
             await context.SaveChangesAsync();
         }
 
-        public async Task<int?> Create(Category data, string userId = null)
+        public async Task<int?> Create(Category data, string userId)
         {
             Models.Category raw = Models.Category.FromModel(data);
             if (userId != null)
@@ -53,7 +53,7 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task<int?> Delete(int id, string userId = null)
+        public async Task<int?> Delete(int id, string userId)
         {
             Models.Category raw = await context.Categories.FindAsync(id);
             if (raw == null || (userId != null && raw.UserId != userId))
@@ -76,7 +76,7 @@ namespace MindNote.Data.Providers.SqlServer
             return id;
         }
 
-        public async Task<Category> Get(int id, string userId = null)
+        public async Task<Category> Get(int id, string userId)
         {
             IQueryable<Models.Category> query = context.Categories.Where(x => x.Id == id);
             if (userId != null)
@@ -87,7 +87,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public async Task<Category> GetByName(string name, string userId = null)
+        public async Task<Category> GetByName(string name, string userId)
         {
             IQueryable<Models.Category> query = context.Categories.Where(x => x.Name == name);
             if (userId != null)
@@ -98,7 +98,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public async Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId = null)
+        public async Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId)
         {
             IQueryable<Models.Category> query = context.Categories.AsQueryable();
             if (userId != null)
@@ -121,7 +121,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<IEnumerable<Category>> GetAll(string userId = null)
+        public async Task<IEnumerable<Category>> GetAll(string userId)
         {
             IQueryable<Models.Category> query = context.Categories.AsQueryable();
             if (userId != null)
@@ -132,7 +132,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<int?> Update(int id, Category data, string userId = null)
+        public async Task<int?> Update(int id, Category data, string userId)
         {
             Models.Category raw = await context.Categories.FindAsync(id);
             if (raw == null || (userId != null && raw.UserId != userId))
