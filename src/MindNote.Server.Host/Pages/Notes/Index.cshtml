@@ -5,95 +5,26 @@
     ViewData["Id"] = "Notes";
 }
 
-@*
-<ul class="breadcrumb">
-    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
-    <li class="breadcrumb-item active">@ViewData["Title"]</li>
-</ul>
-*@
-
-<div class="text-center" style="width:100%">
-    <form method="post" class="form-inline" style="display:inline-flex">
-        <input class="form-control" asp-for="PostData.QueryId" style="margin-left:10px; width:100px" placeholder="Id"/>
-        <input class="form-control" asp-for="PostData.QueryTitle" style="margin-left:10px; width:150px" placeholder="Title"/>        
-        <input class="form-control" asp-for="PostData.QueryContent" style="margin-left:10px; width:150px" placeholder="Content"/>
-        <select class="form-control" asp-for="PostData.QueryCategoryId" asp-items="Model.CategorySelector" style="margin-left:10px; width:150px"></select>
-        <input class="form-control" asp-for="PostData.QueryKeyword" style="margin-left:10px; width:150px" placeholder="Keyword"/>
-        <button type="submit" asp-page-handler="Query" class="btn btn-outline-dark" style="margin-left:10px">
-            <i class="fa fa-search"></i>
-        </button>
-        <a asp-page="./Edit" class="btn btn-outline-success" style="margin-left:10px">
-            <i class="fa fa-plus"></i>
-        </a>
-    </form>
+<div class="card-columns" style="column-count: 1">
+    @foreach (var item in Model.Data)
+    {
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">
+                    <a asp-page="./View" asp-route-id="@item.Data.Id" style="color: black">@item.Data.Title</a>
+                </h4>
+                <partial name="_NoteMetadataPartial" model="item"/>
+                <p class="card-text">
+                    <text-clipper text="@item.Data.Content"></text-clipper>
+                </p>
+                <a asp-page="./View" asp-route-id="@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
+            </div>
+        </div>
+    }
 </div>
 
-<table class="table table-hover" style="margin-top:10px; table-layout:fixed;">
-    <thead>
-        <tr>
-            <th style="width:6%">
-                Id
-            </th>
-            <th style="width:10%">
-                Name
-            </th>
-            <th>
-                Content
-            </th>
-            <th style="width:15%">
-                Category
-            </th>
-            <th style="width:15%">
-                Keywords
-            </th>
-            <th style="width:10%">
-                Operations
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Data)
-        {
-        <tr>
-            <td>
-                @item.Data.Id
-            </td>
-            <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <a asp-page="./View" asp-route-id="@item.Data.Id">@item.Data.Title</a>
-            </td>
-            <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                @item.Data.Content
-            </td>
-            <td>
-                @if (item.Category != null)
-                {
-                    <a asp-page="/Categories/View" asp-route-id="@item.Category.Id">
-                        <category-display value="@item.Category"></category-display>
-                    </a>
-                }
-            </td>
-            <td>
-                @if (item.Data.Keywords != null)
-                {
-                    @(string.Join(';',item.Data.Keywords))
-                }
-            </td>
-            <td>
-                <div class="row" style="margin-left:0px">
-                    <form method="post" style="margin-left:0px">
-                        <input type="hidden" asp-for="PostData.Data.Id" value="@item.Data.Id" />
-                        <div class="btn-group-sm">
-                            <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
-                                <i class="fa fa-edit"></i>
-                            </a>
-                            <button asp-page-handler="Delete" asp-route-id="@item.Data.Id" class="btn btn-outline-danger">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
+<div class="corner">
+    <div class="btn-group-vertical">
+        <a asp-page="./List" class="btn btn-dark"><i class="fa fa-list"></i></a>
+    </div>
+</div>

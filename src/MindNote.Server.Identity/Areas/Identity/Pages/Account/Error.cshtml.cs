@@ -13,8 +13,8 @@ namespace MindNote.Server.Identity.Areas.Identity.Pages.Account
 {
     public class ErrorModel : PageModel
     {
-        private IIdentityServerInteractionService _interaction;
-        private ILogger<ErrorModel> _logger;
+        private readonly IIdentityServerInteractionService _interaction;
+        private readonly ILogger<ErrorModel> _logger;
 
         public ErrorMessage Message { get; set; }
 

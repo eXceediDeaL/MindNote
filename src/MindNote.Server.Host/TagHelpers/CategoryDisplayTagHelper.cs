@@ -16,15 +16,15 @@ namespace MindNote.Server.Host.TagHelpers
                 output.TagName = "span";
                 output.TagMode = TagMode.StartTagAndEndTag;
 
-                TagBuilder color = new TagBuilder("i");
-                color.AddCssClass("fa");
-                color.AddCssClass("fa-tag");
+                TagBuilder icon = new TagBuilder("i");
+                icon.AddCssClass("far");
+                icon.AddCssClass("fa-folder");
                 // "display:inline-block; border-radius:50%; height:12px; width:12px; position:relative;"
-                color.Attributes["style"] = (Value.Color != null ? $"color:{Value.Color}" : "");
-                output.Content.AppendHtml(color);
+                icon.Attributes["style"] = (Value.Color != null ? $"color:{Value.Color}" : "");
+                output.Content.AppendHtml(icon);
 
                 TagBuilder name = new TagBuilder("span");
-                name.Attributes["style"] = "margin-left: 10px";
+                name.Attributes["style"] = "margin-left: 5px";
                 name.InnerHtml.Append(Value.Name);
                 output.Content.AppendHtml(name);
             }

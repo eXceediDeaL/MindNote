@@ -10,6 +10,9 @@ else {
             dotnet run -p ./src/MindNote.Server.Identity
         }
         "host" {
+            dotnet run -p ./src/MindNote.Server.Host --launch-profile "MindNote.Server.Host(Remote)"
+        }
+        "hostl" {
             dotnet run -p ./src/MindNote.Server.Host
         }
         default {

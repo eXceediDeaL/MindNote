@@ -5,52 +5,37 @@
     ViewData["Id"] = "Notes";
 }
 
-@*
-    <ul class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
-        <li class="breadcrumb-item"><a asp-page="/Notes/Index">Notes</a></li>
-        <li class="breadcrumb-item active">@Model.Data.Data.Id</li>
-    </ul>
-*@
+<span id="top"></span>
+<h1 class="display-4" style="text-align:center">@Html.DisplayFor(model => model.Data.Data.Title)</h1>
+<div style="text-align:center" class="m-4">
+    <partial name="_NoteMetadataPartial" model="Model.Data" />
+</div>
+<partial name="_MarkdownViewerPartial" model="Model.Markdown" />
 
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a href="#content" data-toggle="tab" class="nav-link" id="aContent">
-                <h4>@Html.DisplayFor(model => model.Data.Data.Title)</h4>
+<div class="corner">
+    <form method="post">
+        <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />
+        <div class="btn-group-vertical">
+            <a class="btn btn-light" id="btnBackToTop"><i class="fa fa-angle-up"></i></a>
+            <a asp-page="./List" class="btn btn-dark"><i class="fa fa-list"></i></a>
+            <a asp-page="./Edit" asp-route-id="@Model.Data.Data.Id" class="btn btn-primary">
+                <i class="fa fa-edit"></i>
             </a>
-        </li>
-        <li class="nav-item" style="margin-top:auto; margin-left:10px"><a href="#relations" data-toggle="tab" class="nav-link active">Relations</a></li>
-        <li class="nav-item" style="margin-top:auto; margin-left:auto; margin-right:0px">
-            <form method="post">
-                <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />
-                <div class="btn-group-toggle">
-                    @if (Model.Data.Category != null)
-                    {
-                        <a asp-page="/Categories/View" asp-route-id="@Model.Data.Category.Id" class="btn btn-outline-info">
-                            <category-display value="@Model.Data.Category"></category-display>
-                        </a>
-                    }
-                    <a asp-page="./Edit" asp-route-id="@Model.Data.Data.Id" class="btn btn-outline-primary">
-                        <i class="fa fa-edit"></i>
-                    </a>
-                    <button type="submit" asp-page-handler="Delete" asp-route-id="@Model.Data.Data.Id" class="btn btn-outline-danger">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>
-            </form>
-        </li>
-    </ul>
-<div class="tab-content pt-2" height="100%" width="100%">
-    <div class="tab-pane " id="content">
-        <partial name="_MarkdownViewerPartial" model="Model.Markdown" />
-    </div>
-    <div class="tab-pane active" id="relations">
-        <partial name="_GraphViewerPartial" model="Model.Graph" />
-    </div>
+            <button type="submit" asp-page-handler="Delete" asp-route-id="@Model.Data.Data.Id" class="btn btn-danger">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+    </form>
 </div>
 
-@section scripts{
+@section scripts {
     <script>
-        document.getElementById("aContent").click();
+        document.getElementById("btnBackToTop").onclick = (function smoothscroll() {
+            var currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            if (currentScroll > 0) {
+                window.requestAnimationFrame(smoothscroll);
+                window.scrollTo(0, currentScroll - (currentScroll / 5));
+            }
+        });
     </script>
 }

@@ -63,10 +63,9 @@ namespace Test.Data
                     CategoryId = null,
                 };
                 string username = random.Choice(usernames);
-                int id = 0;
-
                 Assert.AreEqual(data, data.Clone(), "clone failed");
 
+                int id;
                 {
                     int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
@@ -162,10 +161,9 @@ namespace Test.Data
                     To = random.Choice(nodes),
                 };
                 string username = random.Choice(usernames);
-                int id = 0;
-
                 Assert.AreEqual(data, data.Clone());
 
+                int id;
                 {
                     int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
@@ -299,10 +297,9 @@ namespace Test.Data
                     Color = random.NextString(),
                 };
                 string username = random.Choice(usernames);
-                int id = 0;
-
                 Assert.AreEqual(data, data.Clone());
 
+                int id;
                 {
                     int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
