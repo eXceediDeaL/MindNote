@@ -26,5 +26,12 @@ namespace Test.Data
             Tester tester = new Tester(new DataProvider());
             tester.CategoryIndependent();
         }
+
+        [TestMethod]
+        public void User()
+        {
+            Tester tester = new Tester(new DataProvider());
+            tester.UserIndependent();
+        }
     }
 }

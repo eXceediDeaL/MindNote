@@ -94,5 +94,29 @@ namespace Test.Server.SDKs
                 }
             }, provider);
         }
+
+        [TestMethod]
+        public void Users()
+        {
+            Utils.UseApiEnvironment((_, api, token) =>
+            {
+                using (var baseClient = api.CreateClient())
+                {
+                    var client = new UsersClient(baseClient);
+
+                    Assert.IsFalse(client.GetAll(token).Result.Any());
+                    Assert.IsNull(client.Get(token, "0").Result);
+                    client.Clear(token).Wait();
+                    {
+                        User tag = new User { Name = "user" };
+                        string id = client.Create(token, Guid.NewGuid().ToString(), tag).Result;
+                        Assert.AreEqual(tag.Name, client.Get(token, id).Result?.Name);
+                        tag.Name = "user2";
+                        Assert.IsNotNull(client.Update(token, id, tag).Result);
+                        Assert.IsNotNull(client.Delete(token, id).Result);
+                    }
+                }
+            });
+        }
     }
 }

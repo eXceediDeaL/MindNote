@@ -5,18 +5,16 @@
     ViewData["Id"] = "Notes";
 }
 
-<span id="top"></span>
 <h1 class="display-4" style="text-align:center">@Html.DisplayFor(model => model.Data.Data.Title)</h1>
 <div style="text-align:center" class="m-4">
     <partial name="_NoteMetadataPartial" model="Model.Data" />
 </div>
 <partial name="_MarkdownViewerPartial" model="Model.Markdown" />
 
-<div class="corner">
+@section corner {
     <form method="post">
         <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />
         <div class="btn-group-vertical">
-            <a class="btn btn-light" id="btnBackToTop"><i class="fa fa-angle-up"></i></a>
             <a asp-page="./List" class="btn btn-dark"><i class="fa fa-list"></i></a>
             <a asp-page="./Edit" asp-route-id="@Model.Data.Data.Id" class="btn btn-primary">
                 <i class="fa fa-edit"></i>
@@ -26,16 +24,4 @@
             </button>
         </div>
     </form>
-</div>
-
-@section scripts {
-    <script>
-        document.getElementById("btnBackToTop").onclick = (function smoothscroll() {
-            var currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
-            if (currentScroll > 0) {
-                window.requestAnimationFrame(smoothscroll);
-                window.scrollTo(0, currentScroll - (currentScroll / 5));
-            }
-        });
-    </script>
 }

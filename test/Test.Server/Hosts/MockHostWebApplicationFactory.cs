@@ -47,6 +47,7 @@ namespace Test.Server.Hosts
                 services.AddSingleton<INotesClient, NotesClient>(x => new NotesClient(apiServer.CreateClient()));
                 services.AddSingleton<ICategoriesClient, CategoriesClient>(x => new CategoriesClient(apiServer.CreateClient()));
                 services.AddSingleton<IRelationsClient, RelationsClient>(x => new RelationsClient(apiServer.CreateClient()));
+                services.AddSingleton<IUsersClient, UsersClient>(x => new UsersClient(apiServer.CreateClient()));
 
                 Startup.ConfigureFinalServices(null, services);
             });

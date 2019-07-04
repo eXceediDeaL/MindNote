@@ -48,5 +48,15 @@ namespace Test.Data
                 tester.CategoryIndependent();
             }
         }
+
+        [TestMethod]
+        public void User()
+        {
+            using (DataContext context = CreateContext("sqlserver_test_category"))
+            {
+                Tester tester = new Tester(new DataProvider(context));
+                tester.UserIndependent();
+            }
+        }
     }
 }

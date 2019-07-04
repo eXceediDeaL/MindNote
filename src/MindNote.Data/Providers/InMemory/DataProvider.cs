@@ -7,13 +7,16 @@
             NotesProvider = new NotesProvider(this);
             RelationsProvider = new RelationsProvider(this);
             CategoriesProvider = new CategoriesProvider(this);
+            UsersProvider = new UsersProvider(this);
         }
 
-        public INotesProvider NotesProvider { get; private set; }
+        public INotesProvider NotesProvider { get; }
 
-        public IRelationsProvider RelationsProvider { get; private set; }
+        public IRelationsProvider RelationsProvider { get; }
 
-        public ICategoriesProvider CategoriesProvider { get; private set; }
+        public ICategoriesProvider CategoriesProvider { get; }
+
+        public IUsersProvider UsersProvider { get; }
     }
 
     internal struct Model<T>

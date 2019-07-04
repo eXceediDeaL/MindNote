@@ -53,6 +53,14 @@ namespace Test.Server.Apis
                     };
                     res.AddRange(sub.Select(x => "/Categories/" + x));
                 }
+                {
+                    string[] sub = new string[]
+                    {
+                    "All",
+                    "user"
+                    };
+                    res.AddRange(sub.Select(x => "/Users/" + x));
+                }
                 return res.Select(x => new object[] { x });
             }
         }
@@ -91,7 +99,7 @@ namespace Test.Server.Apis
         }
 
         [TestMethod]
-        public void Nodes()
+        public void Notes()
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
             NotesController controller = new NotesController(provider, Utils.MockIdentityDataGetter);
@@ -132,7 +140,7 @@ namespace Test.Server.Apis
         }
 
         [TestMethod]
-        public void Tags()
+        public void Categories()
         {
             MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
 
@@ -148,6 +156,25 @@ namespace Test.Server.Apis
                 tag.Color = "white";
                 Assert.IsTrue(controller.Update(id, tag).Result.HasValue);
                 Assert.IsTrue(controller.Delete(id).Result.HasValue);
+            }
+        }
+
+        [TestMethod]
+        public void Users()
+        {
+            MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
+
+            UsersController controller = new UsersController(provider, Utils.MockIdentityDataGetter);
+            Assert.IsFalse(controller.GetAll().Result.Any());
+            Assert.IsNull(controller.Get("0").Result);
+            controller.Clear().Wait();
+            {
+                User tag = new User { Name = "user" };
+                string id = controller.Create(Guid.NewGuid().ToString(), tag).Result;
+                Assert.AreEqual(tag.Name, controller.Get(id).Result?.Name);
+                tag.Name = "user2";
+                Assert.IsNotNull(controller.Update(id, tag).Result);
+                Assert.IsNotNull(controller.Delete(id).Result);
             }
         }
     }

@@ -20,3 +20,17 @@
         </div>
     }
 </div>
+
+@if (Model.EnablePaging)
+{
+    <div class="text-center">
+        <ul class="pagination" style="display:inline-flex">
+            <li class="page-item @(Model.CurrentPageIndex == 1 ? "disabled" : "")"><a class="page-link" asp-route-pageIndex="@(Model.CurrentPageIndex - 1)"><i class="fa fa-angle-left"></i></a></li>
+            @for (int i = Math.Max(1, Model.CurrentPageIndex - 5); i <= Math.Min(Model.CurrentPageIndex + 5, Model.MaximumPageIndex); i++)
+            {
+                <li class="page-item @(i == Model.CurrentPageIndex ? "active" : "")"><a class="page-link" asp-all-route-data="@Model.PagingRouteData" asp-route-pageIndex="@i">@i</a></li>
+            }
+            <li class="page-item @(Model.CurrentPageIndex == Model.MaximumPageIndex ? "disabled" : "")"><a class="page-link" asp-route-pageIndex="@(Model.CurrentPageIndex + 1)"><i class="fa fa-angle-right"></i></a></li>
+        </ul>
+    </div>
+}

@@ -9,6 +9,7 @@ namespace MindNote.Data.Providers.SqlServer
             NotesProvider = new NotesProvider(context, this);
             RelationsProvider = new RelationsProvider(context, this);
             CategoriesProvider = new CategoriesProvider(context, this);
+            UsersProvider = new UsersProvider(context, this);
         }
 
         public INotesProvider NotesProvider { get; }
@@ -16,5 +17,7 @@ namespace MindNote.Data.Providers.SqlServer
         public IRelationsProvider RelationsProvider { get; }
 
         public ICategoriesProvider CategoriesProvider { get; }
+
+        public IUsersProvider UsersProvider { get; }
     }
 }

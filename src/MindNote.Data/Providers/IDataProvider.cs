@@ -7,5 +7,7 @@
         IRelationsProvider RelationsProvider { get; }
 
         ICategoriesProvider CategoriesProvider { get; }
+
+        IUsersProvider UsersProvider { get; }
     }
 }

@@ -21,8 +21,7 @@
 <script src="~/lib/highlight.js/highlight.min.js"></script>
 
 <script>
-    content = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Raw ?? ""));
-    md = window.markdownit({
+    var md = window.markdownit({
         html: true,
         linkify: true,
         typographer: true,
@@ -49,9 +48,15 @@
         .use(window.markdownitEmoji)
         .use(window.markdownitTaskLists);
 
-    result = md.render(content);
-    item = document.getElementById('_markdownViewerPartial_divContent');
-    item.innerHTML = result;
+    function update_markdown(content) {
+        let result = md.render(content);
+        let item = document.getElementById('_markdownViewerPartial_divContent');
+        item.innerHTML = result;
+    }
+
+    let content = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Raw ?? ""));
+
+    update_markdown(content);
 </script>
 
 <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>

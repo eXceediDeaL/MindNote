@@ -16,8 +16,6 @@ namespace MindNote.Server.Host.Pages.Notes
     [Authorize]
     public class IndexModel : PageModel
     {
-        const int NotePerPage = 8;
-
         private readonly INotesClient client;
         private readonly IIdentityDataGetter idData;
         private readonly ICategoriesClient tagsClient;
@@ -32,10 +30,6 @@ namespace MindNote.Server.Host.Pages.Notes
         public List<SelectListItem> CategorySelector { get; private set; }
 
         public NoteListViewModel Data { get; set; }
-
-        public int CurrentPageIndex { get; set; }
-
-        public int MaximumPageIndex { get; set; }
 
         private async Task<IList<NotesViewModel>> GenData(IList<Note> nodes, string token)
         {
@@ -68,25 +62,31 @@ namespace MindNote.Server.Host.Pages.Notes
 
             await GenTagSelector(token);
 
+            Data = new NoteListViewModel
+            {
+                EnablePaging = true,
+                ItemCountPerPage = 8,
+            };
+
             int count = (await client.Query(token, null, null, null, null, null, null, null, NoteTargets.Count)).Count();
-            MaximumPageIndex = (count / NotePerPage) + (count % NotePerPage > 0 ? 1 : 0);
+            Data.MaximumPageIndex = (count / Data.ItemCountPerPage) + (count % Data.ItemCountPerPage > 0 ? 1 : 0);
 
             int offset;
             if (pageIndex.HasValue)
             {
                 if (pageIndex <= 0) pageIndex = 1;
-                if (pageIndex > MaximumPageIndex) pageIndex = MaximumPageIndex;
-                offset = (pageIndex.Value - 1) * NotePerPage;
-                CurrentPageIndex = pageIndex.Value;
+                if (pageIndex > Data.MaximumPageIndex) pageIndex = Data.MaximumPageIndex;
+                offset = (pageIndex.Value - 1) * Data.ItemCountPerPage;
+                Data.CurrentPageIndex = pageIndex.Value;
             }
             else
             {
                 offset = 0;
-                CurrentPageIndex = 1;
+                Data.CurrentPageIndex = 1;
             }
 
-            IEnumerable<Note> ms = await client.Query(token, null, null, null, null, null, offset, NotePerPage, null);
-            Data = new NoteListViewModel { Data = await GenData(ms.ToList(), token) };
+            IEnumerable<Note> ms = await client.Query(token, null, null, null, null, null, offset, Data.ItemCountPerPage, null);
+            Data.Data = await GenData(ms.ToList(), token);
         }
     }
 }

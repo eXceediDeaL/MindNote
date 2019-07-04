@@ -377,5 +377,20 @@ namespace Test.Data
             CategoryBasic();
             CategoryFailed();
         }
+
+        public void UserIndependent()
+        {
+            IUsersProvider provider = Provider.UsersProvider;
+            provider.Clear().Wait();
+            Assert.IsFalse(provider.GetAll().Result.Any());
+            foreach(var v in usernames)
+            {
+                Assert.AreEqual(v, provider.Create(v, new User()).Result);
+                Assert.IsNotNull(provider.Get(v).Result);
+                Assert.AreEqual(v, provider.Update(v, new User()).Result);
+                Assert.AreEqual(v, provider.Delete(v).Result);
+                Assert.IsNull(provider.Get(v).Result);
+            }
+        }
     }
 }

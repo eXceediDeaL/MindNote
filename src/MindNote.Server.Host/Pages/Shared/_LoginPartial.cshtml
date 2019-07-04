@@ -1,14 +1,23 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
 @inject MindNote.Client.SDK.Identity.IIdentityDataGetter IDData
+@inject MindNote.Client.SDK.API.IUsersClient UsersClient
+
+@{
+    MindNote.Client.SDK.API.User userProfile = null;
+    if (User.Identity.IsAuthenticated)
+    {
+        userProfile = await Helpers.UserHelper.GetProfile(Context, UsersClient, IDData);
+    }
+}
 
 <ul class="navbar-nav">
     @if (User.Identity.IsAuthenticated)
     {
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Index">
-                <img gravatar="@IDData.GetClaimEmail(User)" size="24" default="mp" style="display:inline" class="rounded" />
-                <span style="margin-left:5px;">@IDData.GetClaimName(User)</span>
+                <img gravatar="@userProfile.Email" size="24" default="mp" style="display:inline" class="rounded" />
+                <span style="margin-left:5px;">@userProfile.Name</span>
             </a>
         </li>
         <li class="nav-item">

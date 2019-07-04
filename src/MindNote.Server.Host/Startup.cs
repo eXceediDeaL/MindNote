@@ -64,8 +64,15 @@ namespace MindNote.Server.Host
                             var tokenClient = new Client.SDK.Identity.TokenClient(httpclient);
                             var tokens = await tokenClient.RefreshToken(idClient.ClientId, idClient.ClientSecret, oldRefreshToken, oldIdToken);
 
-                            context.Properties.StoreTokens(tokens);
-                            context.ShouldRenew = true;
+                            if (tokens == null)
+                            {
+                                context.RejectPrincipal();
+                            }
+                            else
+                            {
+                                context.Properties.StoreTokens(tokens);
+                                context.ShouldRenew = true;
+                            }
                         }
                     },
                 };
@@ -75,7 +82,7 @@ namespace MindNote.Server.Host
                 options.SignInScheme = "Cookies";
                 options.Authority = server.Identity;
                 options.RequireHttpsMetadata = false;
-                options.UseTokenLifetime = true;
+                // options.UseTokenLifetime = true;
 
                 options.ClientId = idClient.ClientId;
                 options.ClientSecret = idClient.ClientSecret;
@@ -96,6 +103,7 @@ namespace MindNote.Server.Host
             services.AddHttpClient<INotesClient, NotesClient>(client => client.BaseAddress = new Uri(server.Api));
             services.AddHttpClient<ICategoriesClient, CategoriesClient>(client => client.BaseAddress = new Uri(server.Api));
             services.AddHttpClient<IRelationsClient, RelationsClient>(client => client.BaseAddress = new Uri(server.Api));
+            services.AddHttpClient<IUsersClient, UsersClient>(client => client.BaseAddress = new Uri(server.Api));
         }
 
         public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
