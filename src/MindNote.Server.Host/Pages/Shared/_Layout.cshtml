@@ -28,10 +28,10 @@
                                 Home
                             </a>
                         </li>
-                        <li class="nav-item @((string)ViewData["Id"] == "Nodes" ? "active":"")" style="margin-left:10px;">
-                            <a class="nav-link" asp-area="" asp-page="/Nodes/Index">
+                        <li class="nav-item @((string)ViewData["Id"] == "Notes" ? "active":"")" style="margin-left:10px;">
+                            <a class="nav-link" asp-area="" asp-page="/Notes/Index">
                                 <i class="fa fa-list" style="margin-right:3px"></i>
-                                Nodes
+                                Notes
                             </a>
                         </li>
                         <li class="nav-item @((string)ViewData["Id"] == "Relations" ? "active":"")" style="margin-left:10px;">
@@ -40,10 +40,10 @@
                                 Relations
                             </a>
                         </li>
-                        <li class="nav-item @((string)ViewData["Id"] == "Tags" ? "active":"")" style="margin-left:10px;">
-                            <a class="nav-link" asp-area="" asp-page="/Tags/Index">
-                                <i class="fa fa-tags" style="margin-right:3px"></i>
-                                Tags
+                        <li class="nav-item @((string)ViewData["Id"] == "Categories" ? "active":"")" style="margin-left:10px;">
+                            <a class="nav-link" asp-area="" asp-page="/Categories/Index">
+                                <i class="fa fa-th" style="margin-right:3px"></i>
+                                Categories
                             </a>
                         </li>
                     </ul>
@@ -58,6 +58,14 @@
         </main>
     </div>
 
+    <div class="corner">
+        <div class="btn-group-vertical" style="display:block">
+            <button class="btn btn-light" id="btnBackToTop"><i class="fa fa-angle-up"></i></button>
+        </div>
+        @RenderSection("corner", required: false)
+    </div>
+
+
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2019 - MindNote - <a asp-area="" asp-page="/Privacy"><i class="fa fa-user-secret"></i></a> - <a href="https://github.com/StardustDL/MindNote"><i class="fa fa-code-branch"></i> </a>
@@ -68,6 +76,16 @@
     <script src="~/lib/twitter-bootstrap/js/bootstrap.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @RenderSection("Scripts", required: false)
+    <script>
+        document.getElementById("btnBackToTop").onclick = (function smoothscroll() {
+            var currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            if (currentScroll > 0) {
+                window.requestAnimationFrame(smoothscroll);
+                window.scrollTo(0, currentScroll - (currentScroll / 5));
+            }
+        });
+    </script>
+
+    @RenderSection("scripts", required: false)
 </body>
 </html>

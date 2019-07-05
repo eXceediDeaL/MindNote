@@ -8,11 +8,11 @@ namespace MindNote.Server.Host.Helpers
 {
     public class RelationHelper
     {
-        public static async Task<IEnumerable<Node>> GetNodes(INodesClient client, IEnumerable<Relation> relations, string token)
+        public static async Task<IEnumerable<Note>> GetNotes(INotesClient client, IEnumerable<Relation> relations, string token)
         {
             if (relations == null)
             {
-                return Array.Empty<Node>();
+                return Array.Empty<Note>();
             }
 
             HashSet<int> ns = new HashSet<int>();
@@ -21,7 +21,7 @@ namespace MindNote.Server.Host.Helpers
                 ns.Add(v.From);
                 ns.Add(v.To);
             }
-            List<Node> res = new List<Node>();
+            List<Note> res = new List<Note>();
             foreach (int v in ns)
             {
                 res.Add(await client.Get(token, v));
@@ -51,19 +51,19 @@ namespace MindNote.Server.Host.Helpers
             public IList<D3GraphNode> nodes;
         }
 
-        public static async Task<D3Graph> GenerateGraph(INodesClient nodeC, ITagsClient tagC, IEnumerable<Relation> relations, string token, IEnumerable<Node> nodes = null)
+        public static async Task<D3Graph> GenerateGraph(INotesClient noteC, ICategoriesClient categoryC, IEnumerable<Relation> relations, string token, IEnumerable<Note> nodes = null)
         {
             Random rand = new Random();
             if (nodes == null)
             {
-                nodes = await GetNodes(nodeC, relations, token);
+                nodes = await GetNotes(noteC, relations, token);
             }
 
-            List<Tag> tags = new List<Tag>();
+            List<Category> tags = new List<Category>();
             {
-                foreach (Node v in nodes)
+                foreach (Note v in nodes)
                 {
-                    tags.Add(v.TagId == null ? null : await tagC.Get(token, v.TagId.Value));
+                    tags.Add(v.CategoryId == null ? null : await categoryC.Get(token, v.CategoryId.Value));
                 }
             }
 
@@ -124,7 +124,7 @@ namespace MindNote.Server.Host.Helpers
 
             {
                 HashSet<int> isReflexive = new HashSet<int>();
-                foreach (Node v in nodes)
+                foreach (Note v in nodes)
                 {
                     if (graph.TryGetValue(v.Id, out HashSet<int> to))
                     {
@@ -140,7 +140,7 @@ namespace MindNote.Server.Host.Helpers
                     {
                         id = node.Id,
                         color = tag?.Color ?? "grey",
-                        name = node.Name,
+                        name = node.Title,
                         reflexive = isReflexive.Contains(node.Id),
                     };
                     return res;

@@ -16,7 +16,7 @@ namespace MindNote.Data.Providers.InMemory
             this.parent = parent;
         }
 
-        public Task Clear(string userId = null)
+        public Task Clear(string userId)
         {
             IEnumerable<Relation> query = GetAll(userId).Result;
             foreach (int v in query.Select(x => x.Id))
@@ -27,9 +27,9 @@ namespace MindNote.Data.Providers.InMemory
             return Task.CompletedTask;
         }
 
-        public async Task<int?> Create(Relation data, string userId = null)
+        public async Task<int?> Create(Relation data, string userId)
         {
-            if ((await parent.NodesProvider.Get(data.From, userId) == null) || (await parent.NodesProvider.Get(data.To, userId) == null))
+            if ((await parent.NotesProvider.Get(data.From, userId) == null) || (await parent.NotesProvider.Get(data.To, userId) == null))
             {
                 return null;
             }
@@ -43,7 +43,7 @@ namespace MindNote.Data.Providers.InMemory
             return raw.Data.Id;
         }
 
-        public Task<int?> Delete(int id, string userId = null)
+        public Task<int?> Delete(int id, string userId)
         {
             if (Data.TryGetValue(id, out Model<Relation> value))
             {
@@ -56,13 +56,13 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult<int?>(null);
         }
 
-        public Task<Relation> Get(int id, string userId = null)
+        public Task<Relation> Get(int id, string userId)
         {
             IEnumerable<Relation> query = GetAll(userId).Result;
             return Task.FromResult(query.Where(x => x.Id == id).Select(x => (Relation)x.Clone()).FirstOrDefault());
         }
 
-        public Task<IEnumerable<Relation>> GetAll(string userId = null)
+        public Task<IEnumerable<Relation>> GetAll(string userId)
         {
             IEnumerable<Model<Relation>> query = Data.Values.AsEnumerable();
             if (userId != null)
@@ -73,7 +73,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult(query.Select(x => (Relation)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId = null)
+        public Task<IEnumerable<Relation>> Query(int? id, int? from, int? to, string userId)
         {
             IEnumerable<Model<Relation>> query = Data.Values.AsEnumerable();
             if (userId != null)
@@ -99,7 +99,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult(query.Select(x => (Relation)x.Data.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<int?> Update(int id, Relation data, string userId = null)
+        public Task<int?> Update(int id, Relation data, string userId)
         {
             if (Data.TryGetValue(id, out Model<Relation> value))
             {
@@ -113,19 +113,19 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult<int?>(null);
         }
 
-        public Task<IEnumerable<Relation>> GetAdjacents(int nodeId, string userId = null)
+        public Task<IEnumerable<Relation>> GetAdjacents(int noteId, string userId)
         {
             IEnumerable<Relation> query = GetAll(userId).Result;
-            return Task.FromResult(query.Where(x => x.From == nodeId || x.To == nodeId).Select(x => (Relation)x.Clone()).ToArray().AsEnumerable());
+            return Task.FromResult(query.Where(x => x.From == noteId || x.To == noteId).Select(x => (Relation)x.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<int?> ClearAdjacents(int nodeId, string userId = null)
+        public Task<int?> ClearAdjacents(int noteId, string userId)
         {
-            foreach (int v in GetAdjacents(nodeId, userId).Result.Select(x => x.Id).ToArray())
+            foreach (int v in GetAdjacents(noteId, userId).Result.Select(x => x.Id).ToArray())
             {
                 Data.Remove(v);
             }
-            return Task.FromResult<int?>(nodeId);
+            return Task.FromResult<int?>(noteId);
         }
     }
 }

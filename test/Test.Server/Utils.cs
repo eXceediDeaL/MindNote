@@ -1,8 +1,10 @@
 ﻿using IdentityServer4.Test;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Client.SDK.Identity;
 using MindNote.Data.Providers;
 using MindNote.Server.Share.Configuration;
 using System;
+using System.Collections.Generic;
 using Test.Server.Apis;
 using Test.Server.Hosts;
 using Test.Server.Identities;
@@ -56,6 +58,41 @@ namespace Test.Server
                     action(testServer, token);
                 }
             }, provider);
+        }
+
+        public static IDataProvider SampleOneUserDataProvider(string userId)
+        {
+            var res = new MindNote.Data.Providers.InMemory.DataProvider();
+            List<int> catid = new List<int>();
+            for (int i = 0; i < 5; i++)
+            {
+                var c = res.CategoriesProvider.Create(new MindNote.Data.Category
+                {
+                    Name = $"category{i}",
+                    Color = "black"
+                }, userId).Result.Value;
+                catid.Add(c);
+            }
+            List<int> noteid = new List<int>();
+            for (int i = 0; i < 10; i++)
+            {
+                var c = res.NotesProvider.Create(new MindNote.Data.Note
+                {
+                    Title = $"title{i}",
+                    Content = $"content{i}",
+                    CategoryId = catid[i % catid.Count],
+                }, userId).Result.Value;
+                noteid.Add(c);
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                _ = res.RelationsProvider.Create(new MindNote.Data.Relation
+                {
+                    From = noteid[i % noteid.Count],
+                    To = noteid[(i + 1) % noteid.Count],
+                }, userId).Result.Value;
+            }
+            return res;
         }
     }
 }

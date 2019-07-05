@@ -20,12 +20,12 @@ namespace Test.Data
         }
 
         [TestMethod]
-        public void Node()
+        public void Note()
         {
-            using (DataContext context = CreateContext("sqlserver_test_node"))
+            using (DataContext context = CreateContext("sqlserver_test_note"))
             {
                 Tester tester = new Tester(new DataProvider(context));
-                tester.NodeIndependent();
+                tester.NoteIndependent();
             }
         }
 
@@ -40,12 +40,22 @@ namespace Test.Data
         }
 
         [TestMethod]
-        public void Tag()
+        public void Category()
         {
-            using (DataContext context = CreateContext("sqlserver_test_tag"))
+            using (DataContext context = CreateContext("sqlserver_test_category"))
             {
                 Tester tester = new Tester(new DataProvider(context));
-                tester.TagIndependent();
+                tester.CategoryIndependent();
+            }
+        }
+
+        [TestMethod]
+        public void User()
+        {
+            using (DataContext context = CreateContext("sqlserver_test_category"))
+            {
+                Tester tester = new Tester(new DataProvider(context));
+                tester.UserIndependent();
             }
         }
     }

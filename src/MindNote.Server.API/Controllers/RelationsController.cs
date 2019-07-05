@@ -30,16 +30,16 @@ namespace MindNote.Server.API.Controllers
             return await provider.GetAll(identityDataGetter.GetClaimId(User));
         }
 
-        [HttpGet("Adjacents/{nodeId}")]
-        public async Task<IEnumerable<Relation>> GetAdjacents(int nodeId)
+        [HttpGet("Adjacents/{noteId}")]
+        public async Task<IEnumerable<Relation>> GetAdjacents(int noteId)
         {
-            return await provider.GetAdjacents(nodeId, identityDataGetter.GetClaimId(User));
+            return await provider.GetAdjacents(noteId, identityDataGetter.GetClaimId(User));
         }
 
-        [HttpPut("Adjacents/{nodeId}/Clear")]
-        public async Task<int?> ClearAdjacents(int nodeId)
+        [HttpPut("Adjacents/{noteId}/Clear")]
+        public async Task<int?> ClearAdjacents(int noteId)
         {
-            return await provider.ClearAdjacents(nodeId, identityDataGetter.GetClaimId(User));
+            return await provider.ClearAdjacents(noteId, identityDataGetter.GetClaimId(User));
         }
 
         [HttpGet("Query")]

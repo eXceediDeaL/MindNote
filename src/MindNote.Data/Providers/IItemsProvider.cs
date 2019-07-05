@@ -5,16 +5,16 @@ namespace MindNote.Data.Providers
 {
     public interface IItemsProvider<T>
     {
-        Task<T> Get(int id, string userId = null);
+        Task<T> Get(int id, string identity);
 
-        Task<IEnumerable<T>> GetAll(string userId = null);
+        Task<IEnumerable<T>> GetAll(string identity);
 
-        Task<int?> Delete(int id, string userId = null);
+        Task<int?> Delete(int id, string identity);
 
-        Task<int?> Update(int id, T data, string userId = null);
+        Task<int?> Update(int id, T data, string identity);
 
-        Task<int?> Create(T data, string userId = null);
+        Task<int?> Create(T data, string identity);
 
-        Task Clear(string userId = null);
+        Task Clear(string identity);
     }
 }

@@ -6,15 +6,18 @@ namespace MindNote.Data.Providers.SqlServer
     {
         public DataProvider(DataContext context)
         {
-            NodesProvider = new NodesProvider(context, this);
+            NotesProvider = new NotesProvider(context, this);
             RelationsProvider = new RelationsProvider(context, this);
-            TagsProvider = new TagsProvider(context, this);
+            CategoriesProvider = new CategoriesProvider(context, this);
+            UsersProvider = new UsersProvider(context, this);
         }
 
-        public INodesProvider NodesProvider { get; }
+        public INotesProvider NotesProvider { get; }
 
         public IRelationsProvider RelationsProvider { get; }
 
-        public ITagsProvider TagsProvider { get; }
+        public ICategoriesProvider CategoriesProvider { get; }
+
+        public IUsersProvider UsersProvider { get; }
     }
 }

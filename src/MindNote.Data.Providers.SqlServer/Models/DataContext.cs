@@ -8,10 +8,12 @@ namespace MindNote.Data.Providers.SqlServer.Models
         {
         }
 
-        public DbSet<Node> Nodes { get; set; }
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Note> Notes { get; set; }
 
         public DbSet<Relation> Relations { get; set; }
 
-        public DbSet<Tag> Tags { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }

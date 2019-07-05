@@ -2,10 +2,12 @@
 {
     public interface IDataProvider
     {
-        INodesProvider NodesProvider { get; }
+        INotesProvider NotesProvider { get; }
 
         IRelationsProvider RelationsProvider { get; }
 
-        ITagsProvider TagsProvider { get; }
+        ICategoriesProvider CategoriesProvider { get; }
+
+        IUsersProvider UsersProvider { get; }
     }
 }
