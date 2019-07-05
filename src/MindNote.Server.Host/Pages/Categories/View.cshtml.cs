@@ -14,20 +14,21 @@ using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Categories
 {
-    [Authorize]
     public class ViewModel : PageModel
     {
         private readonly ICategoriesClient client;
         private readonly INotesClient nodesClient;
         private readonly IIdentityDataGetter idData;
         private readonly IRelationsClient relationsClient;
+        private readonly IUsersClient usersClient;
 
-        public ViewModel(ICategoriesClient client, INotesClient nodesClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
+        public ViewModel(ICategoriesClient client, INotesClient nodesClient, IRelationsClient relationsClient, IUsersClient usersClient, IIdentityDataGetter idData)
         {
             this.client = client;
             this.nodesClient = nodesClient;
             this.idData = idData;
             this.relationsClient = relationsClient;
+            this.usersClient = usersClient;
         }
 
         public CategoriesViewModel Data { get; set; }
@@ -37,6 +38,8 @@ namespace MindNote.Server.Host.Pages.Categories
         public PagingSettings Paging { get; set; }
 
         public string Token { get; set; }
+
+        public User Onwer { get; set; }
 
         [BindProperty]
         public CategoriesPostModel PostData { get; set; }
@@ -51,6 +54,10 @@ namespace MindNote.Server.Host.Pages.Categories
             try
             {
                 Data = new CategoriesViewModel { Data = await client.Get(token, id) };
+                if (Data.Data.UserId != idData.GetClaimId(User))
+                {
+                    Onwer = await usersClient.Get(token, Data.Data.UserId);
+                }
 
                 Paging = new PagingSettings
                 {
@@ -62,16 +69,16 @@ namespace MindNote.Server.Host.Pages.Categories
                 };
                 IEnumerable<Note> notes;
                 {
-                    int count = (await nodesClient.Query(token, null, null, null, null, null, null, null, NoteTargets.Count)).Count();
+                    int count = (await nodesClient.Query(token, null, null, null, Data.Data.Id, null, null, null, NoteTargets.Count, null)).Count();
                     Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
                     if (!pageIndex.HasValue) pageIndex = 1;
                     Paging.CurrentIndex = pageIndex.Value;
                     int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-                    notes = await nodesClient.Query(token, null, null, null, null, null, offset, Paging.ItemCountPerPage, null);
+                    notes = await nodesClient.Query(token, null, null, null, Data.Data.Id, null, offset, Paging.ItemCountPerPage, null, null);
                     Notes = notes.ToList();
                 }
-                {
+                /*{
                     Dictionary<int, Relation> rs = new Dictionary<int, Relation>();
                     foreach (Note v in notes)
                     {
@@ -89,7 +96,7 @@ namespace MindNote.Server.Host.Pages.Categories
                     {
                         Graph = await RelationHelper.GenerateGraph(nodesClient, client, rs.Values, token)
                     };
-                }
+                }*/
             }
             catch
             {
@@ -101,6 +108,9 @@ namespace MindNote.Server.Host.Pages.Categories
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();

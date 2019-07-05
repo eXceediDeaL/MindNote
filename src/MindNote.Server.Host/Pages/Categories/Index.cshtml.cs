@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Categories
 {
-
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly ICategoriesClient client;
@@ -42,7 +40,7 @@ namespace MindNote.Server.Host.Pages.Categories
             try
             {
 
-                IEnumerable<Category> ms = await client.Query(token, PostData.QueryId, PostData.QueryName, PostData.QueryColor);
+                IEnumerable<Category> ms = await client.Query(token, PostData.QueryId, PostData.QueryName, PostData.QueryColor, null);
                 Data = ms.Select(x => new CategoriesViewModel { Data = x }).ToList();
             }
             catch
@@ -54,6 +52,9 @@ namespace MindNote.Server.Host.Pages.Categories
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();

@@ -73,6 +73,7 @@ namespace Test.Data
                     CategoryId = null,
                 };
                 string username = random.Choice(usernames);
+                data.UserId = username;
 
                 Assert.AreEqual(data, data.Clone(), "clone failed");
 
@@ -98,7 +99,7 @@ namespace Test.Data
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    IEnumerable<Note> items = pro.Query(id, data.Title, data.Content, null, null, null, null, null, username).Result;
+                    IEnumerable<Note> items = pro.Query(id, data.Title, data.Content, null, null, null, null, null, null, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
                     Note actual = items.First();
                     Valid(actual, username);
@@ -301,6 +302,7 @@ namespace Test.Data
                     Color = random.NextString(),
                 };
                 string username = random.Choice(usernames);
+                data.UserId = username;
                 Assert.AreEqual(data, data.Clone());
 
                 int id;
@@ -313,10 +315,6 @@ namespace Test.Data
 
                     Category actual = pro.Get(id, username).Result;
                     Valid(actual);
-                    {
-                        Category tname = pro.GetByName(data.Name, username).Result;
-                        Assert.AreEqual(actual, tname);
-                    }
 
                     data.Id = id;
                     Assert.AreEqual(data, actual, "get failed");
@@ -329,7 +327,7 @@ namespace Test.Data
                     data.Id = random.Next();
                     Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
 
-                    IEnumerable<Category> items = pro.Query(id, data.Name, data.Color, username).Result;
+                    IEnumerable<Category> items = pro.Query(id, data.Name, data.Color, null, username).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
                     Category actual = items.First();
                     Valid(actual);

@@ -19,21 +19,25 @@ namespace MindNote.Data.Providers.SqlServer
             parent = dataProvider;
         }
 
-        public async Task Clear(string userId)
+        public async Task Clear(string identity)
         {
-            await parent.RelationsProvider.Clear(userId);
+            if (identity == null) return;
+
+            await parent.RelationsProvider.Clear(identity);
             IQueryable<Models.Note> query = context.Notes.AsQueryable();
-            if (userId != null)
+            if (identity != null)
             {
-                query = query.Where(x => x.UserId == userId);
+                query = query.Where(x => x.UserId == identity);
             }
 
             context.Notes.RemoveRange(query);
             await context.SaveChangesAsync();
         }
 
-        public async Task<int?> Create(Note data, string userId)
+        public async Task<int?> Create(Note data, string identity)
         {
+            if (identity == null) return null;
+
             if (string.IsNullOrEmpty(data.Title))
             {
                 return null;
@@ -41,7 +45,7 @@ namespace MindNote.Data.Providers.SqlServer
 
             if (data.CategoryId.HasValue)
             {
-                if (await parent.CategoriesProvider.Get(data.CategoryId.Value, userId) == null)
+                if (await parent.CategoriesProvider.Get(data.CategoryId.Value, identity) == null)
                 {
                     return null;
                 }
@@ -49,59 +53,60 @@ namespace MindNote.Data.Providers.SqlServer
 
             Models.Note raw = Models.Note.FromModel(data);
             raw.CreationTime = raw.ModificationTime = DateTimeOffset.Now;
-            if (userId != null)
-            {
-                raw.UserId = userId;
-            }
+            raw.UserId = identity;
 
             context.Notes.Add(raw);
             await context.SaveChangesAsync();
             return raw.Id;
         }
 
-        public async Task<int?> Delete(int id, string userId)
+        public async Task<int?> Delete(int id, string identity)
         {
+            if (identity == null) return null;
+
             Models.Note raw = await context.Notes.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId))
+            if (raw == null || raw.UserId != identity)
             {
                 return null;
             }
 
             {
                 IRelationsProvider provider = parent.RelationsProvider;
-                await provider.ClearAdjacents(id, userId);
+                await provider.ClearAdjacents(id, identity);
             }
             context.Notes.Remove(raw);
             await context.SaveChangesAsync();
             return id;
         }
 
-        public async Task<Note> Get(int id, string userId)
+        public async Task<Note> Get(int id, string identity)
         {
             IQueryable<Models.Note> query = context.Notes.Where(x => x.Id == id);
-            if (userId != null)
-            {
-                query = query.Where(x => x.UserId == userId);
-            }
+            if (identity == null)
+                query = query.Where(x => x.Status == ItemStatus.Public);
+            else
+                query = query.Where(x => x.UserId == identity);
 
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public async Task<IEnumerable<Note>> GetAll(string userId)
+        public async Task<IEnumerable<Note>> GetAll(string identity)
         {
             IQueryable<Models.Note> query = context.Notes.AsQueryable();
-            if (userId != null)
-            {
-                query = query.Where(x => x.UserId == userId);
-            }
+            if (identity == null)
+                query = query.Where(x => x.Status == ItemStatus.Public);
+            else
+                query = query.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
 
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
-        public async Task<int?> Update(int id, Note data, string userId)
+        public async Task<int?> Update(int id, Note data, string identity)
         {
+            if (identity == null) return null;
+
             Models.Note raw = await context.Notes.FindAsync(id);
-            if (raw == null || (userId != null && raw.UserId != userId))
+            if (raw == null || raw.UserId != identity)
             {
                 return null;
             }
@@ -111,6 +116,7 @@ namespace MindNote.Data.Providers.SqlServer
             raw.Content = value.Content;
             raw.CategoryId = value.CategoryId;
             raw.Keywords = value.Keywords;
+            raw.Status = value.Status;
 
             raw.ModificationTime = DateTimeOffset.Now;
 
@@ -119,14 +125,18 @@ namespace MindNote.Data.Providers.SqlServer
             return raw.Id;
         }
 
-        public async Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId)
+        public async Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId, string identity)
         {
             IQueryable<Models.Note> query = context.Notes.AsQueryable();
+            if (identity == null)
+                query = query.Where(x => x.Status == ItemStatus.Public);
+            else
+                query = query.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
+
             if (userId != null)
             {
-                query = query.Where(x => x.UserId == userId);
+                query = query.Where(item => item.UserId == userId);
             }
-
             if (id.HasValue)
             {
                 query = query.Where(item => item.Id == id.Value);

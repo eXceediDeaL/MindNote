@@ -10,6 +10,8 @@
 
         public string UserId { get; set; }
 
+        public ItemStatus Status { get; set; }
+
         public Data.Category ToModel()
         {
             return new Data.Category
@@ -17,6 +19,8 @@
                 Id = Id,
                 Name = Name,
                 Color = Color,
+                UserId = UserId,
+                Status = Status,
             };
         }
 
@@ -27,6 +31,8 @@
                 Id = data.Id,
                 Name = data.Name,
                 Color = data.Color,
+                UserId = data.UserId,
+                Status = data.Status,
             };
             return res;
         }

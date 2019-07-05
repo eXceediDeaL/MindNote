@@ -31,7 +31,7 @@ namespace Test.Server.SDKs
                     {
                         Note node = new Note { Title = "name" };
                         int id = client.Create(token, node).Result.Value;
-                        Assert.AreEqual(node.Title, client.Query(token, id, null, null, null, null, null, null, null).Result.First().Title);
+                        Assert.AreEqual(node.Title, client.Query(token, id, null, null, null, null, null, null, null, null).Result.First().Title);
                         node.Content = "content";
                         Assert.IsTrue(client.Update(token, id, node).Result.HasValue);
                         Assert.IsTrue(client.Delete(token, id).Result.HasValue);
@@ -55,8 +55,8 @@ namespace Test.Server.SDKs
                     {
                         Category tag = new Category { Name = "tag", Color = "black" };
                         int id = client.Create(token, tag).Result.Value;
-                        Assert.AreEqual(tag.Name, client.Query(token, id, null, null).Result.First().Name);
-                        Assert.AreEqual(tag.Color, client.GetByName(token, tag.Name).Result.Color);
+                        Assert.AreEqual(tag.Name, client.Query(token, id, null, null, null).Result.First().Name);
+                        Assert.AreEqual(tag.Color, client.Get(token, id).Result.Color);
                         tag.Color = "white";
                         Assert.IsTrue(client.Update(token, id, tag).Result.HasValue);
                         Assert.IsTrue(client.Delete(token, id).Result.HasValue);

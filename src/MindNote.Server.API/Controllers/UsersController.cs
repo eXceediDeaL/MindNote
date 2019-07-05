@@ -10,8 +10,7 @@ using System.Threading.Tasks;
 namespace MindNote.Server.API.Controllers
 {
     [Route("[controller]")]
-    [ApiController]
-    [Authorize]
+    [ApiController]    
     [EnableCors]
     public class UsersController : ControllerBase
     {
@@ -36,24 +35,28 @@ namespace MindNote.Server.API.Controllers
             return await provider.Get(id);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<string> Delete(string id)
         {
             return await provider.Delete(id);
         }
 
+        [Authorize]
         [HttpPut("Clear")]
         public async Task Clear()
         {
             await provider.Clear();
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<string> Update(string id, User data)
         {
             return await provider.Update(id, data);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<string> Create(string id, [FromBody] User data)
         {

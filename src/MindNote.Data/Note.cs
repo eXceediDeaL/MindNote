@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MindNote.Data
 {
-    public class Note : ICloneable, IEquatable<Note>
+    public class Note : ICloneable
     {
         public int Id { get; set; }
 
@@ -20,6 +20,8 @@ namespace MindNote.Data
         public DateTimeOffset ModificationTime { get; set; }
 
         public string UserId { get; set; }
+
+        public ItemStatus Status { get; set; }
 
         public object Clone() => MemberwiseClone();
 

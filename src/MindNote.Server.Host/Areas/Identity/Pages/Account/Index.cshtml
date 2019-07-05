@@ -33,9 +33,10 @@
         </div>
     </div>
     <div class="col-9">
-        <div class="row" style="margin-left:0px">
-            @if (Model.Profile.Id == IDData.GetClaimId(User))
-            {
+        @if (Model.Profile.Id == IDData.GetClaimId(User))
+        {
+            <div class="row m-2">
+
                 <form method="post">
                     <button type="submit" asp-page-handler="Initialize" class="btn btn-outline-primary">
                         Initialize
@@ -46,8 +47,9 @@
                         Clear
                     </button>
                 </form>
-            }
-        </div>
+            </div>
+        }
+        <vc:note-list-waterfall token="@Model.Token" data="@Model.Notes" paging="@Model.Paging" column="1"></vc:note-list-waterfall>
     </div>
 </div>
 

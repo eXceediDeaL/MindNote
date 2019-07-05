@@ -24,13 +24,16 @@ namespace MindNote.Server.Host.Pages.Shared.Components.NoteListWaterfall
             public IList<NotesViewModel> Data { get; set; }
 
             public PagingSettings Paging { get; set; }
+
+            public int? Column { get; set; }
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(IEnumerable<Note> data, string token, PagingSettings paging = null)
+        public async Task<IViewComponentResult> InvokeAsync(IEnumerable<Note> data, string token, int? column = null, PagingSettings paging = null)
         {
             var model = new ViewModel()
             {
                 Paging = paging,
+                Column = column,
             };
 
             var ls = new List<NotesViewModel>();

@@ -13,8 +13,8 @@ namespace MindNote.Server.Host.Areas.Identity.Pages.Account.Manage
     [Authorize]
     public partial class IndexModel : PageModel
     {
-        private IIdentityDataGetter idData;
-        private IUsersClient usersClient;
+        private readonly IIdentityDataGetter idData;
+        private readonly IUsersClient usersClient;
 
         public IndexModel(IUsersClient usersClient, IIdentityDataGetter idData)
         {

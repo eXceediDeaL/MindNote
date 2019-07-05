@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Notes
 {
-    [Authorize]
     public class ViewModel : PageModel
     {
         private readonly INotesClient client;
@@ -46,6 +45,8 @@ namespace MindNote.Server.Host.Pages.Notes
                 Data = new NotesViewModel { Data = await client.Get(token, id) };
                 Markdown = new MarkdownViewModel { Raw = Data.Data.Content };
                 await Data.Load(tagsClient, usersClient, token);
+
+                /*
                 List<Relation> res = (await relationsClient.GetAdjacents(token, id)).ToList();
                 if (res.Count > 0)
                 {
@@ -65,6 +66,7 @@ namespace MindNote.Server.Host.Pages.Notes
                         SelectNodeIndex = 0,
                     };
                 }
+                */
             }
             catch
             {
@@ -76,6 +78,9 @@ namespace MindNote.Server.Host.Pages.Notes
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
+            if (User.Identity.IsAuthenticated)
+                return Unauthorized();
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();

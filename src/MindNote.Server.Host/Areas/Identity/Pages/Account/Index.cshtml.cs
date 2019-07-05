@@ -4,14 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
+using MindNote.Data.Providers.Queries;
 using MindNote.Server.Host.Helpers;
+using MindNote.Server.Host.Pages.Shared.Components;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Areas.Identity.Pages.Account
 {
-    [Authorize]
     public partial class IndexModel : PageModel
     {
         private readonly ICategoriesClient tagsClient;
@@ -19,6 +21,12 @@ namespace MindNote.Server.Host.Areas.Identity.Pages.Account
         private readonly IIdentityDataGetter idData;
         private readonly IRelationsClient relationsClient;
         private readonly IUsersClient usersClient;
+
+        public IList<Note> Notes { get; set; }
+
+        public PagingSettings Paging { get; set; }
+
+        public string Token { get; set; }
 
         public User Profile { get; set; }
 
@@ -31,10 +39,14 @@ namespace MindNote.Server.Host.Areas.Identity.Pages.Account
             this.usersClient = usersClient;
         }
 
-        public async Task<IActionResult> OnGetAsync(string id)
+        public async Task<IActionResult> OnGetAsync(string id, int? pageIndex)
         {
             if (id == null)
             {
+                if (!User.Identity.IsAuthenticated)
+                {
+                    return NotFound();
+                }
                 Profile = await Helpers.UserHelper.GetProfile(HttpContext, usersClient, idData);
             }
             else
@@ -50,11 +62,44 @@ namespace MindNote.Server.Host.Areas.Identity.Pages.Account
                     };
                 }
             }
+            string token = await idData.GetAccessToken(HttpContext);
+            Token = token;
+
+            try
+            {
+                Paging = new PagingSettings
+                {
+                    ItemCountPerPage = 8,
+                    RouteData = new Dictionary<string, string>
+                    {
+                        ["id"] = Profile.Id,
+                    }
+                };
+                IEnumerable<Note> notes;
+                {
+                    int count = (await nodesClient.Query(token, null, null, null, null, null, null, null, NoteTargets.Count, Profile.Id)).Count();
+                    Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
+                    if (!pageIndex.HasValue) pageIndex = 1;
+                    Paging.CurrentIndex = pageIndex.Value;
+                    int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
+
+                    notes = await nodesClient.Query(token, null, null, null, null, null, offset, Paging.ItemCountPerPage, null, Profile.Id);
+                    Notes = notes.ToList();
+                }
+            }
+            catch
+            {
+                return NotFound();
+            }
+
             return Page();
         }
 
         public async Task<IActionResult> OnPostInitializeAsync()
         {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
             string token = await idData.GetAccessToken(HttpContext);
 
             List<Category> tags = new List<Category>();
@@ -89,6 +134,9 @@ namespace MindNote.Server.Host.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostClearAsync()
         {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
             string token = await idData.GetAccessToken(HttpContext);
 
             await nodesClient.Clear(token);

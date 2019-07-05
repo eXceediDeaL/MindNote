@@ -11,7 +11,6 @@ namespace MindNote.Server.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
     [EnableCors]
     public class CategoriesController : ControllerBase
     {
@@ -31,9 +30,9 @@ namespace MindNote.Server.API.Controllers
         }
 
         [HttpGet("Query")]
-        public async Task<IEnumerable<Category>> Query(int? id, string name, string color)
+        public async Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId)
         {
-            return await provider.Query(id, name, color, identityDataGetter.GetClaimId(User));
+            return await provider.Query(id, name, color, userId, identityDataGetter.GetClaimId(User));
         }
 
         [HttpGet("{id}")]
@@ -42,30 +41,28 @@ namespace MindNote.Server.API.Controllers
             return await provider.Get(id, identityDataGetter.GetClaimId(User));
         }
 
-        [HttpGet]
-        public async Task<Category> GetByName(string name)
-        {
-            return await provider.GetByName(name, identityDataGetter.GetClaimId(User));
-        }
-
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<int?> Delete(int id)
         {
             return await provider.Delete(id, identityDataGetter.GetClaimId(User));
         }
 
+        [Authorize]
         [HttpPut("Clear")]
         public async Task Clear()
         {
             await provider.Clear(identityDataGetter.GetClaimId(User));
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<int?> Update(int id, Category data)
         {
             return await provider.Update(id, data, identityDataGetter.GetClaimId(User));
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<int?> Create([FromBody] Category data)
         {

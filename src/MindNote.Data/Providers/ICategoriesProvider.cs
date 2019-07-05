@@ -5,8 +5,6 @@ namespace MindNote.Data.Providers
 {
     public interface ICategoriesProvider : IItemsProvider<Category>
     {
-        Task<Category> GetByName(string name, string userId);
-
-        Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId);
+        Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId, string identity);
     }
 }

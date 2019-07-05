@@ -24,6 +24,8 @@ namespace MindNote.Data.Providers.SqlServer.Models
 
         public string UserId { get; set; }
 
+        public ItemStatus Status { get; set; }
+
         public Data.Note ToModel()
         {
             var res = new Data.Note
@@ -35,6 +37,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
                 UserId = UserId,
+                Status = Status,
             };
             if (Keywords == null)
             {
@@ -58,6 +61,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,
                 UserId = data.UserId,
+                Status = data.Status,
             };
             if (data.Keywords == null)
             {

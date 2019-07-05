@@ -87,11 +87,11 @@ namespace Test.Server.Hosts
             {
                 using (HttpClient client = host.CreateClient())
                 {
-                    HttpResponseMessage response = client.GetAsync(url).Result;
-                    Assert.IsFalse(response.IsSuccessStatusCode);
+                    // HttpResponseMessage response = client.GetAsync(url).Result;
+                    // Assert.IsFalse(response.IsSuccessStatusCode);
 
                     client.SetBearerToken(token);
-                    response = client.GetAsync(url).Result;
+                    HttpResponseMessage response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
                 }
             }, Utils.SampleOneUserDataProvider(Utils.DefaultUser.SubjectId));

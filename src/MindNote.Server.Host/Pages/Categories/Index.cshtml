@@ -6,23 +6,26 @@
 }
 
 @*
-<ul class="breadcrumb">
-    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
-    <li class="breadcrumb-item active">@ViewData["Title"]</li>
-</ul>
+    <ul class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+    </ul>
 *@
 
 <div class="text-center" style="width:100%">
     <form method="post" class="form-inline" style="display:inline-flex">
-        <input class="form-control" asp-for="PostData.QueryId" style="margin-left:10px; width:100px" placeholder="Id"/>
-        <input class="form-control" asp-for="PostData.QueryName" style="margin-left:10px; width:150px" placeholder="Name"/>
-        <input class="form-control" asp-for="PostData.QueryColor" style="margin-left:10px; width:150px" placeholder="Color"/>
+        <input class="form-control" asp-for="PostData.QueryId" style="margin-left:10px; width:100px" placeholder="Id" />
+        <input class="form-control" asp-for="PostData.QueryName" style="margin-left:10px; width:150px" placeholder="Name" />
+        <input class="form-control" asp-for="PostData.QueryColor" style="margin-left:10px; width:150px" placeholder="Color" />
         <button type="submit" asp-page-handler="Query" class="btn btn-outline-dark" style="margin-left:10px">
             <i class="fa fa-search"></i>
         </button>
-        <a asp-page="./Edit" class="btn btn-outline-success" style="margin-left:10px">
-            <i class="fa fa-plus"></i>
-        </a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a asp-page="./Edit" class="btn btn-outline-success" style="margin-left:10px">
+                <i class="fa fa-plus"></i>
+            </a>
+        }
     </form>
 </div>
 
@@ -56,13 +59,17 @@
                     <div class="row" style="margin-left:0px">
                         <form method="post" style="margin-left:0px">
                             <input type="hidden" asp-for="PostData.Data.Id" value="@item.Data.Id" />
+
                             <div class="btn-group-sm">
-                                <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <button asp-page-handler="Delete" asp-route-id="@item.Data.Id" class="btn btn-outline-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <button asp-page-handler="Delete" asp-route-id="@item.Data.Id" class="btn btn-outline-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                }
                             </div>
                         </form>
                     </div>

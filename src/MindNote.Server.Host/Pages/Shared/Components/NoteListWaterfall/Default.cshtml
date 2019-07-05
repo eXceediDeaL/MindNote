@@ -1,6 +1,6 @@
 ﻿@model  Components.NoteListWaterfall.NoteListWaterfallViewComponent.ViewModel
 
-<div class="card-columns waterfall-card-columns">
+<div class="card-columns @(!Model.Column.HasValue ? "waterfall-card-columns" : "")" style="@(Model.Column.HasValue ? $"column-count: {Model.Column.Value}" : "")">
     @foreach (var item in Model.Data)
     {
         <div class="card mt-4 border-0">

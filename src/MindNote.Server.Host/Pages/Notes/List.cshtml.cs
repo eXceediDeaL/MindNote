@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Notes
 {
-
-    [Authorize]
     public class ListModel : PageModel
     {
         private readonly INotesClient client;
@@ -76,7 +74,7 @@ namespace MindNote.Server.Host.Pages.Notes
             try
             {
                 await GenTagSelector(token);
-                IEnumerable<Note> ms = await client.Query(token, PostData.QueryId, PostData.QueryTitle, PostData.QueryContent, PostData.QueryCategoryId, PostData.QueryKeyword, null, null, null);
+                IEnumerable<Note> ms = await client.Query(token, PostData.QueryId, PostData.QueryTitle, PostData.QueryContent, PostData.QueryCategoryId, PostData.QueryKeyword, null, null, null, null);
                 Data = await GenData(ms.ToList(), token);
             }
             catch
@@ -88,6 +86,9 @@ namespace MindNote.Server.Host.Pages.Notes
 
         public async Task<IActionResult> OnPostDeleteAsync()
         {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();

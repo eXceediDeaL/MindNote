@@ -8,11 +8,9 @@ namespace MindNote.Client.SDK.API
     {
         Task<IEnumerable<Category>> GetAll(string token);
 
-        Task<IEnumerable<Category>> Query(string token, int? id, string name, string color);
+        Task<IEnumerable<Category>> Query(string token, int? id, string name, string color, string userId);
 
         Task<Category> Get(string token, int id);
-
-        Task<Category> GetByName(string token, string name);
 
         Task<int?> Delete(string token, int id);
 
@@ -65,16 +63,10 @@ namespace MindNote.Client.SDK.API
             return await Raw.GetAllAsync();
         }
 
-        public async Task<IEnumerable<Category>> Query(string token, int? id, string name, string color)
+        public async Task<IEnumerable<Category>> Query(string token, int? id, string name, string color, string userId)
         {
             if (token != null) Client.SetBearerToken(token);
-            return await Raw.QueryAsync(id, name, color);
-        }
-
-        public async Task<Category> GetByName(string token, string name)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            return await Raw.GetByNameAsync(name);
+            return await Raw.QueryAsync(id, name, color, userId);
         }
 
         public async Task<int?> Update(string token, int id, Category data)

@@ -4,16 +4,22 @@
     <small>
         <item-time creation-time="@Model.Data.CreationTime" modification-time="@Model.Data.ModificationTime"></item-time>
     </small>
-    <small class="m-1">|</small>
-    <small>
-        <a asp-page="/Categories/View" asp-route-id="@Model.Category.Id" style="color: #555;">
-            <category-display value="@Model.Category"></category-display>
-        </a>
-    </small>
-    <small class="m-1">|</small>
-    <small>
-        <keywords-display keywords="@Model.Data.Keywords"></keywords-display>
-    </small>
+    @if (Model.Category != null)
+    {
+        <small class="m-1">|</small>
+        <small>
+            <a asp-page="/Categories/View" asp-route-id="@Model.Category.Id" style="color: #555;">
+                <category-display value="@Model.Category"></category-display>
+            </a>
+        </small>
+    }
+    @if (Model.Data.Keywords != null && Model.Data.Keywords.Count > 0)
+    {
+        <small class="m-1">|</small>
+        <small>
+            <keywords-display keywords="@Model.Data.Keywords"></keywords-display>
+        </small>
+    }
     <small class="m-1">|</small>
     <small>
         <word-count text="@Model.Data.Content"></word-count>
@@ -25,12 +31,7 @@
     <small class="m-1">|</small>
     <small>
         <a asp-area="Identity" asp-page="/Account/Index" asp-route-id="@Model.User.Id" style="color: #555;">
-            <span>
-                <i class="fa fa-user" style="color:#999"></i>
-                <span style="margin-left: 5px; color:#999">
-                    @Model.User.Name
-                </span>
-            </span>
+            <user-display value="@Model.User"></user-display>
         </a>
     </small>
 </div>

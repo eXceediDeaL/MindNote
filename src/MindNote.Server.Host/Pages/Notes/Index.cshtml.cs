@@ -13,8 +13,6 @@ using System.Threading.Tasks;
 
 namespace MindNote.Server.Host.Pages.Notes
 {
-
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly INotesClient client;
@@ -62,13 +60,13 @@ namespace MindNote.Server.Host.Pages.Notes
             {
                 ItemCountPerPage = 8,
             };
-            int count = (await client.Query(token, null, null, null, null, null, null, null, NoteTargets.Count)).Count();
+            int count = (await client.Query(token, null, null, null, null, null, null, null, NoteTargets.Count, null)).Count();
             Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
             if (!pageIndex.HasValue) pageIndex = 1;
             Paging.CurrentIndex = pageIndex.Value;
             int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-            IEnumerable<Note> ms = await client.Query(token, null, null, null, null, null, offset, Paging.ItemCountPerPage, null);
+            IEnumerable<Note> ms = await client.Query(token, null, null, null, null, null, offset, Paging.ItemCountPerPage, null, null);
             Data = ms.ToList();
         }
     }
