@@ -4,16 +4,22 @@ if ($args.Count -eq 0) {
 else {
     switch ($args[0]) {
         "api" {
-            dotnet run -p ./src/MindNote.Server.API
+            dotnet run -p ./src/Server/MindNote.Server.API
         }
         "id" {
-            dotnet run -p ./src/MindNote.Server.Identity
+            dotnet run -p ./src/Server/MindNote.Server.Identity
         }
         "host" {
-            dotnet run -p ./src/MindNote.Server.Host --launch-profile "MindNote.Server.Host(Remote)"
+            dotnet run -p ./src/Server/MindNote.Server.Host --launch-profile "MindNote.Server.Host(Remote)"
         }
         "hostl" {
-            dotnet run -p ./src/MindNote.Server.Host
+            dotnet run -p ./src/Server/MindNote.Server.Host
+        }
+        "client" {
+            cd ./src/Client/Host
+            dotnet build
+            cd ../../..
+            dotnet run -p ./src/Client/Host/MindNote.Client.Host.Server
         }
         "cover" {
             rm ./coverage.json

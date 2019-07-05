@@ -1,0 +1,56 @@
+﻿@page "/fetchdata"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@inject HttpClient Http
+
+<h1>Notes</h1>
+
+@if (Data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-hover" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th style="width:6%">
+                    Id
+                </th>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Content
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Data)
+            {
+                <tr>
+                    <td>
+                        @item.Id
+                    </td>
+                    <td>
+                        @item.Title
+                    </td>
+                    <td>
+                        @item.Content
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    IList<Note> Data { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        INotesClient client = new NotesClient(Http, await Utils.GetApiServerUrl(Http));
+        var ms = await client.GetAll(null);
+        Data = ms.ToList();
+    }
+}
