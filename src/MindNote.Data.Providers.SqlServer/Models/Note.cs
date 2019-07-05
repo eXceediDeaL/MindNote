@@ -34,6 +34,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 CategoryId = CategoryId,
                 CreationTime = CreationTime,
                 ModificationTime = ModificationTime,
+                UserId = UserId,
             };
             if (Keywords == null)
             {
@@ -56,6 +57,7 @@ namespace MindNote.Data.Providers.SqlServer.Models
                 CategoryId = data.CategoryId,
                 CreationTime = data.CreationTime,
                 ModificationTime = data.ModificationTime,
+                UserId = data.UserId,
             };
             if (data.Keywords == null)
             {

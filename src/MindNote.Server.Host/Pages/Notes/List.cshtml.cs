@@ -18,17 +18,19 @@ namespace MindNote.Server.Host.Pages.Notes
         private readonly INotesClient client;
         private readonly IIdentityDataGetter idData;
         private readonly ICategoriesClient tagsClient;
+        private readonly IUsersClient usersClient;
 
-        public ListModel(INotesClient client, ICategoriesClient tagsClient, IIdentityDataGetter idData)
+        public ListModel(INotesClient client, ICategoriesClient tagsClient, IUsersClient usersClient, IIdentityDataGetter idData)
         {
             this.client = client;
             this.tagsClient = tagsClient;
+            this.usersClient = usersClient;
             this.idData = idData;
         }
 
         public List<SelectListItem> CategorySelector { get; private set; }
 
-        public NoteListViewModel Data { get; set; }
+        public IList<NotesViewModel> Data { get; set; }
 
         private async Task<IList<NotesViewModel>> GenData(IList<Note> nodes, string token)
         {
@@ -36,7 +38,7 @@ namespace MindNote.Server.Host.Pages.Notes
             foreach (Note v in nodes)
             {
                 NotesViewModel t = new NotesViewModel { Data = v };
-                await t.LoadCategory(tagsClient, token);
+                await t.Load(tagsClient, usersClient, token);
                 res.Add(t);
             }
             return res;
@@ -61,7 +63,7 @@ namespace MindNote.Server.Host.Pages.Notes
 
             await GenTagSelector(token);
             IEnumerable<Note> ms = await client.GetAll(token);
-            Data = new NoteListViewModel { Data = await GenData(ms.ToList(), token) };
+            Data = Data = await GenData(ms.ToList(), token);
         }
 
         [BindProperty]
@@ -75,11 +77,11 @@ namespace MindNote.Server.Host.Pages.Notes
             {
                 await GenTagSelector(token);
                 IEnumerable<Note> ms = await client.Query(token, PostData.QueryId, PostData.QueryTitle, PostData.QueryContent, PostData.QueryCategoryId, PostData.QueryKeyword, null, null, null);
-                Data = new NoteListViewModel { Data = await GenData(ms.ToList(), token) };
+                Data = await GenData(ms.ToList(), token);
             }
             catch
             {
-                Data = new NoteListViewModel { Data = Array.Empty<NotesViewModel>() };
+                Data = Array.Empty<NotesViewModel>();
             }
             return Page();
         }

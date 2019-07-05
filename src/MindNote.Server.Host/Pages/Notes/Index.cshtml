@@ -11,7 +11,7 @@
             column-count: 1;
         }
     </style>
-    <partial name="_NoteListWaterfallPartial" model="Model.Data" />
+    <vc:note-list-waterfall token="@Model.Token" data="@Model.Data" paging="@Model.Paging"></vc:note-list-waterfall>
 </div>
 
 @section corner {

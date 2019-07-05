@@ -15,5 +15,4 @@
 
 <h1 class="display-4 mb-4 text-center"><category-display value="Model.Data.Data"></category-display></h1>
 
-<partial name="/Pages/Notes/_NoteListWaterfallPartial.cshtml" model="Model.Notes"/>
-
+<vc:note-list-waterfall token="@Model.Token" data="@Model.Notes" paging="@Model.Paging"></vc:note-list-waterfall>

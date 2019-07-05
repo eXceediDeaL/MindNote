@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
 using MindNote.Data.Providers.Queries;
+using MindNote.Server.Host.Pages.Shared.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,29 +20,23 @@ namespace MindNote.Server.Host.Pages.Notes
         private readonly INotesClient client;
         private readonly IIdentityDataGetter idData;
         private readonly ICategoriesClient tagsClient;
+        private readonly IUsersClient usersClient;
 
-        public IndexModel(INotesClient client, ICategoriesClient tagsClient, IIdentityDataGetter idData)
+        public IndexModel(INotesClient client, ICategoriesClient tagsClient, IUsersClient usersClient, IIdentityDataGetter idData)
         {
             this.client = client;
             this.tagsClient = tagsClient;
+            this.usersClient = usersClient;
             this.idData = idData;
         }
 
         public List<SelectListItem> CategorySelector { get; private set; }
 
-        public NoteListViewModel Data { get; set; }
+        public IList<Note> Data { get; set; }
 
-        private async Task<IList<NotesViewModel>> GenData(IList<Note> nodes, string token)
-        {
-            List<NotesViewModel> res = new List<NotesViewModel>();
-            foreach (Note v in nodes)
-            {
-                NotesViewModel t = new NotesViewModel { Data = v };
-                await t.LoadCategory(tagsClient, token);
-                res.Add(t);
-            }
-            return res;
-        }
+        public PagingSettings Paging { get; set; }
+
+        public string Token { get; set; }
 
         private async Task GenTagSelector(string token)
         {
@@ -59,34 +54,22 @@ namespace MindNote.Server.Host.Pages.Notes
         public async Task OnGetAsync(int? pageIndex)
         {
             string token = await idData.GetAccessToken(HttpContext);
+            Token = token;
 
             await GenTagSelector(token);
 
-            Data = new NoteListViewModel
+            Paging = new PagingSettings
             {
-                EnablePaging = true,
                 ItemCountPerPage = 8,
             };
-
             int count = (await client.Query(token, null, null, null, null, null, null, null, NoteTargets.Count)).Count();
-            Data.MaximumPageIndex = (count / Data.ItemCountPerPage) + (count % Data.ItemCountPerPage > 0 ? 1 : 0);
+            Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
+            if (!pageIndex.HasValue) pageIndex = 1;
+            Paging.CurrentIndex = pageIndex.Value;
+            int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-            int offset;
-            if (pageIndex.HasValue)
-            {
-                if (pageIndex <= 0) pageIndex = 1;
-                if (pageIndex > Data.MaximumPageIndex) pageIndex = Data.MaximumPageIndex;
-                offset = (pageIndex.Value - 1) * Data.ItemCountPerPage;
-                Data.CurrentPageIndex = pageIndex.Value;
-            }
-            else
-            {
-                offset = 0;
-                Data.CurrentPageIndex = 1;
-            }
-
-            IEnumerable<Note> ms = await client.Query(token, null, null, null, null, null, offset, Data.ItemCountPerPage, null);
-            Data.Data = await GenData(ms.ToList(), token);
+            IEnumerable<Note> ms = await client.Query(token, null, null, null, null, null, offset, Paging.ItemCountPerPage, null);
+            Data = ms.ToList();
         }
     }
 }

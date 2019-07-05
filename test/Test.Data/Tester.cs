@@ -383,7 +383,7 @@ namespace Test.Data
             IUsersProvider provider = Provider.UsersProvider;
             provider.Clear().Wait();
             Assert.IsFalse(provider.GetAll().Result.Any());
-            foreach(var v in usernames)
+            foreach (var v in usernames)
             {
                 Assert.AreEqual(v, provider.Create(v, new User()).Result);
                 Assert.IsNotNull(provider.Get(v).Result);

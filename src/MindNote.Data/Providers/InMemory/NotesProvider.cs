@@ -11,7 +11,7 @@ namespace MindNote.Data.Providers.InMemory
     {
         private int count = 0;
         private readonly IDataProvider parent;
-        private readonly Dictionary<int, Model<Note>> Data = new Dictionary<int, Model<Note>>();
+        private readonly Dictionary<int, Note> Data = new Dictionary<int, Note>();
 
         public NotesProvider(IDataProvider parent)
         {
@@ -45,20 +45,17 @@ namespace MindNote.Data.Providers.InMemory
                 }
             }
 
-            Model<Note> raw = new Model<Note>
-            {
-                Data = (Note)data.Clone(),
-                UserId = userId,
-            };
-            raw.Data.Id = Interlocked.Increment(ref count);
-            raw.Data.CreationTime = raw.Data.ModificationTime = DateTimeOffset.Now;
-            Data.Add(raw.Data.Id, raw);
-            return raw.Data.Id;
+            Note raw = (Note)data.Clone();
+            raw.UserId = userId;
+            raw.Id = Interlocked.Increment(ref count);
+            raw.CreationTime = raw.ModificationTime = DateTimeOffset.Now;
+            Data.Add(raw.Id, raw);
+            return raw.Id;
         }
 
         public Task<int?> Delete(int id, string userId)
         {
-            if (Data.TryGetValue(id, out Model<Note> value))
+            if (Data.TryGetValue(id, out Note value))
             {
                 if (userId == null || value.UserId == userId)
                 {
@@ -78,18 +75,18 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<IEnumerable<Note>> GetAll(string userId)
         {
-            IEnumerable<Model<Note>> query = Data.Values.AsEnumerable();
+            IEnumerable<Note> query = Data.Values.AsEnumerable();
             if (userId != null)
             {
                 query = query.Where(x => x.UserId == userId);
             }
 
-            return Task.FromResult(query.Select(x => (Note)x.Data.Clone()).ToArray().AsEnumerable());
+            return Task.FromResult(query.Select(x => (Note)x.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId)
         {
-            IEnumerable<Model<Note>> query = Data.Values.AsEnumerable();
+            IEnumerable<Note> query = Data.Values.AsEnumerable();
             if (userId != null)
             {
                 query = query.Where(x => x.UserId == userId);
@@ -97,27 +94,27 @@ namespace MindNote.Data.Providers.InMemory
 
             if (id.HasValue)
             {
-                query = query.Where(x => x.Data.Id == id.Value);
+                query = query.Where(x => x.Id == id.Value);
             }
 
             if (title != null)
             {
-                query = query.Where(x => x.Data.Title.Contains(title));
+                query = query.Where(x => x.Title.Contains(title));
             }
 
             if (content != null)
             {
-                query = query.Where(x => x.Data.Content.Contains(content));
+                query = query.Where(x => x.Content.Contains(content));
             }
 
             if (keyword != null)
             {
-                query = query.Where(x => x.Data.Keywords.Any(s => s.Contains(keyword)));
+                query = query.Where(x => x.Keywords.Any(s => s.Contains(keyword)));
             }
 
             if (categoryId.HasValue)
             {
-                query = query.Where(x => x.Data.CategoryId == categoryId.Value);
+                query = query.Where(x => x.CategoryId == categoryId.Value);
             }
 
             if (offset.HasValue && offset.Value >= 0)
@@ -137,20 +134,20 @@ namespace MindNote.Data.Providers.InMemory
                     return Task.FromResult(query.Select(x => (Note)null).ToArray().AsEnumerable());
                 }
             }
-            return Task.FromResult(query.Select(x => (Note)x.Data.Clone()).ToArray().AsEnumerable());
+            return Task.FromResult(query.Select(x => (Note)x.Clone()).ToArray().AsEnumerable());
         }
 
         public Task<int?> Update(int id, Note data, string userId)
         {
-            if (Data.TryGetValue(id, out Model<Note> value))
+            if (Data.TryGetValue(id, out Note value))
             {
                 if (userId == null || value.UserId == userId)
                 {
-                    value.Data.Title = data.Title;
-                    value.Data.CategoryId = data.CategoryId;
-                    value.Data.Content = data.Content;
-                    value.Data.Keywords = data.Keywords;
-                    value.Data.ModificationTime = DateTimeOffset.Now;
+                    value.Title = data.Title;
+                    value.CategoryId = data.CategoryId;
+                    value.Content = data.Content;
+                    value.Keywords = data.Keywords;
+                    value.ModificationTime = DateTimeOffset.Now;
                     return Task.FromResult<int?>(id);
                 }
             }

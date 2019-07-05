@@ -33,6 +33,7 @@ namespace MindNote.Server.Host
             services.AddAuthorization();
 
             Helpers.UserHelper.RegisterUrl = $"{server.Identity}/Identity/Account/Register";
+            Helpers.UserHelper.IdentityManageUrl = $"{server.Identity}/Identity/Account/Manage";
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 

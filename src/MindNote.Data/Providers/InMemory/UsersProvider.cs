@@ -23,7 +23,7 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<string> Create(string id, User data)
         {
-            if(id == null)
+            if (id == null)
             {
                 id = Guid.NewGuid().ToString();
             }

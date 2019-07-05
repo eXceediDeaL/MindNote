@@ -10,6 +10,8 @@ namespace MindNote.Server.Host.Helpers
     {
         public static string RegisterUrl { get; set; }
 
+        public static string IdentityManageUrl { get; set; }
+
         public static async Task<User> GetProfile(HttpContext context, IUsersClient client, IIdentityDataGetter identityDataGetter)
         {
             var token = await identityDataGetter.GetAccessToken(context);

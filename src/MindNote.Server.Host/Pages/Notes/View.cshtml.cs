@@ -18,12 +18,14 @@ namespace MindNote.Server.Host.Pages.Notes
         private readonly IIdentityDataGetter idData;
         private readonly ICategoriesClient tagsClient;
         private readonly IRelationsClient relationsClient;
+        private readonly IUsersClient usersClient;
 
-        public ViewModel(INotesClient client, ICategoriesClient tagsClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
+        public ViewModel(INotesClient client, ICategoriesClient tagsClient, IRelationsClient relationsClient, IUsersClient usersClient, IIdentityDataGetter idData)
         {
             this.client = client;
             this.tagsClient = tagsClient;
             this.relationsClient = relationsClient;
+            this.usersClient = usersClient;
             this.idData = idData;
         }
 
@@ -43,7 +45,7 @@ namespace MindNote.Server.Host.Pages.Notes
             {
                 Data = new NotesViewModel { Data = await client.Get(token, id) };
                 Markdown = new MarkdownViewModel { Raw = Data.Data.Content };
-                await Data.LoadCategory(tagsClient, token);
+                await Data.Load(tagsClient, usersClient, token);
                 List<Relation> res = (await relationsClient.GetAdjacents(token, id)).ToList();
                 if (res.Count > 0)
                 {

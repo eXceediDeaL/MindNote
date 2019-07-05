@@ -26,7 +26,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<string> Create(string id, User data)
         {
-            if(id == null)
+            if (id == null)
             {
                 id = Guid.NewGuid().ToString();
             }

@@ -2600,6 +2600,9 @@ namespace MindNote.Client.SDK.API
         [Newtonsoft.Json.JsonProperty("modificationTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.DateTimeOffset ModificationTime { get; set; }
     
+        [Newtonsoft.Json.JsonProperty("userId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string UserId { get; set; }
+    
     
     }
     

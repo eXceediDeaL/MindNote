@@ -22,4 +22,15 @@
     <small>
         <read-time text="@Model.Data.Content"></read-time>
     </small>
+    <small class="m-1">|</small>
+    <small>
+        <a asp-area="Identity" asp-page="/Account/Index" asp-route-id="@Model.User.Id" style="color: #555;">
+            <span>
+                <i class="fa fa-user" style="color:#999"></i>
+                <span style="margin-left: 5px; color:#999">
+                    @Model.User.Name
+                </span>
+            </span>
+        </a>
+    </small>
 </div>

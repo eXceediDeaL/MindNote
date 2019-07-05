@@ -7,6 +7,7 @@ using MindNote.Data.Providers.Queries;
 using MindNote.Server.Host.Helpers;
 using MindNote.Server.Host.Pages.Notes;
 using MindNote.Server.Host.Pages.Shared;
+using MindNote.Server.Host.Pages.Shared.Components;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,11 @@ namespace MindNote.Server.Host.Pages.Categories
 
         public CategoriesViewModel Data { get; set; }
 
-        public NoteListViewModel Notes { get; set; }
+        public IList<Note> Notes { get; set; }
+
+        public PagingSettings Paging { get; set; }
+
+        public string Token { get; set; }
 
         [BindProperty]
         public CategoriesPostModel PostData { get; set; }
@@ -41,16 +46,16 @@ namespace MindNote.Server.Host.Pages.Categories
         public async Task<IActionResult> OnGetAsync(int id, int? pageIndex)
         {
             string token = await idData.GetAccessToken(HttpContext);
+            Token = token;
 
             try
             {
                 Data = new CategoriesViewModel { Data = await client.Get(token, id) };
 
-                Notes = new NoteListViewModel
+                Paging = new PagingSettings
                 {
-                    EnablePaging = true,
                     ItemCountPerPage = 8,
-                    PagingRouteData = new Dictionary<string, string>
+                    RouteData = new Dictionary<string, string>
                     {
                         ["id"] = Data.Data.Id.ToString(),
                     }
@@ -58,32 +63,13 @@ namespace MindNote.Server.Host.Pages.Categories
                 IEnumerable<Note> notes;
                 {
                     int count = (await nodesClient.Query(token, null, null, null, null, null, null, null, NoteTargets.Count)).Count();
-                    Notes.MaximumPageIndex = (count / Notes.ItemCountPerPage) + (count % Notes.ItemCountPerPage > 0 ? 1 : 0);
+                    Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
+                    if (!pageIndex.HasValue) pageIndex = 1;
+                    Paging.CurrentIndex = pageIndex.Value;
+                    int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-                    int offset;
-                    if (pageIndex.HasValue)
-                    {
-                        if (pageIndex <= 0) pageIndex = 1;
-                        if (pageIndex > Notes.MaximumPageIndex) pageIndex = Notes.MaximumPageIndex;
-                        offset = (pageIndex.Value - 1) * Notes.ItemCountPerPage;
-                        Notes.CurrentPageIndex = pageIndex.Value;
-                    }
-                    else
-                    {
-                        offset = 0;
-                        Notes.CurrentPageIndex = 1;
-                    }
-
-                    notes = await nodesClient.Query(token, null, null, null, null, null, offset, Notes.ItemCountPerPage, null);
-                }
-
-                {
-                    List<NotesViewModel> noteViews = new List<NotesViewModel>();
-                    foreach (Note v in notes)
-                    {
-                        noteViews.Add(new NotesViewModel { Data = v, Category = Data.Data });
-                    }
-                    Notes.Data = noteViews;
+                    notes = await nodesClient.Query(token, null, null, null, null, null, offset, Paging.ItemCountPerPage, null);
+                    Notes = notes.ToList();
                 }
                 {
                     Dictionary<int, Relation> rs = new Dictionary<int, Relation>();

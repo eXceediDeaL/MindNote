@@ -18,17 +18,39 @@ namespace MindNote.Server.Host.Areas.Identity.Pages.Account
         private readonly INotesClient nodesClient;
         private readonly IIdentityDataGetter idData;
         private readonly IRelationsClient relationsClient;
+        private readonly IUsersClient usersClient;
 
-        public IndexModel(ICategoriesClient tagsClient, INotesClient nodesClient, IRelationsClient relationsClient, IIdentityDataGetter idData)
+        public User Profile { get; set; }
+
+        public IndexModel(ICategoriesClient tagsClient, INotesClient nodesClient, IRelationsClient relationsClient, IUsersClient usersClient, IIdentityDataGetter idData)
         {
             this.tagsClient = tagsClient;
             this.nodesClient = nodesClient;
             this.idData = idData;
             this.relationsClient = relationsClient;
+            this.usersClient = usersClient;
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync(string id)
         {
+            if (id == null)
+            {
+                Profile = await Helpers.UserHelper.GetProfile(HttpContext, usersClient, idData);
+            }
+            else
+            {
+                Profile = await Helpers.UserHelper.GetProfile(id, HttpContext, usersClient, idData);
+                if (Profile == null)
+                {
+                    Profile = new User
+                    {
+                        Email = idData.GetClaimEmail(User),
+                        Name = idData.GetClaimName(User),
+                        Id = idData.GetClaimId(User),
+                    };
+                }
+            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostInitializeAsync()

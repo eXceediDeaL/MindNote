@@ -19,6 +19,8 @@ namespace MindNote.Data
 
         public DateTimeOffset ModificationTime { get; set; }
 
+        public string UserId { get; set; }
+
         public object Clone() => MemberwiseClone();
 
         public override bool Equals(object obj)
@@ -35,12 +37,13 @@ namespace MindNote.Data
                    EqualityComparer<int?>.Default.Equals(CategoryId, other.CategoryId) &&
                    EqualityComparer<string[]>.Default.Equals(Keywords, other.Keywords) &&
                    CreationTime.Equals(other.CreationTime) &&
-                   ModificationTime.Equals(other.ModificationTime);
+                   ModificationTime.Equals(other.ModificationTime) &&
+                   UserId == other.UserId;
         }
 
         public override int GetHashCode()
         {
-            var hashCode = -240095195;
+            var hashCode = -1604058068;
             hashCode = hashCode * -1521134295 + Id.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Title);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Content);
@@ -48,6 +51,7 @@ namespace MindNote.Data
             hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Keywords);
             hashCode = hashCode * -1521134295 + EqualityComparer<DateTimeOffset>.Default.GetHashCode(CreationTime);
             hashCode = hashCode * -1521134295 + EqualityComparer<DateTimeOffset>.Default.GetHashCode(ModificationTime);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(UserId);
             return hashCode;
         }
 
