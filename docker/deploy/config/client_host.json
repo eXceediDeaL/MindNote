@@ -1,0 +1,16 @@
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Warning"
+        }
+    },
+    "AllowedHosts": "*",
+    "server": {
+        "Identity": "http://id.mindnote.com",
+        "Api": "http://api.mindnote.com"
+    },
+    "identityClient": {
+        "ClientId": "client.host",
+        "ClientSecret": "secret"
+    }
+}

@@ -9,5 +9,7 @@ namespace MindNote.Client.Host.Shared
         public string UserId { get; set; }
 
         public string AccessToken { get; set; }
+
+        public DateTimeOffset ExpiresAt { get; set; }
     }
 }

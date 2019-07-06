@@ -7,7 +7,7 @@ COPY ./test ./test
 
 RUN dotnet restore
 
-RUN cd ./src/MindNote.Server.API && dotnet publish -c Release -o /build
+RUN cd ./src/Server/MindNote.Server.API && dotnet publish -c Release -o /build
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 WORKDIR /app

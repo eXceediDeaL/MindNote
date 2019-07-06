@@ -1,0 +1,32 @@
+@page "/login"
+@inject HttpClient Http
+
+<h1>Log in</h1>
+
+<EditForm Model="@Model" OnValidSubmit="@LoginAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText class="form-control" @bind-Value="@Model.Name" />
+    </div>
+
+    <div class="form-group">
+        <label class="control-label">Password</label>
+        <InputText class="form-control" @bind-Value="@Model.Password" type="password"/>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Log in</button>
+    </div>
+</EditForm>
+
+@code {
+    private LoginModel Model = new LoginModel();
+
+    private async Task LoginAsync()
+    {
+        Settings.Identity = await HostServer.Login(Http, Model.Name, Model.Password);
+    }
+}

@@ -33,8 +33,8 @@ namespace MindNote.Client.Host.Server.Controllers
                 TokenResponse tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
                 {
                     Address = disco.TokenEndpoint,
-                    ClientId = "client.host",
-                    ClientSecret = "secret",
+                    ClientId = Utils.IdentityClient.ClientId,
+                    ClientSecret = Utils.IdentityClient.ClientSecret,
 
                     UserName = request.UserName,
                     Password = request.Password,
@@ -49,11 +49,13 @@ namespace MindNote.Client.Host.Server.Controllers
                 string token = tokenResponse.Json["access_token"].ToString();
                 var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(token);
+                var expireTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(Utils.GetClaim(jwt.Claims, "exp")));
 
                 return new IdentityData
                 {
                     UserId = jwt.Subject,
                     AccessToken = token,
+                    ExpiresAt = expireTime
                 };
             }
         }

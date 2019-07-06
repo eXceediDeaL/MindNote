@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using MindNote.Client.SDK.Identity;
 using MindNote.Server.Shared.Configuration;
 using NSwag;
-using NSwag.SwaggerGeneration.Processors.Security;
+using NSwag.Generation.Processors.Security;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -62,9 +62,9 @@ namespace MindNote.Server.API
         {
             services.AddOpenApiDocument(config =>
             {
-                config.AddSecurity("bearer", Enumerable.Empty<string>(), new SwaggerSecurityScheme
+                config.AddSecurity("bearer", Enumerable.Empty<string>(), new OpenApiSecurityScheme
                 {
-                    Type = SwaggerSecuritySchemeType.OAuth2,
+                    Type = OpenApiSecuritySchemeType.OAuth2,
                     Description = "MindNote Identity",
                     Flows = new OpenApiOAuthFlows()
                     {
@@ -89,7 +89,7 @@ namespace MindNote.Server.API
                     document.Info.Title = "MindNote API";
                     document.Info.Description = "API for MindNote";
                     document.Info.TermsOfService = "None";
-                    document.Info.Contact = new NSwag.SwaggerContact
+                    document.Info.Contact = new NSwag.OpenApiContact
                     {
                         Name = "StardustDL",
                         Email = string.Empty,

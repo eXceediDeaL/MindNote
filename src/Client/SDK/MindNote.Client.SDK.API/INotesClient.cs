@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MindNote.Client.SDK.API
 {
-    public interface INotesClient
+    public interface INotesClient : IBaseClient
     {
         Task<IEnumerable<Note>> GetAll(string token);
 
@@ -23,11 +23,16 @@ namespace MindNote.Client.SDK.API
 
     public class NotesClient : INotesClient
     {
-        public NotesClient(HttpClient client, string baseUrl = null)
+        public NotesClient(HttpClient client)
         {
             Client = client;
             Raw = new RawNotesClient(Client);
-            Raw.BaseUrl = baseUrl;
+        }
+
+        public string BaseUrl
+        {
+            get => Raw.BaseUrl;
+            set => Raw.BaseUrl = value;
         }
 
         public HttpClient Client { get; private set; }

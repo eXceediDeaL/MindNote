@@ -6,6 +6,7 @@
 /temp/*
 tempkey.rsa
 coverage.json
+**/.vscode
 
 # User-specific files
 *.suo

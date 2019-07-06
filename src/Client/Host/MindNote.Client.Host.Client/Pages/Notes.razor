@@ -1,0 +1,35 @@
+﻿@page "/notes"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using System.Linq
+@inject INotesClient NoteClient
+@inject IUsersClient UserClient
+@inject ICategoriesClient CategoryClient
+
+<h1>Notes</h1>
+
+@if (Data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <NoteListWaterfall Data="@Data" Column="1"/>
+}
+
+@code {
+    IList<NoteViewModel> Data { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        NoteClient.BaseUrl = Settings.ApiServerUrl;
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+        
+        var ms = await NoteClient.GetAll(Settings.Identity?.AccessToken);
+        var data = ms.Select(x => new NoteViewModel{Data = x}).ToList();
+        foreach(var v in data)
+            await v.Load(CategoryClient, UserClient, Settings.Identity?.AccessToken);
+        Data = data;
+    }
+}

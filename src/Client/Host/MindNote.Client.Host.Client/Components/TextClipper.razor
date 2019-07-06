@@ -1,0 +1,27 @@
+@if(Value != null){
+    <span>
+        <span>@Clipped</span>
+    </span>
+}
+
+@code {
+    [Parameter]
+    private string Value { get; set; }
+
+    [Parameter]
+    private int Length { get; set; } = 300;
+
+    private string Clipped {
+        get
+        {
+            if (Value.Length <= Length)
+            {
+                return Value;
+            }
+            else
+            {
+                return Value.Substring(0, Length) + "...";
+            }
+        }
+    }
+}

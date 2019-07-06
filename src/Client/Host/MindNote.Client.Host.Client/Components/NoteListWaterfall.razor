@@ -1,0 +1,47 @@
+@using MindNote.Client.SDK.API
+
+<div class="card-columns @(!Column.HasValue ? "waterfall-card-columns" : "")" style="@(Column.HasValue ? $"column-count: {Column.Value}" : "")">
+    @foreach (var item in Data)
+    {
+        <div class="card mt-4 border-0">
+            <div class="card-body">
+                <h4 class="card-title mb-4">
+                    <a style="color: black">@item.Data.Title</a>
+                </h4>
+                <div class="card-subtitle mb-4">
+                    <NoteMetadataDisplay Value="@item" />
+                </div>
+
+                <p class="card-text mb-4">
+                    <TextClipper value="@item.Data.Content" />
+                </p>
+                <a class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Paging != null)
+{
+    <div class="text-center">
+        <ul class="pagination" style="display:inline-flex">
+            <li class="page-item @(Paging.CurrentIndex == 1 ? "disabled" : "")"><a class="page-link"><i class="fa fa-angle-left"></i></a></li>
+            @for (int i = Math.Max(1, Paging.CurrentIndex - 5); i <= Math.Min(Paging.CurrentIndex + 5, Paging.MaximumIndex); i++)
+            {
+                <li class="page-item @(i == Paging.CurrentIndex ? "active" : "")"><a class="page-link">@i</a></li>
+            }
+            <li class="page-item @(Paging.CurrentIndex == Paging.MaximumIndex ? "disabled" : "")"><a class="page-link"><i class="fa fa-angle-right"></i></a></li>
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    private IList<NoteViewModel> Data { get; set; }
+
+    [Parameter]
+    private PagingSettings Paging { get; set; } = null;
+
+    [Parameter]
+    private int? Column { get; set; } = null;
+}

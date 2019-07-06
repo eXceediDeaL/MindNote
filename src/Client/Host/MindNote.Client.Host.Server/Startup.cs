@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using MindNote.Client.SDK.API;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 
 namespace MindNote.Client.Host.Server
@@ -22,6 +23,15 @@ namespace MindNote.Client.Host.Server
         public static LinkedServerConfiguration Load(IConfiguration configuration) => configuration?.GetSection("server")?.Get<LinkedServerConfiguration>();
     }
 
+    public class IdentityClientConfiguration
+    {
+        public string ClientId { get; set; }
+
+        public string ClientSecret { get; set; }
+
+        public static IdentityClientConfiguration Load(IConfiguration configuration) => configuration?.GetSection("identityClient")?.Get<IdentityClientConfiguration>();
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -35,7 +45,10 @@ namespace MindNote.Client.Host.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             Utils.Linked = LinkedServerConfiguration.Load(Configuration);
+            Utils.IdentityClient = IdentityClientConfiguration.Load(Configuration);
 
             services.AddHttpClient();
 
@@ -65,6 +78,7 @@ namespace MindNote.Client.Host.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
+
                 endpoints.MapFallbackToClientSideBlazor<Client.Startup>("index.html");
             });
         }

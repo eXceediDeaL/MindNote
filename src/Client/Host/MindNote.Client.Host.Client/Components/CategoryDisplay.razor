@@ -1,0 +1,13 @@
+@using MindNote.Client.SDK.API
+
+@if(Value != null){
+    <span>
+        <i class="far fa-folder" style="@(Value.Color != null ? $"color:{Value.Color}" : "")"></i>
+        <span style="margin-left:5px">@Value.Name</span>
+    </span>
+}
+
+@code {
+    [Parameter]
+    private Category Value { get; set; }
+}
