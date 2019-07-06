@@ -1,9 +1,13 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
-WORKDIR /build
+WORKDIR /source
 
-COPY ./src/Client/Host ./src
+COPY *.sln .
+COPY ./src ./src
+COPY ./test ./test
 
 RUN dotnet restore
+
+WORKDIR /source/src/Client/Host
 
 RUN cd ./MindNote.Client.Host.Server && dotnet publish -c Release -o /build \
      && cp -r /build/MindNote.Client.Host.Client/dist/* /build/wwwroot && rm -rf /build/MindNote.Client.Host.Client \

@@ -1,0 +1,75 @@
+﻿@page "/categories"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using System.Linq
+@inject IUsersClient UserClient
+@inject ICategoriesClient CategoryClient
+
+<h1>Categories</h1>
+
+@if (Data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-hover" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th style="width:6%">
+                    Id
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    User
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Data)
+            {
+                <tr>
+                    <td>
+                        @item.Data.Id
+                    </td>
+                    <td>
+                        <a href="@item.Data.Id">
+                            <CategoryDisplay value="@item.Data" />
+                        </a>
+                    </td>
+                    <td>
+                        <a>
+                            <UserDisplay value="@item.User" />
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
+    IList<CategoryViewModel> Data { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        string token = null;
+        if(user.Identity.IsAuthenticated)
+            token = UserHelper.GetAccessToken(user);
+
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+        
+        var ms = await CategoryClient.GetAll(token);
+        var data = ms.Select(x => new CategoryViewModel{Data = x}).ToList();
+        foreach(var v in data)
+            await v.Load(UserClient, token);
+        Data = data;
+    }
+}

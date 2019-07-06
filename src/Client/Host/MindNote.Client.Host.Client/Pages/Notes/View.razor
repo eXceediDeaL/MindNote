@@ -1,0 +1,55 @@
+﻿@page "/notes/{id:int}"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@inject INotesClient NoteClient
+@inject IUsersClient UserClient
+@inject ICategoriesClient CategoryClient
+
+@if(Current == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if(Current.Data == null)
+    {
+        <p><em>Not found.</em></p>
+    }
+    else
+    {
+        <h1 class="display-4 text-center">@Current.Data.Title</h1>
+        <div class="m-4 text-center">
+            <NoteMetadataDisplay Value="@Current" />
+        </div>
+        <MarkdownViewer Value="@Current.Data.Content" />
+    }
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    private int Id {get;set;}
+
+    NoteViewModel Current {get;set;}
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        string token = null;
+        if(user.Identity.IsAuthenticated)
+            token = UserHelper.GetAccessToken(user);
+
+        NoteClient.BaseUrl = Settings.ApiServerUrl;
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+        
+        Current = new NoteViewModel { Data = await NoteClient.Get(token, Id) };
+
+        if(Current.Data != null)
+        {
+            await Current.Load(CategoryClient, UserClient, token);
+        }
+    }
+}

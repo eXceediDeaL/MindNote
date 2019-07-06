@@ -1,0 +1,107 @@
+﻿@page "/account"
+@page "/account/{id}"
+
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using System.Linq
+@inject IUsersClient UserClient
+@inject INotesClient NoteClient
+@inject ICategoriesClient CategoryClient
+@inject IUriHelper UriHelper
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (Current == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="d-flex flex-row">
+        <Gravatar Class="rounded" Value="@Current.Email" Size="200"/>
+        <div class="d-flex flex-column ml-4">
+            <h3>@Current.Name</h3>
+            <h5 class="text-muted">@Current.Email</h5>
+            @if (!String.IsNullOrEmpty(Current.Bio))
+            {
+                <span class="mt-2">@(Current.Bio ?? "Bio")</span>
+            }
+            <dl class="mt-2">
+                @if (Current.Location != null)
+                {
+                    <dt style="float:left; min-width:24px"><i class="fa fa-map-marker"></i></dt>
+                    <dd>@Current.Location</dd>
+                }
+                @if (Current.Url != null)
+                {
+                    <dt style="float:left; min-width:24px"><i class="fa fa-link"></i></dt>
+                    <dd><a href="@Current.Url">@Current.Url</a></dd>
+                }
+            </dl>
+            
+        </div>
+    </div>
+}
+
+@if (Notes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <NoteListWaterfall Data="@Notes" Column="1"/>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
+    [Parameter]
+    private string Id {get;set;} = null;
+
+    User Current {get;set;}
+
+    IList<NoteViewModel> Notes { get; set; }
+
+    public void Logout()
+    {
+        var auth = (AuthStateProvider)AuthenticationStateProvider;
+        auth.Logout();
+        UriHelper.NavigateTo("/");
+    }
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+
+        NoteClient.BaseUrl = Settings.ApiServerUrl;
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+
+        if(Id == null)
+        {
+            if(!user.Identity.IsAuthenticated)
+            {
+                UriHelper.NavigateTo("/account/login");
+                return;
+            }
+            Id = UserHelper.GetId(user);
+        }
+
+        string token = null;
+        if(user.Identity.IsAuthenticated)
+            token = UserHelper.GetAccessToken(user);
+        
+        {
+            Current = await UserClient.Get(token, Id);
+        }
+
+        if(Current != null)
+        {
+            var ms = await NoteClient.Query(token, null, null, null, null, null, null, null, null, Current.Id);
+            var data = ms.Select(x => new NoteViewModel{Data = x}).ToList();
+            foreach(var v in data)
+                await v.Load(CategoryClient, UserClient, token);
+            Notes = data;
+        }
+    }
+}

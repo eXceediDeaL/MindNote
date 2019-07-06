@@ -1,8 +1,6 @@
-@if(Value != null){
-    <span>
-        <span>@Clipped</span>
-    </span>
-}
+<span>
+    <span>@Clipped</span>
+</span>
 
 @code {
     [Parameter]
@@ -14,6 +12,10 @@
     private string Clipped {
         get
         {
+            if (Value == null){
+                return "";
+            }
+            
             if (Value.Length <= Length)
             {
                 return Value;

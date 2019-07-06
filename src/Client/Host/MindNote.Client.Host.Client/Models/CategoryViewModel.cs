@@ -3,31 +3,15 @@ using MindNote.Client.SDK.API;
 
 namespace MindNote.Client.Host.Client.Models
 {
-
-    public class NoteViewModel
+    public class CategoryViewModel
     {
-        public Note Data { get; set; }
-
-        public Category Category { get; set; }
+        public Category Data { get; set; }
 
         public User User { get; set; }
 
-        public async Task Load(ICategoriesClient categoriesClient, IUsersClient usersClient, string token)
+        public async Task Load(IUsersClient usersClient, string token)
         {
-            await LoadCategory(categoriesClient, token);
             await LoadUser(usersClient, token);
-        }
-
-        public async Task LoadCategory(ICategoriesClient client, string token)
-        {
-            if (Data.CategoryId.HasValue)
-            {
-                Category = await client.Get(token, Data.CategoryId.Value);
-            }
-            else
-            {
-                Category = null;
-            }
         }
 
         public async Task LoadUser(IUsersClient client, string token)

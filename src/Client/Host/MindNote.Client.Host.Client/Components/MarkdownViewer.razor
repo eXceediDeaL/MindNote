@@ -1,0 +1,17 @@
+@inject IJSRuntime JSRuntime
+
+<div @ref="markdownContent">
+
+</div>
+
+@code {
+    [Parameter]
+    private string Value { get; set; }
+
+    private ElementRef markdownContent;
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        await JSRuntime.InvokeAsync<object>("update_markdown", markdownContent, Value);
+    }
+}

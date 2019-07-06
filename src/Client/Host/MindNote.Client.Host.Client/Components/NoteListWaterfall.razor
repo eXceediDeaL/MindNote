@@ -6,7 +6,7 @@
         <div class="card mt-4 border-0">
             <div class="card-body">
                 <h4 class="card-title mb-4">
-                    <a style="color: black">@item.Data.Title</a>
+                    <a href="/notes/@item.Data.Id" style="color:black">@item.Data.Title</a>
                 </h4>
                 <div class="card-subtitle mb-4">
                     <NoteMetadataDisplay Value="@item" />
@@ -15,7 +15,7 @@
                 <p class="card-text mb-4">
                     <TextClipper value="@item.Data.Content" />
                 </p>
-                <a class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
+                <a href="/notes/@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
             </div>
         </div>
     }

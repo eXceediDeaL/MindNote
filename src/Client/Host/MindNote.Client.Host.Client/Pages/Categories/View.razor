@@ -1,0 +1,80 @@
+﻿@page "/categories/{id:int}"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using System.Linq
+@inject INotesClient NoteClient
+@inject IUsersClient UserClient
+@inject ICategoriesClient CategoryClient
+
+@if(Current == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if(Current.Data == null)
+    {
+        <p><em>Not found.</em></p>
+    }
+    else
+    {
+        <h1>
+            <CategoryDisplay value="@Current.Data" />
+        </h1>
+        <div>
+            <small>
+                <a href="/account/@Current.User.Id" style="color: #555;">
+                    <UserDisplay Value="@Current.User"/>
+                </a>
+            </small>
+        </div>
+    }
+}
+
+@if (Notes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <NoteListWaterfall Data="@Notes"/>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
+    [Parameter]
+    private int Id {get;set;}
+
+    CategoryViewModel Current {get;set;}
+
+    IList<NoteViewModel> Notes { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        string token = null;
+        if(user.Identity.IsAuthenticated)
+            token = UserHelper.GetAccessToken(user);
+
+        NoteClient.BaseUrl = Settings.ApiServerUrl;
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+        
+        {
+            Current = new CategoryViewModel { Data = await CategoryClient.Get(token, Id) };
+        }
+
+        if(Current?.Data != null)
+        {
+            await Current.Load(UserClient, token);
+
+            var ms = await NoteClient.Query(token, null, null, null, Current.Data.Id, null, null, null, null, null);
+            var data = ms.Select(x => new NoteViewModel{Data = x}).ToList();
+            foreach(var v in data)
+                await v.Load(CategoryClient, UserClient, token);
+            Notes = data;
+        }
+    }
+}

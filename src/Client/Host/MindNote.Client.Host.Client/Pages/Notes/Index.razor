@@ -18,18 +18,26 @@ else
 }
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
     IList<NoteViewModel> Data { get; set; }
 
     protected override async Task OnInitAsync()
     {
+        var user = (await authenticationStateTask).User;
+        string token = null;
+        if(user.Identity.IsAuthenticated)
+            token = UserHelper.GetAccessToken(user);
+
         NoteClient.BaseUrl = Settings.ApiServerUrl;
         CategoryClient.BaseUrl = Settings.ApiServerUrl;
         UserClient.BaseUrl = Settings.ApiServerUrl;
-        
-        var ms = await NoteClient.GetAll(Settings.Identity?.AccessToken);
+
+        var ms = await NoteClient.GetAll(token);
         var data = ms.Select(x => new NoteViewModel{Data = x}).ToList();
         foreach(var v in data)
-            await v.Load(CategoryClient, UserClient, Settings.Identity?.AccessToken);
+            await v.Load(CategoryClient, UserClient, token);
         Data = data;
     }
 }

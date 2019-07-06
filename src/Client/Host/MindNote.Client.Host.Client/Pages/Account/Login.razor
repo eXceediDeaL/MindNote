@@ -1,0 +1,59 @@
+@page "/account/login"
+
+@inject HttpClient Http
+@inject IUriHelper UriHelper
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h1>Log in</h1>
+
+<p>@Message</p>
+
+<EditForm Model="@Model" OnValidSubmit="@LoginAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label class="control-label">Name</label>
+        <InputText class="form-control" @bind-Value="@Model.Name" />
+    </div>
+
+    <div class="form-group">
+        <label class="control-label">Password</label>
+        <InputText class="form-control" @bind-Value="@Model.Password" type="password"/>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Log in</button>
+    </div>
+</EditForm>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    
+    private LoginModel Model = new LoginModel();
+
+    string Message {get; set;}
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if(user.Identity.IsAuthenticated)
+        {
+            UriHelper.NavigateTo("/account");
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        var auth = (AuthStateProvider)AuthenticationStateProvider;
+        if(await auth.Login(Model.Name, Model.Password))
+        {
+            UriHelper.NavigateTo("/account");
+        }
+        else
+        {
+            Message = "Login failed.";
+        }
+    }
+}

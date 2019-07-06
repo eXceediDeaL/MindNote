@@ -3,7 +3,7 @@
     <time style="margin-left:5px" 
         datetime="@CreationTime" 
         title="@(string.Format("Creation time: {0} / Modification time: {1}", CreationTime.DateTime.ToString("yyyy-MM-dd hh:mm:ss"), ModificationTime.DateTime.ToString("yyyy-MM-dd hh:mm:ss")))">
-        @CreationTime.Date.ToString("yyyy-MM-dd")
+        @CreationTime.ToLocalTime().Date.ToString("yyyy-MM-dd")
     </time>
 </span>
 
