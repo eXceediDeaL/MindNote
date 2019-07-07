@@ -1,4 +1,5 @@
 using MindNote.Client.SDK.API;
+using MindNote.Data;
 using System.Threading.Tasks;
 
 namespace MindNote.Client.Host.Client.Models

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MindNote.Client.SDK.API;
+using MindNote.Data;
 using MindNote.Server.Host.Pages.Notes;
 using System;
 using System.Collections.Generic;

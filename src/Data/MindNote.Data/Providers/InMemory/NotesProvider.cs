@@ -97,7 +97,7 @@ namespace MindNote.Data.Providers.InMemory
             return Task.FromResult(query.Select(x => (Note)x.Clone()).ToArray().AsEnumerable());
         }
 
-        public Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets,string userId, string identity)
+        public Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId, string identity)
         {
             IEnumerable<Note> query = Data.Values.AsEnumerable();
             if (identity == null)
@@ -105,7 +105,7 @@ namespace MindNote.Data.Providers.InMemory
             else
                 query = query.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
 
-            if(userId != null)
+            if (userId != null)
             {
                 query = query.Where(x => x.UserId == userId);
             }
@@ -157,7 +157,7 @@ namespace MindNote.Data.Providers.InMemory
 
         public Task<int?> Update(int id, Note data, string identity)
         {
-            if(identity == null)
+            if (identity == null)
                 return Task.FromResult<int?>(null);
             if (Data.TryGetValue(id, out Note value))
             {

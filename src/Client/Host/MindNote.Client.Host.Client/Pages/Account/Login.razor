@@ -1,5 +1,6 @@
 @page "/account/login"
 @using MindNote.Client.SDK.API
+@using MindNote.Data
 @inject IUsersClient UserClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -37,9 +38,6 @@
 
     protected override async Task OnInitAsync()
     {
-        var auth = (AuthStateProvider)AuthenticationStateProvider;
-        await auth.Login("stardustdl@163.com", "Z7hp0Gh&");
-
         var user = (await authenticationStateTask).User;
         if (user.Identity.IsAuthenticated)
         {

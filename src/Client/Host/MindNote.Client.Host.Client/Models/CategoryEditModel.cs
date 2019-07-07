@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MindNote.Client.SDK.API;
+using MindNote.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace MindNote.Client.Host.Client.Models
 {
@@ -12,5 +14,25 @@ namespace MindNote.Client.Host.Client.Models
 
         [Required]
         public string Color { get; set; }
+
+        public CategoryEditModel() { }
+        
+        public CategoryEditModel(Category item)
+        {
+            Name = item.Name;
+            Color = item.Color;
+            IsPublic = item.Status == ItemStatus.Public;
+        }
+
+        public Category ToModel()
+        {
+            Category item = new Category
+            {
+                Name = Name,
+                Color = Color,
+                Status = IsPublic ? ItemStatus.Public : ItemStatus.Private,
+            };
+            return item;
+        }
     }
 }

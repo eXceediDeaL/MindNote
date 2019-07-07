@@ -89,7 +89,7 @@ namespace MindNote.Data.Providers.SqlServer
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
-        public async Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId,string identity)
+        public async Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId, string identity)
         {
             IQueryable<Models.Category> query = context.Categories.AsQueryable();
             if (identity == null)
@@ -97,7 +97,7 @@ namespace MindNote.Data.Providers.SqlServer
             else
                 query = query.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
 
-            if(userId != null)
+            if (userId != null)
             {
                 query = query.Where(item => item.UserId == userId);
             }

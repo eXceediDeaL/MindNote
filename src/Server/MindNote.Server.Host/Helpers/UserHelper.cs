@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
+using MindNote.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
 

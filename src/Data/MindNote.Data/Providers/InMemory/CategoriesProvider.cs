@@ -87,7 +87,7 @@ namespace MindNote.Data.Providers.InMemory
             else
                 query = query.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
 
-            if(userId != null)
+            if (userId != null)
             {
                 query = query.Where(x => x.UserId == userId);
             }

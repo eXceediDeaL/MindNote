@@ -2,6 +2,7 @@
 @using MindNote.Client.Host.Shared
 @using MindNote.Client.SDK.API
 @using System.Linq
+@using MindNote.Data
 @inject INotesClient NoteClient
 @inject IUsersClient UserClient
 @inject ICategoriesClient CategoryClient
@@ -52,30 +53,12 @@ else
         if (item.UserId != UserHelper.GetId(user)) return;
         Categories = await CategoryClient.GetAll(Token);
 
-        Model = new NoteEditModel
-        {
-            Title = item.Title,
-            Content = item.Content,
-            CategoryId = item.CategoryId?.ToString(),
-            Keywords = item.Keywords == null ? "" : string.Join(";", item.Keywords),
-            IsPublic = item.Status == ItemStatus.Public,
-        };
+        Model = new NoteEditModel(item);
     }
 
     private async Task OnSubmit()
     {
-        int? catId = null;
-        if (int.TryParse(Model.CategoryId, out int res))
-            catId = res;
-        Note item = new Note
-        {
-            Title = Model.Title,
-            Content = Model.Content,
-            CategoryId = catId,
-            Keywords = Model.Keywords?.Split(';'),
-            Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
-        };
-        var id = await NoteClient.Update(Token, Id, item);
+        var id = await NoteClient.Update(Token, Id, Model.ToModel());
         UriHelper.NavigateTo($"/notes/{id}");
     }
 }

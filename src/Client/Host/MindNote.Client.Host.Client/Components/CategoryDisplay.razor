@@ -1,6 +1,8 @@
 @using MindNote.Client.SDK.API
+@using MindNote.Data
 
-@if(Value != null){
+@if (Value != null)
+{
     <span>
         <i class="far fa-folder" style="@(Value.Color != null ? $"color:{Value.Color}" : "")"></i>
         <span style="margin-left:5px">@Value.Name</span>

@@ -1,12 +1,14 @@
 @using MindNote.Client.SDK.API
+@using MindNote.Data
+
 @inject INotesClient NoteClient
 
 <div class="card-columns @(!Column.HasValue ? "waterfall-card-columns" : "")" style="@(Column.HasValue ? $"column-count: {Column.Value}" : "")">
     @foreach (var item in Data)
     {
-        <div class="card mt-4 border-0">
+        <div class="card border-0">
             <div class="card-body">
-                <div class="card-title d-flex flex-row mb-4">
+                <div class="card-title d-flex flex-row mb-1">
                     <h4>
                         <a href="/notes/@item.Data.Id" style="color:black">@item.Data.Title</a>
                     </h4>
@@ -19,11 +21,11 @@
                     }
                 </div>
 
-                <div class="card-subtitle mb-4">
+                <div class="card-subtitle mb-2">
                     <NoteMetadataDisplay Value="@item" />
                 </div>
 
-                <p class="card-text mb-4">
+                <p class="card-text mb-1">
                     <TextClipper value="@item.Data.Content" />
                 </p>
                 <a href="/notes/@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>

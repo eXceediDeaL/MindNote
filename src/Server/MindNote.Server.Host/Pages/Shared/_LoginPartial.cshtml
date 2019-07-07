@@ -4,7 +4,7 @@
 @inject MindNote.Client.SDK.API.IUsersClient UsersClient
 
 @{
-    MindNote.Client.SDK.API.User userProfile = null;
+    MindNote.Data.User userProfile = null;
     if (User.Identity.IsAuthenticated)
     {
         userProfile = await Helpers.UserHelper.GetProfile(Context, UsersClient, IDData);

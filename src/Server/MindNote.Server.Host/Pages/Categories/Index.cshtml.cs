@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
+using MindNote.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

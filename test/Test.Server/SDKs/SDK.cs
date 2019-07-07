@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Client.SDK.API;
 using MindNote.Client.SDK.Identity;
+using MindNote.Data;
 using MindNote.Data.Providers;
 using MindNote.Server.Identity;
 using System;
