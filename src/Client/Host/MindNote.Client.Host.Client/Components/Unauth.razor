@@ -1,0 +1,8 @@
+@inject IUriHelper UriHelper
+
+@code {
+    protected override void OnInit()
+    {
+        UriHelper.NavigateTo("/account/login");
+    }
+}

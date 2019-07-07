@@ -1,0 +1,124 @@
+﻿@page "/categories"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using System.Linq
+@using MindNote.Data
+@inject IUsersClient UserClient
+@inject ICategoriesClient CategoryClient
+
+<div class="d-flex flex-row">
+    <h1>Categories</h1>
+    @if (IsAuthenticated)
+    {
+        <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+            <a href="/categories/new" class="btn btn-success"><i class="fa fa-plus"></i></a>
+        </div>
+    }
+</div>
+
+
+@if (Data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-hover" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th style="width:6%">
+                    Id
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    User
+                </th>
+                <th>
+                    Operations
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Data)
+            {
+                <tr>
+                    <td>
+                        @item.Data.Id
+                    </td>
+                    <td>
+                        <a href="/categories/@item.Data.Id">
+                            <CategoryDisplay value="@item.Data" />
+                        </a>
+                    </td>
+                    <td>
+                        @if (item.User != null)
+                        {
+                            <a>
+                                <UserDisplay value="@item.User" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Data.UserId != null && item.Data.UserId == CurrentUserId)
+                        {
+                            <div class="btn-group-sm">
+                                <a href="/categories/@item.Data.Id/edit" class="btn btn-outline-primary">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-danger" @onclick="@(async e => await OnDelete(item.Data.Id))">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    IList<CategoryViewModel> Data { get; set; }
+
+    string Token { get; set; }
+
+    string CurrentUserId { get; set; }
+
+    bool IsAuthenticated { get; set; } = false;
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            Token = UserHelper.GetAccessToken(user);
+            IsAuthenticated = true;
+            CurrentUserId = UserHelper.GetId(user);
+        }
+
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+
+        await Update();
+    }
+
+    private async Task Update()
+    {
+        var ms = await CategoryClient.GetAll(Token);
+        var data = ms.Select(x => new CategoryViewModel { Data = x }).ToList();
+        foreach (var v in data)
+            await v.Load(UserClient, Token);
+        Data = data;
+    }
+
+    private async Task OnDelete(int id)
+    {
+        await CategoryClient.Delete(Token, id);
+        await Update();
+    }
+}

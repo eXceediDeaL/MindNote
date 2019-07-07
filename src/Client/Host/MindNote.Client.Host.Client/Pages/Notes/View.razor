@@ -1,0 +1,78 @@
+﻿@page "/notes/{id:int}"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using MindNote.Data
+@inject INotesClient NoteClient
+@inject IUsersClient UserClient
+@inject ICategoriesClient CategoryClient
+@inject IUriHelper UriHelper
+
+@if (Current == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (Current.Data == null)
+    {
+        <p><em>Not found.</em></p>
+    }
+    else
+    {
+        <div class="d-flex flex-row">
+            <h1 class="display-4">@Current.Data.Title</h1>
+            @if (Current.Data.UserId != null && Current.Data.UserId == CurrentUserId)
+            {
+                <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+                    <button class="btn btn-outline-danger m-1" @onclick="@(async e => await OnDelete())"><i class="fa fa-trash"></i></button>
+                    <a href="/notes/@Id/edit" class="btn btn-outline-primary m-1"><i class="fa fa-edit"></i></a>
+                </div>
+            }
+        </div>
+        <div class="mb-4">
+            <NoteMetadataDisplay Value="@Current" />
+        </div>
+        <MarkdownViewer Value="@Current.Data.Content" />
+    }
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    private int Id { get; set; }
+
+    string CurrentUserId { get; set; }
+
+    string Token { get; set; }
+
+    NoteViewModel Current { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (user.Identity.IsAuthenticated)
+        {
+            CurrentUserId = UserHelper.GetId(user);
+            Token = UserHelper.GetAccessToken(user);
+        }
+
+        NoteClient.BaseUrl = Settings.ApiServerUrl;
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+
+        Current = new NoteViewModel { Data = await NoteClient.Get(Token, Id) };
+
+        if (Current.Data != null)
+        {
+            await Current.Load(CategoryClient, UserClient, Token);
+        }
+    }
+
+    private async Task OnDelete()
+    {
+        await NoteClient.Delete(Token, Id);
+        UriHelper.NavigateTo("/notes");
+    }
+}

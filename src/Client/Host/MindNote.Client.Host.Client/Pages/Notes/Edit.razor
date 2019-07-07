@@ -1,0 +1,64 @@
+﻿@page "/notes/{id:int}/edit"
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using System.Linq
+@using MindNote.Data
+@inject INotesClient NoteClient
+@inject IUsersClient UserClient
+@inject ICategoriesClient CategoryClient
+@inject IUriHelper UriHelper
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/notes">Notes</a></li>
+    <li class="breadcrumb-item">
+        <a href="/notes/@Id">@Id</a>
+    </li>
+    <li class="breadcrumb-item active">Edit</li>
+</ul>
+
+@if (Model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <NoteEdit Model="@Model" OnSubmit="@OnSubmit" Categories="@Categories" />
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    private int Id { get; set; }
+
+    NoteEditModel Model { get; set; }
+
+    IEnumerable<Category> Categories { get; set; }
+
+    string Token { get; set; } = null;
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+        if (!user.Identity.IsAuthenticated) return;
+
+        Token = UserHelper.GetAccessToken(user);
+
+        NoteClient.BaseUrl = Settings.ApiServerUrl;
+        CategoryClient.BaseUrl = Settings.ApiServerUrl;
+        UserClient.BaseUrl = Settings.ApiServerUrl;
+
+        Note item = await NoteClient.Get(Token, Id);
+        if (item.UserId != UserHelper.GetId(user)) return;
+        Categories = await CategoryClient.GetAll(Token);
+
+        Model = new NoteEditModel(item);
+    }
+
+    private async Task OnSubmit()
+    {
+        var id = await NoteClient.Update(Token, Id, Model.ToModel());
+        UriHelper.NavigateTo($"/notes/{id}");
+    }
+}

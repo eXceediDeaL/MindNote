@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
-WORKDIR /build
+WORKDIR /source
 
 COPY *.sln .
 COPY ./src ./src
@@ -7,7 +7,7 @@ COPY ./test ./test
 
 RUN dotnet restore
 
-RUN cd ./src/MindNote.Server.Host && dotnet publish -c Release -o /build
+RUN cd ./src/Server/MindNote.Server.Host && dotnet publish -c Release -o /build
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS runtime
 WORKDIR /app

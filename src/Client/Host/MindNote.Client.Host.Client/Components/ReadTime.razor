@@ -1,0 +1,26 @@
+<span>
+    <i class="far fa-clock"></i>
+    <span style="margin-left:5px">@Time</span>
+</span>
+
+@code {
+    const int CharPerMinute = 500;
+
+    [Parameter]
+    private string Value { get; set; }
+
+    private string Time {
+        get
+        {
+            int time = (int)Math.Round((Value?.Length ?? 0) / (double)CharPerMinute);
+            if (time <= 1)
+            {
+                return "1 minute";
+            }
+            else
+            {
+                return $"{time.ToString()} minutes";
+            }
+        }
+    }
+}

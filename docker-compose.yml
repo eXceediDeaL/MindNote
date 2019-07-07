@@ -1,5 +1,10 @@
 version: "3"
 services:
+  client:
+    build:
+      context: .
+      dockerfile: ./docker/client/Dockerfile
+    image: mindnote:client
   host:
     build:
       context: .

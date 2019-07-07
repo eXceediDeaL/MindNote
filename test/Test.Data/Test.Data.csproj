@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
-    <ProjectReference Include="..\..\src\MindNote.Data\MindNote.Data.csproj" />
+    <ProjectReference Include="..\..\src\Data\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Data\MindNote.Data\MindNote.Data.csproj" />
   </ItemGroup>
 
 </Project>

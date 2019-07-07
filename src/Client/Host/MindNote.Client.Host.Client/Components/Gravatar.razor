@@ -1,0 +1,37 @@
+@using System.Security.Cryptography
+
+<img src="@Src" class="@Class"/>
+
+@code {
+    const int CharPerMinute = 500;
+
+    [Parameter]
+    private string Class { get; set; } = null;
+
+    [Parameter]
+    private string Value { get; set; }
+
+    [Parameter]
+    private uint Size { get; set; } = 80;
+
+    [Parameter]
+    private string Default { get; set; } = "mp";
+
+    private string ComputeHash(string input)
+    {
+        MD5CryptoServiceProvider MD5 = new MD5CryptoServiceProvider();
+        byte[] inputArray = System.Text.Encoding.ASCII.GetBytes(input);
+        byte[] hashedArray = MD5.ComputeHash(inputArray);
+        MD5.Clear();
+        return BitConverter.ToString(hashedArray).Replace("-", "");
+    }
+
+    private string Src {
+        get
+        {
+            string email = Value.Trim().ToLower();
+            string src = $"https://www.gravatar.com/avatar/{ComputeHash(email).ToLower()}?size={Size}&d={Default}";
+            return src;
+        }
+    }
+}

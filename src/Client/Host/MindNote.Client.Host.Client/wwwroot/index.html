@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>MindNote</title>
+    <base href="/" />
+    <link rel="stylesheet" href="lib/twitter-bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="lib/font-awesome/css/all.css">
+    <link rel="stylesheet" href="lib/github-markdown-css/github-markdown.min.css">
+    <link rel="stylesheet" href="lib/highlight.js/styles/github.min.css">
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="lib/monaco-editor/min/vs/editor/editor.main.css">
+    <!--<link rel="stylesheet" href="~/lib/highlight.js/styles/default.min.css">-->
+    <link rel="stylesheet" href="css/site.css" />
+</head>
+<body>
+    <app>Loading...</app>
+
+    <script src="lib/jquery/jquery.js"></script>
+    <script src="lib/twitter-bootstrap/js/bootstrap.min.js"></script>
+    <script src="lib/markdown-it/markdown-it.min.js"></script>
+
+    <script src="lib/markdown-it-emoji/markdown-it-emoji.min.js"></script>
+    <script src="lib/markdown-it-abbr/dist/markdown-it-abbr.min.js"></script>
+    <script src="lib/markdown-it-container/dist/markdown-it-container.min.js"></script>
+    <script src="lib/markdown-it-deflist/dist/markdown-it-deflist.min.js"></script>
+    <script src="lib/markdown-it-ins/dist/markdown-it-ins.min.js"></script>
+    <script src="lib/markdown-it-mark/dist/markdown-it-mark.min.js"></script>
+    <script src="lib/markdown-it-sup/dist/markdown-it-sup.min.js"></script>
+    <script src="lib/markdown-it-sub/dist/markdown-it-sub.min.js"></script>
+    <script src="lib/markdown-it-footnote/markdown-it-footnote.min.js"></script>
+    <script src="lib/markdown-it-task-lists/dist/markdown-it-task-lists.min.js"></script>
+    <script src="lib/highlight.js/highlight.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+        tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+        });
+    </script>
+
+    <script src="js/site.js"></script>
+
+    <script>
+        md = window.markdownit({
+            html: true,
+            linkify: true,
+            typographer: true,
+            highlight: function (str, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return '<pre class="hljs"><code>' +
+                            hljs.highlight(lang, str, true).value +
+                            '</code></pre>';
+                    } catch (__) { }
+                }
+
+                return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+            }
+        })
+            .use(window.markdownitAbbr)
+            .use(window.markdownitContainer)
+            .use(window.markdownitDeflist)
+            .use(window.markdownitIns)
+            .use(window.markdownitMark)
+            .use(window.markdownitSup)
+            .use(window.markdownitSub)
+            .use(window.markdownitFootnote)
+            .use(window.markdownitEmoji)
+            .use(window.markdownitTaskLists);
+    </script>
+    <script>var require = { paths: { 'vs': '../lib/monaco-editor/min/vs' } }</script>
+    <script src="lib/monaco-editor/min/vs/loader.js"></script>
+    <script src="lib/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+    <script src="lib/monaco-editor/min/vs/editor/editor.main.js"></script>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>
