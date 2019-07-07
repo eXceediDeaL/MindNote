@@ -12,7 +12,7 @@ namespace MindNote.Client.SDK.API
 
         Task<int?> ClearAdjacents(string token, int nodeId);
 
-        Task<IEnumerable<Relation>> Query(string token, int? id, int? from, int? to);
+        Task<IEnumerable<Relation>> Query(string token, int? id = null, int? from = null, int? to = null);
 
         Task<Relation> Get(string token, int id);
 

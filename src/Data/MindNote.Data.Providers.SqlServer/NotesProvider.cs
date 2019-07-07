@@ -85,7 +85,7 @@ namespace MindNote.Data.Providers.SqlServer
             if (identity == null)
                 query = query.Where(x => x.Status == ItemStatus.Public);
             else
-                query = query.Where(x => x.UserId == identity);
+                query = query.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
 
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }

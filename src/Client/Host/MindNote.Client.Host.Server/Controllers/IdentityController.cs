@@ -1,10 +1,10 @@
-﻿using MindNote.Client.Host.Shared;
+﻿using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
+using MindNote.Client.Host.Shared;
 using System;
-using System.Threading.Tasks;
-using IdentityModel.Client;
-using System.Net.Http;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MindNote.Client.Host.Server.Controllers
 {
@@ -12,7 +12,7 @@ namespace MindNote.Client.Host.Server.Controllers
     [ApiController]
     public class IdentityController : Controller
     {
-        private IHttpClientFactory httpClientFactory;
+        private readonly IHttpClientFactory httpClientFactory;
 
         public IdentityController(IHttpClientFactory httpClientFactory)
         {
@@ -22,7 +22,7 @@ namespace MindNote.Client.Host.Server.Controllers
         [HttpPost("[action]")]
         public async Task<IdentityData> Login([FromBody] LoginRequest request)
         {
-            using (var client = httpClientFactory.CreateClient())
+            using (HttpClient client = httpClientFactory.CreateClient())
             {
                 DiscoveryResponse disco = await client.GetDiscoveryDocumentAsync(Utils.Linked.Identity);
                 if (disco.IsError)
@@ -47,14 +47,16 @@ namespace MindNote.Client.Host.Server.Controllers
                 }
 
                 string token = tokenResponse.Json["access_token"].ToString();
-                var handler = new JwtSecurityTokenHandler();
-                var jwt = handler.ReadJwtToken(token);
-                var expireTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(Utils.GetClaim(jwt.Claims, "exp")));
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken jwt = handler.ReadJwtToken(token);
+                DateTimeOffset expireTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(Utils.GetClaim(jwt.Claims, "exp")));
 
                 return new IdentityData
                 {
                     UserId = jwt.Subject,
                     AccessToken = token,
+                    Name = Utils.GetClaim(jwt.Claims, "name"),
+                    Email = Utils.GetClaim(jwt.Claims, "email"),
                     ExpiresAt = expireTime
                 };
             }

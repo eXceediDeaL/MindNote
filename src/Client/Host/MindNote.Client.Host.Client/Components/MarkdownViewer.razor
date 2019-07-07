@@ -6,12 +6,18 @@
 
 @code {
     [Parameter]
-    private string Value { get; set; }
+    private string Value { get; set; } = "";
 
     private ElementRef markdownContent;
 
     protected override async Task OnAfterRenderAsync()
     {
-        await JSRuntime.InvokeAsync<object>("update_markdown", markdownContent, Value);
+        await Render(Value);
+    }
+
+    public async Task Render(string value)
+    {
+        Value = value;
+        await JSRuntime.InvokeAsync<object>("renderMarkdown", markdownContent, Value);
     }
 }

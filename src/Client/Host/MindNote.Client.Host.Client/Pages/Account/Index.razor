@@ -16,9 +16,9 @@
 }
 else
 {
-    <div class="d-flex flex-row">
-        <Gravatar Class="rounded" Value="@Current.Email" Size="200"/>
-        <div class="d-flex flex-column ml-4">
+    <div class="media">
+        <Gravatar Class="rounded" Value="@Current.Email" Size="200" />
+        <div class="media-body ml-4">
             <h3>@Current.Name</h3>
             <h5 class="text-muted">@Current.Email</h5>
             @if (!String.IsNullOrEmpty(Current.Bio))
@@ -37,7 +37,6 @@ else
                     <dd><a href="@Current.Url">@Current.Url</a></dd>
                 }
             </dl>
-            
         </div>
     </div>
 }
@@ -48,17 +47,21 @@ else
 }
 else
 {
-    <NoteListWaterfall Data="@Notes" Column="1"/>
+    <NoteListWaterfall Data="@Notes" Paging="@Paging" OnQueryPaging="@OnQueryPaging" />
 }
 
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    
-    [Parameter]
-    private string Id {get;set;} = null;
 
-    User Current {get;set;}
+    [Parameter]
+    private string Id { get; set; } = null;
+
+    User Current { get; set; }
+
+    PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
+
+    string Token { get; set; } = null;
 
     IList<NoteViewModel> Notes { get; set; }
 
@@ -77,9 +80,9 @@ else
         CategoryClient.BaseUrl = Settings.ApiServerUrl;
         UserClient.BaseUrl = Settings.ApiServerUrl;
 
-        if(Id == null)
+        if (Id == null)
         {
-            if(!user.Identity.IsAuthenticated)
+            if (!user.Identity.IsAuthenticated)
             {
                 UriHelper.NavigateTo("/account/login");
                 return;
@@ -87,21 +90,33 @@ else
             Id = UserHelper.GetId(user);
         }
 
-        string token = null;
-        if(user.Identity.IsAuthenticated)
-            token = UserHelper.GetAccessToken(user);
-        
+        if (user.Identity.IsAuthenticated)
+            Token = UserHelper.GetAccessToken(user);
+
         {
-            Current = await UserClient.Get(token, Id);
+            Current = await UserClient.Get(Token, Id);
         }
 
-        if(Current != null)
+        if (Current != null)
         {
-            var ms = await NoteClient.Query(token, null, null, null, null, null, null, null, null, Current.Id);
-            var data = ms.Select(x => new NoteViewModel{Data = x}).ToList();
-            foreach(var v in data)
-                await v.Load(CategoryClient, UserClient, token);
-            Notes = data;
+            int count = (await NoteClient.Query(Token, userId: Current.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+            Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
+            Paging.CurrentIndex = 1;
+            await OnQueryPaging(Paging.CurrentIndex);
         }
+    }
+
+    private async Task OnQueryPaging(int pageIndex)
+    {
+        if (Current == null) return;
+
+        Paging.CurrentIndex = pageIndex;
+        int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
+
+        IEnumerable<Note> ms = await NoteClient.Query(Token, userId: Current.Id, offset: offset, count: Paging.ItemCountPerPage);
+        var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
+        foreach (var v in data)
+            await v.Load(CategoryClient, UserClient, Token);
+        Notes = data;
     }
 }

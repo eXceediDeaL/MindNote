@@ -9,7 +9,7 @@ namespace MindNote.Client.SDK.API
     {
         Task<IEnumerable<Category>> GetAll(string token);
 
-        Task<IEnumerable<Category>> Query(string token, int? id, string name, string color, string userId);
+        Task<IEnumerable<Category>> Query(string token, int? id = null, string name = null, string color = null, string userId = null);
 
         Task<Category> Get(string token, int id);
 

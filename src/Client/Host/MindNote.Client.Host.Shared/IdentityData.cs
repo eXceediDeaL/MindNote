@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MindNote.Client.Host.Shared
 {
@@ -11,5 +9,9 @@ namespace MindNote.Client.Host.Shared
         public string AccessToken { get; set; }
 
         public DateTimeOffset ExpiresAt { get; set; }
+
+        public string Email { get; set; }
+
+        public string Name { get; set; }
     }
 }

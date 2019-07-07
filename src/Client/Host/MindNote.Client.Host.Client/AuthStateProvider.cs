@@ -10,9 +10,9 @@ namespace MindNote.Client.Host.Client
 {
     public class AuthStateProvider : AuthenticationStateProvider
     {
-        static IdentityData Identity { get; set; }
+        private static IdentityData Identity { get; set; }
 
-        HttpClient http;
+        private readonly HttpClient http;
 
         public AuthStateProvider(HttpClient http)
         {
@@ -25,7 +25,7 @@ namespace MindNote.Client.Host.Client
             {
                 return false;
             }
-            var id = await HostServer.Login(http, name, password);
+            IdentityData id = await HostServer.Login(http, name, password);
             if (id == null)
             {
                 return false;
@@ -49,22 +49,22 @@ namespace MindNote.Client.Host.Client
             ClaimsIdentity id;
             if (Identity == null)
             {
-                Console.WriteLine("Unauth");
                 id = new ClaimsIdentity(Array.Empty<Claim>(), null);
             }
             else
             {
-                Console.WriteLine("Auth");
                 id = new ClaimsIdentity(
-                    new [] {
+                    new[] {
                         new Claim("id", Identity.UserId),
+                        new Claim("name", Identity.Name),
+                        new Claim("email", Identity.Email),
                         new Claim("access_token", Identity.AccessToken),
                         new Claim("expires_at", Identity.ExpiresAt.ToFileTime().ToString()),
                     }
                     , "Host");
             }
 
-            var user = new ClaimsPrincipal(id);
+            ClaimsPrincipal user = new ClaimsPrincipal(id);
 
             return Task.FromResult(new AuthenticationState(user));
         }

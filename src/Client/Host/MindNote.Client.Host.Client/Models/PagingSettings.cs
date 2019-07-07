@@ -13,8 +13,16 @@ namespace MindNote.Client.Host.Client.Models
             get => currentIndex;
             set
             {
-                if (value <= 0) value = 1;
-                if (value > MaximumIndex) value = MaximumIndex;
+                if (value <= 0)
+                {
+                    value = 1;
+                }
+
+                if (value > MaximumIndex)
+                {
+                    value = MaximumIndex;
+                }
+
                 currentIndex = value;
             }
         }

@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using MindNote.Client.SDK.API;
+using System.Threading.Tasks;
 
 namespace MindNote.Client.Host.Client.Models
 {

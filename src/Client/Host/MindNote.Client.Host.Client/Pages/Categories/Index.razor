@@ -5,7 +5,16 @@
 @inject IUsersClient UserClient
 @inject ICategoriesClient CategoryClient
 
-<h1>Categories</h1>
+<div class="d-flex flex-row">
+    <h1>Categories</h1>
+    @if (IsAuthenticated)
+    {
+        <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+            <a href="/categories/new" class="btn btn-success"><i class="fa fa-plus"></i></a>
+        </div>
+    }
+</div>
+
 
 @if (Data == null)
 {
@@ -25,6 +34,9 @@ else
                 <th>
                     User
                 </th>
+                <th>
+                    Operations
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -35,14 +47,30 @@ else
                         @item.Data.Id
                     </td>
                     <td>
-                        <a href="@item.Data.Id">
+                        <a href="/categories/@item.Data.Id">
                             <CategoryDisplay value="@item.Data" />
                         </a>
                     </td>
                     <td>
-                        <a>
-                            <UserDisplay value="@item.User" />
-                        </a>
+                        @if (item.User != null)
+                        {
+                            <a>
+                                <UserDisplay value="@item.User" />
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Data.UserId != null && item.Data.UserId == CurrentUserId)
+                        {
+                            <div class="btn-group-sm">
+                                <a href="/categories/@item.Data.Id/edit" class="btn btn-outline-primary">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-danger" @onclick="@(async e => await OnDelete(item.Data.Id))">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        }
                     </td>
                 </tr>
             }
@@ -53,23 +81,43 @@ else
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    
+
     IList<CategoryViewModel> Data { get; set; }
+
+    string Token { get; set; }
+
+    string CurrentUserId { get; set; }
+
+    bool IsAuthenticated { get; set; } = false;
 
     protected override async Task OnInitAsync()
     {
         var user = (await authenticationStateTask).User;
-        string token = null;
-        if(user.Identity.IsAuthenticated)
-            token = UserHelper.GetAccessToken(user);
+        if (user.Identity.IsAuthenticated)
+        {
+            Token = UserHelper.GetAccessToken(user);
+            IsAuthenticated = true;
+            CurrentUserId = UserHelper.GetId(user);
+        }
 
         CategoryClient.BaseUrl = Settings.ApiServerUrl;
         UserClient.BaseUrl = Settings.ApiServerUrl;
-        
-        var ms = await CategoryClient.GetAll(token);
-        var data = ms.Select(x => new CategoryViewModel{Data = x}).ToList();
-        foreach(var v in data)
-            await v.Load(UserClient, token);
+
+        await Update();
+    }
+
+    private async Task Update()
+    {
+        var ms = await CategoryClient.GetAll(Token);
+        var data = ms.Select(x => new CategoryViewModel { Data = x }).ToList();
+        foreach (var v in data)
+            await v.Load(UserClient, Token);
         Data = data;
+    }
+
+    private async Task OnDelete(int id)
+    {
+        await CategoryClient.Delete(Token, id);
+        await Update();
     }
 }

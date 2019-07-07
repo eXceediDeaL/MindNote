@@ -23,7 +23,7 @@ namespace MindNote.Server.Identity
         {
             return new List<ApiResource>
             {
-                new ApiResource(APIScope, "MindNote API", new string[]{ JwtClaimTypes.Profile, JwtClaimTypes.Id })
+                new ApiResource(APIScope, "MindNote API", new string[]{ JwtClaimTypes.Profile, JwtClaimTypes.Id, JwtClaimTypes.Email, JwtClaimTypes.Name })
             };
         }
 

@@ -8,7 +8,7 @@ namespace MindNote.Client.SDK.API
     {
         Task<IEnumerable<Note>> GetAll(string token);
 
-        Task<IEnumerable<Note>> Query(string token, int? id, string name, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId);
+        Task<IEnumerable<Note>> Query(string token, int? id = null, string name = null, string content = null, int? categoryId = null, string keyword = null, int? offset = null, int? count = null, string targets = null, string userId = null);
 
         Task<Note> Get(string token, int id);
 

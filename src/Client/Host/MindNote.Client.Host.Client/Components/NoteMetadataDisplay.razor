@@ -1,14 +1,15 @@
-@if(Value != null){
+@if (Value != null)
+{
     <div style="color:#999">
         <small>
-            <ItemTime CreationTime="@Value.Data.CreationTime" ModificationTime="@Value.Data.ModificationTime"/>
+            <ItemTime CreationTime="@Value.Data.CreationTime" ModificationTime="@Value.Data.ModificationTime" />
         </small>
         @if (Value.Category != null)
         {
             <small class="m-1">|</small>
             <small>
                 <a href="/categories/@Value.Category.Id" style="color: #555;">
-                    <CategoryDisplay Value="@Value.Category"/>
+                    <CategoryDisplay Value="@Value.Category" />
                 </a>
             </small>
         }
@@ -16,26 +17,29 @@
         {
             <small class="m-1">|</small>
             <small>
-                <KeywordsDisplay Value="@Value.Data.Keywords"/>
+                <KeywordsDisplay Value="@Value.Data.Keywords" />
             </small>
         }
         @if (Value.Data.Content != null)
         {
             <small class="m-1">|</small>
             <small>
-                <WordCount Value="@Value.Data.Content"/>
+                <WordCount Value="@Value.Data.Content" />
             </small>
             <small class="m-1">|</small>
             <small>
-                <ReadTime Value="@Value.Data.Content"/>
+                <ReadTime Value="@Value.Data.Content" />
             </small>
         }
-        <small class="m-1">|</small>
-        <small>
-            <a href="/account/@Value.User.Id" style="color: #555;">
-                <UserDisplay Value="@Value.User"/>
-            </a>
-        </small>
+        @if (Value.User != null)
+        {
+            <small class="m-1">|</small>
+            <small>
+                <a href="/account/@Value.User.Id" style="color: #555;">
+                    <UserDisplay Value="@Value.User" />
+                </a>
+            </small>
+        }
     </div>
 }
 

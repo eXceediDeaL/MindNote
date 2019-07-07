@@ -5,29 +5,43 @@
 @inject INotesClient NoteClient
 @inject IUsersClient UserClient
 @inject ICategoriesClient CategoryClient
+@inject IUriHelper UriHelper
 
-@if(Current == null)
+@if (Current == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    @if(Current.Data == null)
+    @if (Current.Data == null)
     {
         <p><em>Not found.</em></p>
     }
     else
     {
-        <h1>
-            <CategoryDisplay value="@Current.Data" />
-        </h1>
-        <div>
-            <small>
-                <a href="/account/@Current.User.Id" style="color: #555;">
-                    <UserDisplay Value="@Current.User"/>
-                </a>
-            </small>
+        <div class="d-flex flex-row">
+            <h1>
+                <CategoryDisplay value="@Current.Data" />
+            </h1>
+            @if (Current.Data.UserId != null && Current.Data.UserId == CurrentUserId)
+            {
+                <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+                    <button class="btn btn-outline-danger m-1" @onclick="@(async e => await OnDelete())"><i class="fa fa-trash"></i></button>
+                    <a href="/categories/@Id/edit" class="btn btn-outline-primary m-1"><i class="fa fa-edit"></i></a>
+                </div>
+            }
         </div>
+
+        @if (Current.User != null)
+        {
+            <div class="mb-4">
+                <small>
+                    <a href="/account/@Current.User.Id" style="color: #555;">
+                        <UserDisplay Value="@Current.User" />
+                    </a>
+                </small>
+            </div>
+        }
     }
 }
 
@@ -37,44 +51,71 @@ else
 }
 else
 {
-    <NoteListWaterfall Data="@Notes"/>
+    <NoteListWaterfall Data="@Notes" Paging="@Paging" OnQueryPaging="@OnQueryPaging" />
 }
 
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    
-    [Parameter]
-    private int Id {get;set;}
 
-    CategoryViewModel Current {get;set;}
+    [Parameter]
+    private int Id { get; set; }
+
+    string CurrentUserId { get; set; }
+
+    string Token { get; set; }
+
+    CategoryViewModel Current { get; set; }
+
+    PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
 
     IList<NoteViewModel> Notes { get; set; }
 
     protected override async Task OnInitAsync()
     {
         var user = (await authenticationStateTask).User;
-        string token = null;
-        if(user.Identity.IsAuthenticated)
-            token = UserHelper.GetAccessToken(user);
+        if (user.Identity.IsAuthenticated)
+        {
+            Token = UserHelper.GetAccessToken(user);
+            CurrentUserId = UserHelper.GetId(user);
+        }
 
         NoteClient.BaseUrl = Settings.ApiServerUrl;
         CategoryClient.BaseUrl = Settings.ApiServerUrl;
         UserClient.BaseUrl = Settings.ApiServerUrl;
-        
+
         {
-            Current = new CategoryViewModel { Data = await CategoryClient.Get(token, Id) };
+            Current = new CategoryViewModel { Data = await CategoryClient.Get(Token, Id) };
         }
 
-        if(Current?.Data != null)
+        if (Current?.Data != null)
         {
-            await Current.Load(UserClient, token);
+            await Current.Load(UserClient, Token);
 
-            var ms = await NoteClient.Query(token, null, null, null, Current.Data.Id, null, null, null, null, null);
-            var data = ms.Select(x => new NoteViewModel{Data = x}).ToList();
-            foreach(var v in data)
-                await v.Load(CategoryClient, UserClient, token);
-            Notes = data;
+            int count = (await NoteClient.Query(Token, categoryId: Current.Data.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+            Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
+
+            await OnQueryPaging(Paging.CurrentIndex);
         }
+    }
+
+    private async Task OnQueryPaging(int pageIndex)
+    {
+        if (Current?.Data == null) return;
+
+        Paging.CurrentIndex = pageIndex;
+        int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
+
+        IEnumerable<Note> ms = await NoteClient.Query(Token, categoryId: Current.Data.Id, offset: offset, count: Paging.ItemCountPerPage);
+        var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
+        foreach (var v in data)
+            await v.Load(CategoryClient, UserClient, Token);
+        Notes = data;
+    }
+
+    private async Task OnDelete()
+    {
+        await CategoryClient.Delete(Token, Id);
+        UriHelper.NavigateTo("/categories");
     }
 }

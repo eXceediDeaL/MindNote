@@ -17,9 +17,20 @@ namespace MindNote.Client.Host.Client.Helpers
             return GetClaim(user.Claims, "id");
         }
 
+        public static string GetEmail(ClaimsPrincipal user)
+        {
+            return GetClaim(user.Claims, "email");
+        }
+
+        public static string GetName(ClaimsPrincipal user)
+        {
+            return GetClaim(user.Claims, "name");
+        }
+
         public static string GetAccessToken(ClaimsPrincipal user)
         {
-            return GetClaim(user.Claims, "access_token");
+            var res = GetClaim(user.Claims, "access_token");
+            return res;
         }
 
         public static DateTimeOffset GetAccessTokenExpiresAt(ClaimsPrincipal user)

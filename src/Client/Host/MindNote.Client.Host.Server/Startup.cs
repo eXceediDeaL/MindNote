@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MindNote.Client.SDK.API;
-using Newtonsoft.Json.Serialization;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 
@@ -20,7 +17,10 @@ namespace MindNote.Client.Host.Server
 
         public string Host { get; set; }
 
-        public static LinkedServerConfiguration Load(IConfiguration configuration) => configuration?.GetSection("server")?.Get<LinkedServerConfiguration>();
+        public static LinkedServerConfiguration Load(IConfiguration configuration)
+        {
+            return configuration?.GetSection("server")?.Get<LinkedServerConfiguration>();
+        }
     }
 
     public class IdentityClientConfiguration
@@ -29,7 +29,10 @@ namespace MindNote.Client.Host.Server
 
         public string ClientSecret { get; set; }
 
-        public static IdentityClientConfiguration Load(IConfiguration configuration) => configuration?.GetSection("identityClient")?.Get<IdentityClientConfiguration>();
+        public static IdentityClientConfiguration Load(IConfiguration configuration)
+        {
+            return configuration?.GetSection("identityClient")?.Get<IdentityClientConfiguration>();
+        }
     }
 
     public class Startup

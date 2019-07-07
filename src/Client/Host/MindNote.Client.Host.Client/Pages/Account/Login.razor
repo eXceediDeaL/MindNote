@@ -1,6 +1,6 @@
 @page "/account/login"
-
-@inject HttpClient Http
+@using MindNote.Client.SDK.API
+@inject IUsersClient UserClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -19,7 +19,7 @@
 
     <div class="form-group">
         <label class="control-label">Password</label>
-        <InputText class="form-control" @bind-Value="@Model.Password" type="password"/>
+        <InputText class="form-control" @bind-Value="@Model.Password" type="password" />
     </div>
 
     <div class="form-group">
@@ -30,15 +30,18 @@
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    
+
     private LoginModel Model = new LoginModel();
 
-    string Message {get; set;}
+    string Message { get; set; }
 
     protected override async Task OnInitAsync()
     {
+        var auth = (AuthStateProvider)AuthenticationStateProvider;
+        await auth.Login("stardustdl@163.com", "Z7hp0Gh&");
+
         var user = (await authenticationStateTask).User;
-        if(user.Identity.IsAuthenticated)
+        if (user.Identity.IsAuthenticated)
         {
             UriHelper.NavigateTo("/account");
         }
@@ -47,8 +50,20 @@
     private async Task LoginAsync()
     {
         var auth = (AuthStateProvider)AuthenticationStateProvider;
-        if(await auth.Login(Model.Name, Model.Password))
+        if (await auth.Login(Model.Name, Model.Password))
         {
+            var user = (await authenticationStateTask).User;
+            var token = UserHelper.GetAccessToken(user);
+            var id = UserHelper.GetId(user);
+            var profile = await UserClient.Get(token, id);
+            if (profile == null)
+            {
+                await UserClient.Create(token, id, new User
+                {
+                    Name = UserHelper.GetName(user),
+                    Email = UserHelper.GetEmail(user)
+                });
+            }
             UriHelper.NavigateTo("/account");
         }
         else

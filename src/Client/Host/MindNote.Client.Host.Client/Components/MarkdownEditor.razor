@@ -1,0 +1,41 @@
+@inject IJSRuntime JSRuntime
+
+<div @ref="codeEditor" class="p-2" style="width:50%"></div>
+<div id="mdViewer" class="p-4" style="width:50%">
+    <MarkdownViewer Value="@Value" @ref="Viewer"></MarkdownViewer>
+</div>
+
+@code {
+    [Parameter]
+    private string Value { get; set; }
+
+    private ElementRef codeEditor;
+
+    MarkdownViewer Viewer;
+
+    [JSInvokable]
+    public string GetValue()
+    {
+        Console.WriteLine("GetValue");
+        return Value;
+    }
+
+    [JSInvokable]
+    public async Task SetValue(string value)
+    {
+        Console.WriteLine("SetValue");
+        Value = value;
+        await Viewer.Render(Value);
+    }
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        await JSRuntime.InvokeAsync<object>("createCodeEditor", codeEditor, DotNetObjectRef.Create(this));
+    }
+
+    // Disable auto update
+    protected override bool ShouldRender()
+    {
+        return false;
+    }
+}

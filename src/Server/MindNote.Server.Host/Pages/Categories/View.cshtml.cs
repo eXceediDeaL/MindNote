@@ -69,13 +69,13 @@ namespace MindNote.Server.Host.Pages.Categories
                 };
                 IEnumerable<Note> notes;
                 {
-                    int count = (await nodesClient.Query(token, null, null, null, Data.Data.Id, null, null, null, NoteTargets.Count, null)).Count();
+                    int count = (await nodesClient.Query(token, categoryId: Data.Data.Id, targets: NoteTargets.Count)).Count();
                     Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
                     if (!pageIndex.HasValue) pageIndex = 1;
                     Paging.CurrentIndex = pageIndex.Value;
                     int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-                    notes = await nodesClient.Query(token, null, null, null, Data.Data.Id, null, offset, Paging.ItemCountPerPage, null, null);
+                    notes = await nodesClient.Query(token, categoryId: Data.Data.Id, offset: offset, count: Paging.ItemCountPerPage);
                     Notes = notes.ToList();
                 }
                 /*{

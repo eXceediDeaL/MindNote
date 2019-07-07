@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Client.Host.Client.Helpers;
 using MindNote.Client.SDK.API;
-using System;
-using System.Net.Http;
 
 namespace MindNote.Client.Host.Client
 {

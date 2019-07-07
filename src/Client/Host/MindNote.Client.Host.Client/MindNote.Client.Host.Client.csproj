@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SDK\MindNote.Client.SDK.API\MindNote.Client.SDK.API.csproj" />
+    <ProjectReference Include="..\..\..\Data\MindNote.Data\MindNote.Data.csproj" />
     <ProjectReference Include="..\MindNote.Client.Host.Shared\MindNote.Client.Host.Shared.csproj" />
   </ItemGroup>
 
