@@ -6,7 +6,7 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "http://id.mindnote.com"
+        "Identity": "{ServerIdentity}"
     },
     "db": {
         "ConnectionString": "server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;",
@@ -14,6 +14,6 @@
     },
     "identityClient": {
         "ClientId": "server.api",
-        "ClientSecret": "secret"
+        "ClientSecret": "{SecretServerApi}"
     }
 }

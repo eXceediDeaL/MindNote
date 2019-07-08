@@ -6,11 +6,11 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "http://id.mindnote.com",
-        "Api": "http://api.mindnote.com"
+        "Identity": "{ServerIdentity}",
+        "Api": "{ServerApi}"
     },
     "identityClient": {
         "ClientId": "client.host",
-        "ClientSecret": "secret"
+        "ClientSecret": "{SecretClientHost}"
     }
 }

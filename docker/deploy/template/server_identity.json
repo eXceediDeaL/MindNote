@@ -6,7 +6,7 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "http://id.mindnote.com"
+        "Identity": "{ServerIdentity}"
     },
     "db": {
         "ConnectionString": "server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mniddb;",
@@ -21,7 +21,7 @@
                 "ClientSecrets": [
                     {
                         "Description": null,
-                        "Value": "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=", // "secret".Sha256()
+                        "Value": "{EncodedSecretServerHost}",
                         "Expiration": null,
                         "Type": "SharedSecret"
                     }
@@ -40,10 +40,10 @@
                 "AllowPlainTextPkce": false,
                 "AllowAccessTokensViaBrowser": false,
                 "RedirectUris": [
-                    "http://mindnote.com/signin-oidc"
+                    "{ServerHost}/signin-oidc"
                 ],
                 "PostLogoutRedirectUris": [
-                    "http://mindnote.com/signout-callback-oidc"
+                    "{ServerHost}/signout-callback-oidc"
                 ],
                 "FrontChannelLogoutUri": null,
                 "FrontChannelLogoutSessionRequired": true,
@@ -79,7 +79,7 @@
                 "UserCodeType": null,
                 "DeviceCodeLifetime": 300,
                 "AllowedCorsOrigins": [
-                    "http://mindnote.com"
+                    "{ServerHost}"
                 ],
                 "Properties": {}
             },
@@ -90,7 +90,7 @@
                 "ClientSecrets": [
                     {
                         "Description": null,
-                        "Value": "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=", // "secret".Sha256()
+                        "Value": "{EncodedSecretServerApi}",
                         "Expiration": null,
                         "Type": "SharedSecret"
                     }
@@ -149,7 +149,7 @@
                 "ClientSecrets": [
                     {
                         "Description": null,
-                        "Value": "K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=", // "secret".Sha256()
+                        "Value": "{EncodedSecretClientHost}",
                         "Expiration": null,
                         "Type": "SharedSecret"
                     }
