@@ -1,0 +1,55 @@
+﻿@page "/notes"
+@using MindNote.Frontend.Client.Shared
+@using MindNote.Frontend.SDK.API
+@using System.Linq
+@using MindNote.Data
+@inject CustomNotesClient NoteClient
+@inject CustomUsersClient UserClient
+@inject CustomCategoriesClient CategoryClient
+
+<div class="d-flex flex-row">
+    <h1>Notes</h1>
+    <AuthorizeView>
+        <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+            <a href="notes/new" class="btn btn-success"><i class="fa fa-plus"></i></a>
+        </div>
+    </AuthorizeView>
+</div>
+
+@if (Data == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <NoteListWaterfall Data="@Data" Column="1" Paging="@Paging" OnQueryPaging="@OnQueryPaging" />
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
+
+    IList<NoteViewModel> Data { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        int count = (await NoteClient.Query(targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+        Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
+        Paging.CurrentIndex = 1;
+        await OnQueryPaging(Paging.CurrentIndex);
+    }
+
+    private async Task OnQueryPaging(int pageIndex)
+    {
+        Paging.CurrentIndex = pageIndex;
+        int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
+
+        IEnumerable<Note> ms = await NoteClient.Query(offset: offset, count: Paging.ItemCountPerPage);
+        var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
+        foreach (var v in data)
+            await v.Load(CategoryClient, UserClient);
+        Data = data;
+    }
+}

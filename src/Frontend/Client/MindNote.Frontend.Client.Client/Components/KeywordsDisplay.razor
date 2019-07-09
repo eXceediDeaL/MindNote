@@ -1,0 +1,11 @@
+@if(Value != null && Value.Count != 0){
+    <span>
+        <i class="fa @(Value.Count == 1 ? "fa-tag" : "fa-tags")"></i>
+        <span style="margin-left:5px">@string.Join(" ; ", Value)</span>
+    </span>
+}
+
+@code {
+    [Parameter]
+    private ICollection<string> Value { get; set; }
+}

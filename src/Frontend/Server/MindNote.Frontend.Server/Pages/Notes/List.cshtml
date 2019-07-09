@@ -1,0 +1,94 @@
+﻿@page
+@model MindNote.Frontend.Server.Pages.Notes.ListModel
+@{
+    ViewData["Title"] = "Notes";
+    ViewData["Id"] = "Notes";
+}
+
+<div class="text-center" style="width:100%">
+    <form method="post" class="form-inline" style="display:inline-flex">
+        <input class="form-control" asp-for="PostData.QueryId" style="margin-left:10px; width:100px" placeholder="Id" />
+        <input class="form-control" asp-for="PostData.QueryTitle" style="margin-left:10px; width:150px" placeholder="Title" />
+        <input class="form-control" asp-for="PostData.QueryContent" style="margin-left:10px; width:150px" placeholder="Content" />
+        <select class="form-control" asp-for="PostData.QueryCategoryId" asp-items="Model.CategorySelector" style="margin-left:10px; width:150px"></select>
+        <input class="form-control" asp-for="PostData.QueryKeyword" style="margin-left:10px; width:150px" placeholder="Keyword" />
+        <button type="submit" asp-page-handler="Query" class="btn btn-outline-dark" style="margin-left:10px">
+            <i class="fa fa-search"></i>
+        </button>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a asp-page="./Edit" class="btn btn-outline-success" style="margin-left:10px">
+                <i class="fa fa-plus"></i>
+            </a>
+        }
+    </form>
+</div>
+
+<div style="margin-top:10px;">
+    <table class="table table-hover" style="table-layout:fixed;">
+        <thead>
+            <tr>
+                <th style="width:6%">
+                    Id
+                </th>
+                <th style="width:10%">
+                    Name
+                </th>
+                <th style="width:15%">
+                    Category
+                </th>
+                <th style="width:15%">
+                    Keywords
+                </th>
+                <th style="width:10%">
+                    Operations
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td>
+                        @item.Data.Id
+                    </td>
+                    <td style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <a asp-page="./View" asp-route-id="@item.Data.Id">@item.Data.Title</a>
+                    </td>
+                    <td>
+                        @if (item.Category != null)
+                        {
+                            <a asp-page="/Categories/View" asp-route-id="@item.Category.Id">
+                                <category-display value="@item.Category"></category-display>
+                            </a>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Data.Keywords != null)
+                        {
+                            @(string.Join(';', item.Data.Keywords))
+                        }
+                    </td>
+                    <td>
+                        <div class="row" style="margin-left:0px">
+                            <form method="post" style="margin-left:0px">
+                                <input type="hidden" asp-for="PostData.Data.Id" value="@item.Data.Id" />
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="btn-group-sm">
+                                        <a asp-page="./Edit" asp-route-id="@item.Data.Id" class="btn btn-outline-primary">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <button asp-page-handler="Delete" asp-route-id="@item.Data.Id" class="btn btn-outline-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

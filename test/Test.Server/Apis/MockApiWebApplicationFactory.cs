@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Client.SDK.Identity;
+using MindNote.Frontend.SDK.Identity;
 using MindNote.Data.Providers;
-using MindNote.Server.API;
+using MindNote.Backend.API;
 
 namespace Test.Server.Apis
 {
-    public class MockApiWebApplicationFactory : WebApplicationFactory<MindNote.Server.API.Startup>
+    public class MockApiWebApplicationFactory : WebApplicationFactory<MindNote.Backend.API.Startup>
     {
         private readonly IDataProvider dataProvider;
         private readonly TestServer idServer;

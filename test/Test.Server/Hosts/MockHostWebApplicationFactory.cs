@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Client.SDK.API;
-using MindNote.Client.SDK.Identity;
-using MindNote.Server.Host;
+using MindNote.Frontend.SDK.API;
+using MindNote.Frontend.SDK.Identity;
+using MindNote.Frontend.Server;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Test.Server.Hosts
 {
-    public class MockHostWebApplicationFactory<TApi> : WebApplicationFactory<MindNote.Server.Host.Startup> where TApi : class
+    public class MockHostWebApplicationFactory<TApi> : WebApplicationFactory<MindNote.Frontend.Server.Startup> where TApi : class
     {
         private readonly WebApplicationFactory<TApi> apiServer;
         private readonly IIdentityDataGetter idData;
@@ -44,9 +44,10 @@ namespace Test.Server.Hosts
 
                 // Mock Clients
                 services.AddSingleton<IIdentityDataGetter>(idData);
-                services.AddSingleton<INodesClient, NodesClient>(x => new NodesClient(apiServer.CreateClient()));
-                services.AddSingleton<ITagsClient, TagsClient>(x => new TagsClient(apiServer.CreateClient()));
+                services.AddSingleton<INotesClient, NotesClient>(x => new NotesClient(apiServer.CreateClient()));
+                services.AddSingleton<ICategoriesClient, CategoriesClient>(x => new CategoriesClient(apiServer.CreateClient()));
                 services.AddSingleton<IRelationsClient, RelationsClient>(x => new RelationsClient(apiServer.CreateClient()));
+                services.AddSingleton<IUsersClient, UsersClient>(x => new UsersClient(apiServer.CreateClient()));
 
                 Startup.ConfigureFinalServices(null, services);
             });

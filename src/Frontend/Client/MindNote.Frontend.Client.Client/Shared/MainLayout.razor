@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="content px-4">
+        @if (Settings.ApiServerUrl == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            @Body
+        }
+    </div>
+</div>

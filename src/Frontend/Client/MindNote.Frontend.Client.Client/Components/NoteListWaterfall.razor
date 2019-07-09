@@ -1,0 +1,83 @@
+@using MindNote.Frontend.SDK.API
+@using MindNote.Data
+
+@inject CustomNotesClient NoteClient
+
+<div class="card-columns @(!Column.HasValue ? "waterfall-card-columns" : "")" style="@(Column.HasValue ? $"column-count: {Column.Value}" : "")">
+    @foreach (var item in Data)
+    {
+        <div class="card border-0">
+            <div class="card-body">
+                <div class="card-title d-flex flex-row mb-1">
+                    <h4>
+                        <a href="notes/@item.Data.Id" style="color:black">@item.Data.Title</a>
+                    </h4>
+                    <AuthorizeView>
+                        @if (item.Data.UserId != null && item.Data.UserId == UserHelper.GetId(context.User))
+                        {
+                            <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+                                <button class="btn btn-sm btn-outline-danger m-1" @onclick="@(async e => await OnDelete(item.Data.Id))"><i class="fa fa-trash"></i></button>
+                                <a href="notes/@item.Data.Id/edit" class="btn btn-sm btn-outline-primary m-1"><i class="fa fa-edit"></i></a>
+                            </div>
+                        }
+                    </AuthorizeView>
+                </div>
+
+                <div class="card-subtitle mb-2">
+                    <NoteMetadataDisplay Value="@item" />
+                </div>
+
+                <p class="card-text mb-1">
+                    <TextClipper value="@item.Data.Content" />
+                </p>
+                <a href="notes/@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Paging != null)
+{
+    <div class="text-center">
+        <ul class="pagination" style="display:inline-flex">
+            @if (Paging.CurrentIndex > 1)
+            {
+                <li class="page-item"><a class="page-link"><i class="fa fa-angle-left"></i></a></li>
+            }
+            @for (int i = Math.Max(1, Paging.CurrentIndex - 5); i <= Math.Min(Paging.CurrentIndex + 5, Paging.MaximumIndex); i++)
+            {
+                var ti = i;
+                <li class="page-item @(ti == Paging.CurrentIndex ? "active" : "")"><button class="page-link" @onclick="@(async e=>await ClickPage(ti))">@i</button></li>
+            }
+            @if (Paging.CurrentIndex < Paging.MaximumIndex)
+            {
+                <li class="page-item"><a class="page-link"><i class="fa fa-angle-right"></i></a></li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    private IList<NoteViewModel> Data { get; set; } = null;
+
+    [Parameter]
+    private PagingSettings Paging { get; set; } = null;
+
+    [Parameter]
+    private int? Column { get; set; } = null;
+
+    [Parameter]
+    private EventCallback<int> OnQueryPaging { get; set; }
+
+    private async Task ClickPage(int pageIndex)
+    {
+        await OnQueryPaging.InvokeAsync(pageIndex);
+    }
+
+    private async Task OnDelete(int id)
+    {
+        await NoteClient.Delete(id);
+        await ClickPage(Paging.CurrentIndex);
+    }
+}

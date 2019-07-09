@@ -1,0 +1,37 @@
+<EditForm Model="@Model" OnValidSubmit="@OnSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="input-group mt-2">
+        <button type="submit" class="btn btn-primary form-control">Submit</button>
+    </div>
+
+    <div class="input-group mt-4">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Name</span>
+        </div>
+        <InputText class="form-control" @bind-Value="@Model.Name" />
+    </div>
+
+    <div class="input-group mt-2">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Public?</span>
+        </div>
+        <InputCheckbox class="form-control" @bind-Value="@Model.IsPublic" />
+    </div>
+
+    <div class="input-group mt-2">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Color</span>
+        </div>
+        <InputText class="form-control" @bind-Value="@Model.Color" type="color" />
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    private EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    private CategoryEditModel Model { get; set; }
+}

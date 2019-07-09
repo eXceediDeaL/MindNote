@@ -1,23 +1,39 @@
 jobs:
-  allow_failures:
-    - os: windows
+  # allow_failures:
+    # - os: windows
+    # - os: osx
   include:
-    - os: windows
+    - name: windows
+      os: windows
       language: bash
       filter_secrets: false
       install:
         - choco install dotnetcore-sdk
-        - choco install opencover.portable
         - dotnet --version
       script: 
         - dotnet restore -s https://api.nuget.org/v3/index.json
         - dotnet build
-        - dotnet test
-        - powershell -c "OpenCover.Console.exe -register:user -target:\"dotnet.exe\" -targetargs:\"test\" -output:coverage.xml -filter:\"+[*]* -[*Moq]* -[xunit*]* -[AutoGen*]*\" -oldstyle"
+        - powershell -c "dotnet test /p:CollectCoverage=true /p:CoverletOutput=../../coverage.json /p:MergeWith=../../coverage.json /maxcpucount:1"
+        - powershell -c "dotnet test ./test/Test.Data /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../../coverage.xml /p:MergeWith=../../coverage.json /maxcpucount:1"
         - curl -s https://codecov.io/bash > codecov
         - chmod +x codecov
         - ./codecov -f "coverage.xml"
-    - os: linux
+    - name: osx
+      os: osx
+      language: bash
+      install:
+        - brew cask install dotnet-sdk
+        - dotnet --version
+      script: 
+        - dotnet restore -s https://api.nuget.org/v3/index.json
+        - dotnet build
+        - dotnet test /p:CollectCoverage=true /p:CoverletOutput=../../coverage.json /p:MergeWith=../../coverage.json /maxcpucount:1
+        - dotnet test ./test/Test.Data /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../../coverage.xml /p:MergeWith=../../coverage.json /maxcpucount:1
+        - curl -s https://codecov.io/bash > codecov
+        - chmod +x codecov
+        - ./codecov -f "coverage.xml"
+    - name: linux
+      os: linux
       dist: xenial
       language: csharp
       mono: none
@@ -31,8 +47,12 @@ jobs:
         - dotnet --version
       script:
         - dotnet build
-        - dotnet test
-    - name: build and run images
+        - dotnet test /p:CollectCoverage=true /p:CoverletOutput=../../coverage.json /p:MergeWith=../../coverage.json /maxcpucount:1
+        - dotnet test ./test/Test.Data /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=../../coverage.xml /p:MergeWith=../../coverage.json /maxcpucount:1
+        - curl -s https://codecov.io/bash > codecov
+        - chmod +x codecov
+        - ./codecov -f "coverage.json"
+    - name: docker
       os: linux
       dist: xenial
       language: csharp
@@ -45,16 +65,21 @@ jobs:
         - docker tag mindnote:api $DOCKER_USERNAME/mindnote:dev-api
         - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:dev-identity
         - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
-        - sudo sh -c "echo \"\n127.0.0.1 mindnote.com\n127.0.0.1 api.mindnote.com\n127.0.0.1 id.mindnote.com\" >> /etc/hosts"
-        - cd ./docker/deploy
-        - docker-compose up -d && sleep 20
+        - docker tag mindnote:client $DOCKER_USERNAME/mindnote:dev-client
+        - sudo sh -c "echo \"\n127.0.0.1 mindnote.com\n127.0.0.1 client.mindnote.com\n127.0.0.1 api.mindnote.com\n127.0.0.1 id.mindnote.com\" >> /etc/hosts"
+        - cd ./docker/deploy && chmod +x ./gen.sh
+        - ./gen.sh
+        - docker-compose up -d && sleep 30
+        - docker stats --no-stream
         - curl http://mindnote.com > /dev/null
         - curl http://api.mindnote.com > /dev/null
         - curl http://id.mindnote.com > /dev/null
+        - curl http://client.mindnote.com > /dev/null
+        - docker stats --no-stream
         - docker-compose stop && docker-compose logs -t
     - stage: deploy
       if: branch = master AND NOT (type = pull_request)
-      name: deploy master image
+      name: master image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker-compose build
@@ -65,9 +90,11 @@ jobs:
       - docker push $DOCKER_USERNAME/mindnote:identity
       - docker tag mindnote:host $DOCKER_USERNAME/mindnote:host
       - docker push $DOCKER_USERNAME/mindnote:host
+      - docker tag mindnote:client $DOCKER_USERNAME/mindnote:client
+      - docker push $DOCKER_USERNAME/mindnote:client
     - stage: deploy
-      if: branch = dev AND NOT (type = pull_request)
-      name: deploy dev image
+      if: NOT (branch = master) AND NOT (type = pull_request)
+      name: dev image
       script:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker-compose build
@@ -78,3 +105,5 @@ jobs:
       - docker push $DOCKER_USERNAME/mindnote:dev-identity
       - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
       - docker push $DOCKER_USERNAME/mindnote:dev-host
+      - docker tag mindnote:client $DOCKER_USERNAME/mindnote:dev-client
+      - docker push $DOCKER_USERNAME/mindnote:dev-client

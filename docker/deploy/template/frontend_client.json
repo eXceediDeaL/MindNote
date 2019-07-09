@@ -1,0 +1,17 @@
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Warning"
+        }
+    },
+    "AllowedHosts": "*",
+    "server": {
+        "Identity": "{ServerIdentity}",
+        "Api": "{ServerApi}",
+        "Client": "{ClientHost}"
+    },
+    "identityClient": {
+        "ClientId": "frontend.client",
+        "ClientSecret": "{SecretClientHost}"
+    }
+}

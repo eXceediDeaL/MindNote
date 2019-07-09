@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="2.6.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
@@ -14,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
-    <ProjectReference Include="..\..\src\MindNote.Data\MindNote.Data.csproj" />
+    <ProjectReference Include="..\..\src\Data\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Data\MindNote.Data\MindNote.Data.csproj" />
   </ItemGroup>
 
 </Project>

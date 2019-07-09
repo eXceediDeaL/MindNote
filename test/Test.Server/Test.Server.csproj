@@ -7,9 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="coverlet.msbuild" Version="2.6.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
@@ -17,9 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\MindNote.Server.API\MindNote.Server.API.csproj" />
-    <ProjectReference Include="..\..\src\MindNote.Server.Host\MindNote.Server.Host.csproj" />
-    <ProjectReference Include="..\..\src\MindNote.Server.Identity\MindNote.Server.Identity.csproj" />
+    <ProjectReference Include="..\..\src\Data\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Data\MindNote.Data\MindNote.Data.csproj" />
+    <ProjectReference Include="..\..\src\Backend\MindNote.Backend.API\MindNote.Backend.API.csproj" />
+    <ProjectReference Include="..\..\src\Backend\MindNote.Backend.Identity\MindNote.Backend.Identity.csproj" />
+    <ProjectReference Include="..\..\src\Frontend\Server\MindNote.Frontend.Server\MindNote.Frontend.Server.csproj" />
   </ItemGroup>
 
 </Project>

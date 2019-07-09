@@ -1,0 +1,15 @@
+@using MindNote.Frontend.SDK.API
+@using MindNote.Data
+
+@if (Value != null)
+{
+    <span>
+        <i class="far fa-user"></i>
+        <span style="margin-left:5px">@Value.Name</span>
+    </span>
+}
+
+@code {
+    [Parameter]
+    private User Value { get; set; }
+}

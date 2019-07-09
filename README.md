@@ -1,6 +1,6 @@
 # MindNote
 
-[![](https://img.shields.io/github/stars/StardustDL/MindNote.svg?style=social&label=Stars)](https://github.com/StardustDL/MindNote) [![](https://img.shields.io/github/forks/StardustDL/MindNote.svg?style=social&label=Fork)](https://github.com/StardustDL/MindNote) ![](http://progressed.io/bar/10?title=developing) [![](https://img.shields.io/github/license/StardustDL/MindNote.svg)](https://github.com/StardustDL/MindNote/blob/master/LICENSE)
+[![](https://img.shields.io/github/stars/StardustDL/MindNote.svg?style=social&label=Stars)](https://github.com/StardustDL/MindNote) [![](https://img.shields.io/github/forks/StardustDL/MindNote.svg?style=social&label=Fork)](https://github.com/StardustDL/MindNote) ![](http://progressed.io/bar/30?title=developing) [![](https://img.shields.io/github/license/StardustDL/MindNote.svg)](https://github.com/StardustDL/MindNote/blob/master/LICENSE)
 
 <p style="text-align:center; font-size:21px">
 Empower your notes.
@@ -17,20 +17,19 @@ Project Status:
 
 # Usage
 
-1. Install Docker and Docker-Compose
-2. Get `docker-compose.yml`
+1. Install Docker and Docker-Compose.
+2. Clone this repository and enter the deploy directory `docker/deploy`. 
+3. Generate configuration files:
+   1. Check templates in `template` directory.
+   2. Edit hostnames and identity clients' secrets in `gen.sh` and execute it.
+   3. Check the configurations in `config` directory.
+4. Use `docker-compose up -d` to start:
 
-```sh
-curl https://raw.githubusercontent.com/StardustDL/MindNote/master/docker/docker-compose-production.yml > docker-compose.yml
-```
 
-3. Replace `http://localhost` in `docker-compose.yml` with your host URL.
-4. Use `docker-compose up` to start containers.
-
-It will create a MySQL container, an API server container, an identity server container, a host server container and a nginx server container for reverse proxy.
-
-The default hostnames are:
-
-- `id.mindnote.com`
-- `api.mindnote.com`
-- `mindnote.com`
+It will create 
+- a MySQL container
+- an API server container on `api.mindnote.com`
+- an identity server container on `id.mindnote.com`
+- a host server container on `mindnote.com`
+- a client server container on `client.mindnote.com`
+- a nginx server container for reverse proxy

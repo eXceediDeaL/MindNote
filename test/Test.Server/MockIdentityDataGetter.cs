@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using MindNote.Client.SDK.Identity;
+using MindNote.Frontend.SDK.Identity;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;

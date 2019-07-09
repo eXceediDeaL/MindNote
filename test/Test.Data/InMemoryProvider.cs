@@ -7,10 +7,10 @@ namespace Test.Data
     public class InMemoryProvider
     {
         [TestMethod]
-        public void Node()
+        public void Note()
         {
             Tester tester = new Tester(new DataProvider());
-            tester.NodeIndependent();
+            tester.NoteIndependent();
         }
 
         [TestMethod]
@@ -21,10 +21,17 @@ namespace Test.Data
         }
 
         [TestMethod]
-        public void Tag()
+        public void Category()
         {
             Tester tester = new Tester(new DataProvider());
-            tester.TagIndependent();
+            tester.CategoryIndependent();
+        }
+
+        [TestMethod]
+        public void User()
+        {
+            Tester tester = new Tester(new DataProvider());
+            tester.UserIndependent();
         }
     }
 }

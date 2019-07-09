@@ -1,0 +1,70 @@
+﻿@model MarkdownViewModel
+
+<link rel="stylesheet" href="~/lib/github-markdown-css/github-markdown.min.css">
+<link rel="stylesheet" href="~/lib/highlight.js/styles/github.min.css">
+
+<div id="_markdownViewerPartial_divContent">
+
+</div>
+
+<script src="~/lib/markdown-it/markdown-it.min.js"></script>
+<script src="~/lib/markdown-it-emoji/markdown-it-emoji.min.js"></script>
+<script src="~/lib/markdown-it-abbr/dist/markdown-it-abbr.min.js"></script>
+<script src="~/lib/markdown-it-container/dist/markdown-it-container.min.js"></script>
+<script src="~/lib/markdown-it-deflist/dist/markdown-it-deflist.min.js"></script>
+<script src="~/lib/markdown-it-ins/dist/markdown-it-ins.min.js"></script>
+<script src="~/lib/markdown-it-mark/dist/markdown-it-mark.min.js"></script>
+<script src="~/lib/markdown-it-sup/dist/markdown-it-sup.min.js"></script>
+<script src="~/lib/markdown-it-sub/dist/markdown-it-sub.min.js"></script>
+<script src="~/lib/markdown-it-footnote/markdown-it-footnote.min.js"></script>
+<script src="~/lib/markdown-it-task-lists/dist/markdown-it-task-lists.min.js"></script>
+<script src="~/lib/highlight.js/highlight.min.js"></script>
+
+<script>
+    var md = window.markdownit({
+        html: true,
+        linkify: true,
+        typographer: true,
+        highlight: function (str, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                try {
+                    return '<pre class="hljs"><code>' +
+                       hljs.highlight(lang, str, true).value +
+                       '</code></pre>';
+                } catch (__) {}
+            }
+
+            return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
+        }
+    })
+        .use(window.markdownitAbbr)
+        .use(window.markdownitContainer)
+        .use(window.markdownitDeflist)
+        .use(window.markdownitIns)
+        .use(window.markdownitMark)
+        .use(window.markdownitSup)
+        .use(window.markdownitSub)
+        .use(window.markdownitFootnote)
+        .use(window.markdownitEmoji)
+        .use(window.markdownitTaskLists);
+
+    function update_markdown(content) {
+        let result = md.render(content);
+        let item = document.getElementById('_markdownViewerPartial_divContent');
+        item.innerHTML = result;
+    }
+
+    let content = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Raw ?? ""));
+
+    update_markdown(content);
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+    displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+    }
+    });
+</script>

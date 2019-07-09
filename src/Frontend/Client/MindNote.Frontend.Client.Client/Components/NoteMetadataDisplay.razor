@@ -1,0 +1,49 @@
+@if (Value != null)
+{
+    <div style="color:#999">
+        <small>
+            <ItemTime CreationTime="@Value.Data.CreationTime" ModificationTime="@Value.Data.ModificationTime" />
+        </small>
+        @if (Value.Category != null)
+        {
+            <small class="m-1">|</small>
+            <small>
+                <a href="categories/@Value.Category.Id" style="color: #555;">
+                    <CategoryDisplay Value="@Value.Category" />
+                </a>
+            </small>
+        }
+        @if (Value.Data.Keywords != null && Value.Data.Keywords.Length > 0)
+        {
+            <small class="m-1">|</small>
+            <small>
+                <KeywordsDisplay Value="@Value.Data.Keywords" />
+            </small>
+        }
+        @if (Value.Data.Content != null)
+        {
+            <small class="m-1">|</small>
+            <small>
+                <WordCount Value="@Value.Data.Content" />
+            </small>
+            <small class="m-1">|</small>
+            <small>
+                <ReadTime Value="@Value.Data.Content" />
+            </small>
+        }
+        @if (Value.User != null)
+        {
+            <small class="m-1">|</small>
+            <small>
+                <a href="account/@Value.User.Id" style="color: #555;">
+                    <UserDisplay Value="@Value.User" />
+                </a>
+            </small>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    private NoteViewModel Value { get; set; }
+}

@@ -1,0 +1,24 @@
+<span>
+    <i class="far fa-file-word"></i>
+    <span style="margin-left:5px">@Count</span>
+</span>
+
+@code {
+    [Parameter]
+    private string Value { get; set; }
+
+    private string Count {
+        get
+        {
+            int len = Value?.Length ?? 0;
+            if (len < 1000)
+            {
+                return len.ToString();
+            }
+            else
+            {
+                return $"{(len / 1000.0).ToString("f1")}k";
+            }
+        }
+    }
+}

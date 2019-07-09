@@ -1,7 +1,7 @@
 using IdentityServer4.Test;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MindNote.Server.Identity;
+using MindNote.Backend.Identity;
 using System;
 
 namespace Test.Server.Identities
@@ -13,14 +13,15 @@ namespace Test.Server.Identities
         [DataRow("/Index")]
         [DataRow("/Privacy")]
         [DataRow("/Error")]
-        [DataRow("/Identity/Account/Register")]
-        [DataRow("/Identity/Account/Login")]
+        [DataRow("/Identity/Account/Error")]
+        [DataRow("/Identity/Account/Logout")]
         [DataRow("/.well-known/openid-configuration")]
         public void Urls(string url)
         {
-            using (TestServer testServer = new TestServer(Program.CreateWebHostBuilder(Array.Empty<string>())))
+            TestUser user = Utils.DefaultUser;
+            using (MockIdentityWebApplicationFactory id = new MockIdentityWebApplicationFactory(user))
             {
-                using (System.Net.Http.HttpClient client = testServer.CreateClient())
+                using (System.Net.Http.HttpClient client = id.CreateClient())
                 {
                     System.Net.Http.HttpResponseMessage response = client.GetAsync(url).Result;
                     response.EnsureSuccessStatusCode();
