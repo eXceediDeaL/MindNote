@@ -1,0 +1,100 @@
+﻿@page "/account/manage"
+@attribute [Authorize]
+
+@using MindNote.Client.Host.Shared
+@using MindNote.Client.SDK.API
+@using System.Linq
+@using MindNote.Data
+@inject CustomUsersClient UserClient
+@inject CustomNotesClient NoteClient
+@inject CustomCategoriesClient CategoryClient
+@inject IUriHelper UriHelper
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="account">Account</a></li>
+    <li class="breadcrumb-item active">Manage</li>
+</ul>
+
+@if (Model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="@Model" OnValidSubmit="@OnSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="input-group mt-2">
+            <button type="submit" class="btn btn-primary form-control">Submit</button>
+        </div>
+
+        <div class="input-group mt-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Name</span>
+            </div>
+            <InputText class="form-control" @bind-Value="@Model.Name" />
+        </div>
+
+        <div class="input-group mt-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Bio</span>
+            </div>
+            <InputText class="form-control" @bind-Value="@Model.Bio" />
+        </div>
+
+        <div class="input-group mt-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Company</span>
+            </div>
+            <InputText class="form-control" @bind-Value="@Model.Company" />
+        </div>
+
+        <div class="input-group mt-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Location</span>
+            </div>
+            <InputText class="form-control" @bind-Value="@Model.Location" />
+        </div>
+
+        <div class="input-group mt-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Url</span>
+            </div>
+            <InputText class="form-control" @bind-Value="@Model.Url" />
+        </div>
+    </EditForm>
+
+    <div class="mt-4">
+        <a class="btn btn-light" href="@($"{Settings.IdentityServerUrl}/Identity/Account/Manage")" target="_blank">
+            <i class="fa fa-external-link-alt"></i>
+            Manage on Identity
+        </a>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    UserManageModel Model { get; set; }
+
+    string Id { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+
+        Id = UserHelper.GetId(user);
+
+        var rawUser = await UserClient.Get(Id);
+        Model = new UserManageModel(rawUser);
+    }
+
+    private async Task OnSubmit()
+    {
+        var id = await UserClient.Update(Id, Model.ToModel());
+        UriHelper.NavigateTo($"account");
+    }
+}

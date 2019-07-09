@@ -22,6 +22,19 @@ namespace MindNote.Client.Host.Client.Helpers
             }
         }
 
+        public static async Task<string> GetIdentityServerUrl(HttpClient http)
+        {
+            HttpResponseMessage response = await http.GetAsync("api/Server/IdentityServer");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public static async Task<string> GetApiServerUrl(HttpClient http)
         {
             HttpResponseMessage response = await http.GetAsync("api/Server/ApiServer");

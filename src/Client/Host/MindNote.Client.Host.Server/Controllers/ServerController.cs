@@ -8,6 +8,12 @@ namespace MindNote.Client.Host.Server.Controllers
     public class ServerController : Controller
     {
         [HttpGet("[action]")]
+        public string IdentityServer()
+        {
+            return Utils.Linked.Identity;
+        }
+
+        [HttpGet("[action]")]
         public string ApiServer()
         {
             return Utils.Linked.Api;

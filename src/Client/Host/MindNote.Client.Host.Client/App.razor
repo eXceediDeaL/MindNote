@@ -15,5 +15,6 @@
     protected override async Task OnInitAsync()
     {
         Settings.ApiServerUrl = await HostServer.GetApiServerUrl(Http);
+        Settings.IdentityServerUrl = await HostServer.GetIdentityServerUrl(Http);
     }
 }

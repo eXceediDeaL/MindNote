@@ -9,8 +9,7 @@ RUN dotnet restore
 
 WORKDIR /source/src/Client/Host
 
-RUN cd ./MindNote.Client.Host.Server && dotnet publish -c Release -o /build \
-     && cp -r /build/wwwroot/_content/mindnoteclienthostclient/* /build/wwwroot && rm -rf /build/wwwroot/_content
+RUN cd ./MindNote.Client.Host.Server && dotnet publish -c Release -o /build
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine AS runtime
 RUN apk update \
