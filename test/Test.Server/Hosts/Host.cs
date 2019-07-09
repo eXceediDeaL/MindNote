@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MindNote.Client.SDK.Identity;
+using MindNote.Frontend.SDK.Identity;
 using MindNote.Data.Providers;
-using MindNote.Server.Identity;
+using MindNote.Backend.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

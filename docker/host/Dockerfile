@@ -7,7 +7,7 @@ COPY ./test ./test
 
 RUN dotnet restore
 
-RUN cd ./src/Server/MindNote.Server.Host && dotnet publish -c Release -o /build
+RUN cd ./src/Frontend/Server/MindNote.Frontend.Server && dotnet publish -c Release -o /build
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-alpine AS runtime
 RUN apk update \
@@ -22,4 +22,4 @@ RUN chmod +x ./wait-for-it.sh
 
 EXPOSE 80/tcp
 
-ENTRYPOINT ["dotnet", "MindNote.Server.Host.dll"]
+ENTRYPOINT ["dotnet", "MindNote.Frontend.Server.dll"]

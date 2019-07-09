@@ -1,7 +1,7 @@
 using IdentityServer4.Test;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MindNote.Server.Identity;
+using MindNote.Backend.Identity;
 using System;
 
 namespace Test.Server.Identities

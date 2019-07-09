@@ -1,0 +1,55 @@
+﻿@page "/notes/new"
+@attribute [Authorize]
+@using MindNote.Frontend.SDK.API
+@using MindNote.Data
+@inject CustomCategoriesClient CategoryClient
+@inject CustomNotesClient NoteClient
+@inject IUriHelper UriHelper
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/notes">Notes</a></li>
+    <li class="breadcrumb-item active">New</li>
+</ul>
+
+@if (Model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <NoteEdit Model="@Model" OnSubmit="@OnSubmit" Categories="@Categories" />
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    private int Id { get; set; }
+
+    NoteEditModel Model { get; set; } = new NoteEditModel();
+
+    IEnumerable<Category> Categories { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        Categories = await CategoryClient.GetAll();
+    }
+
+    private async Task OnSubmit()
+    {
+        int? catId = null;
+        if (int.TryParse(Model.CategoryId, out int res))
+            catId = res;
+        Note item = new Note
+        {
+            Title = Model.Title,
+            Content = Model.Content,
+            CategoryId = catId,
+            Keywords = Model.Keywords?.Split(';'),
+            Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
+        };
+        var id = await NoteClient.Create(item);
+        UriHelper.NavigateTo($"notes/{id}");
+    }
+}

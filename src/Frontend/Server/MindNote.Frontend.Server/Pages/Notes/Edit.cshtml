@@ -1,0 +1,146 @@
+﻿@page
+@model MindNote.Frontend.Server.Pages.Notes.EditModel
+@{
+    if (Model.IsNew)
+    {
+        ViewData["Title"] = "Create";
+    }
+    else
+    {
+        ViewData["Title"] = $"{Model.Data.Data.Title} - Edit";
+    }
+    ViewData["Id"] = "Notes";
+}
+
+@section header{
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="~/lib/monaco-editor/min/vs/editor/editor.main.css">
+    <link rel="stylesheet" href="~/lib/highlight.js/styles/default.min.css">
+}
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a asp-page="/Index">MindNote</a></li>
+    <li class="breadcrumb-item"><a asp-page="./Index">Notes</a></li>
+    @if (!Model.IsNew)
+    {
+        <li class="breadcrumb-item">
+            <a asp-page="./View" asp-route-id="@Model.Data.Data.Id">@Model.Data.Data.Id</a>
+        </li>
+        <li class="breadcrumb-item active">Edit</li>
+    }
+    else
+    {
+        <li class="breadcrumb-item active">Create</li>
+    }
+</ul>
+
+<form method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="PostData.Data.Id" value="@Model.Data.Data.Id" />
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Title</span>
+        </div>
+        <input class="form-control" asp-for="PostData.Data.Title" value="@Model.Data.Data.Title" />
+        <span asp-validation-for="PostData.Data.Title" class="text-danger"></span>
+        <div class="input-group-append">
+            @if (Model.IsNew)
+            {
+                <button type="submit" asp-page-handler="Create" class="btn btn-success">
+                    <i class="fa fa-plus"></i>
+                </button>
+            }
+            else
+            {
+                <button type="submit" asp-page-handler="Edit" class="btn btn-primary">
+                    <i class="fa fa-save"></i>
+                </button>
+                <button type="submit" asp-page-handler="Delete" class="btn btn-danger">
+                    <i class="fa fa-trash"></i>
+                </button>
+            }
+        </div>
+    </div>
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Status</span>
+        </div>
+        <select class="form-control" asp-for="PostData.Data.Status" asp-items="Html.GetEnumSelectList<MindNote.Data.ItemStatus>()"></select>
+        <span asp-validation-for="PostData.Data.Status" class="text-danger"></span>
+    </div>
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Category</span>
+        </div>
+        <select class="form-control" asp-for="PostData.Data.CategoryId" asp-items="Model.CategorySelector"></select>
+        <span asp-validation-for="PostData.Data.CategoryId" class="text-danger"></span>
+    </div>
+    <div class="input-group" style="margin-top:10px">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Keywords</span>
+        </div>
+        <input class="form-control" asp-for="PostData.EditKeywords" value="@(Model.Data.Data.Keywords == null ? "" : string.Join(';', Model.Data.Data.Keywords))" />
+        <span asp-validation-for="PostData.EditKeywords" class="text-danger"></span>
+    </div>
+    <style>
+        textarea {
+            min-height: 500px;
+        }
+    </style>
+    <div class="form-group" style="margin-top:10px; display:none">
+        <label class="control-label">Content</label>
+        <textarea class="form-control" asp-for="PostData.Data.Content" id="formContent"></textarea>
+        <span asp-validation-for="PostData.Data.Content" class="text-danger"></span>
+    </div>
+</form>
+
+<div class="row mt-2" style="min-height:500px; background:white; overflow: auto" id="contentEditor">
+    <div id="codeEditor" class="col-6 p-2"></div>
+    <div id="mdViewer" class="col-6 p-4">
+        <partial name="_MarkdownViewerPartial" model="@(new MindNote.Frontend.Server.Pages.Shared.MarkdownViewModel { Raw = Model.PostData.Data.Content })" />
+    </div>
+</div>
+
+@section corner {
+    <div class="btn-group-vertical">
+        <button class="btn btn-info" onclick="document.getElementById('contentEditor').requestFullscreen()">
+            <i class="fa fa-arrows-alt"></i>
+        </button>
+    </div>
+}
+
+@section scripts{
+    <script>var require = { paths: { 'vs': '../lib/monaco-editor/min/vs' } }</script>
+    <script src="~/lib/monaco-editor/min/vs/loader.js"></script>
+    <script src="~/lib/monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+    <script src="~/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
+    <script>
+        "use strict";
+
+        var editor = null;
+
+        $(document).ready(function () {
+            require(['vs/editor/editor.main'], function () {
+                $('#codeEditor').empty();
+                editor = monaco.editor.create(document.getElementById('codeEditor'), {
+                    value: document.getElementById('formContent').value,
+                    language: "markdown",
+                    wordWrap: "on",
+                    minimap: {
+                        enabled: false
+                    },
+                });
+            });
+
+            editor.onDidChangeModelContent((e) => {
+                document.getElementById('formContent').value = editor.getValue();
+                update_markdown(editor.getValue());
+            });
+
+            window.onresize = function () {
+                if (editor) {
+                    editor.layout();
+                }
+            };
+        });
+    </script>
+}

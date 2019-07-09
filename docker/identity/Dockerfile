@@ -7,7 +7,7 @@ COPY ./test ./test
 
 RUN dotnet restore
 
-RUN cd ./src/Server/MindNote.Server.Identity && dotnet publish -c Release -o /build
+RUN cd ./src/Backend/MindNote.Backend.Identity && dotnet publish -c Release -o /build
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-alpine AS runtime
 RUN apk update \
@@ -22,4 +22,4 @@ RUN chmod +x ./wait-for-it.sh
 
 EXPOSE 80/tcp
 
-ENTRYPOINT ["dotnet", "MindNote.Server.Identity.dll"]
+ENTRYPOINT ["dotnet", "MindNote.Backend.Identity.dll"]

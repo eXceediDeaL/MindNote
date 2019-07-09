@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using MindNote.Client.SDK.API;
-using MindNote.Client.SDK.Identity;
-using MindNote.Server.Host;
+using MindNote.Frontend.SDK.API;
+using MindNote.Frontend.SDK.Identity;
+using MindNote.Frontend.Server;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Test.Server.Hosts
 {
-    public class MockHostWebApplicationFactory<TApi> : WebApplicationFactory<MindNote.Server.Host.Startup> where TApi : class
+    public class MockHostWebApplicationFactory<TApi> : WebApplicationFactory<MindNote.Frontend.Server.Startup> where TApi : class
     {
         private readonly WebApplicationFactory<TApi> apiServer;
         private readonly IIdentityDataGetter idData;

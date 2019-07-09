@@ -1,0 +1,119 @@
+﻿@page "/account"
+@page "/account/{id}"
+
+@using MindNote.Frontend.Client.Shared
+@using MindNote.Frontend.SDK.API
+@using System.Linq
+@using MindNote.Data
+@inject CustomUsersClient UserClient
+@inject CustomNotesClient NoteClient
+@inject CustomCategoriesClient CategoryClient
+@inject IUriHelper UriHelper
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (Current == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="media">
+        <Gravatar Class="rounded" Value="@Current.Email" Size="200" />
+        <div class="media-body ml-4">
+            <div class="d-flex flex-row">
+                <h3>@Current.Name</h3>
+                <AuthorizeView>
+                    <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+                        <a href="account/logout" class="btn btn-outline-danger"><i class="fa fa-sign-out-alt"></i></a>
+                        <a href="account/manage" class="btn btn-outline-primary"><i class="fa fa-edit"></i></a>
+                    </div>
+                </AuthorizeView>
+            </div>
+            <h5 class="text-muted">@Current.Email</h5>
+            @if (!String.IsNullOrEmpty(Current.Bio))
+            {
+                <span class="mt-2">@(Current.Bio ?? "Bio")</span>
+            }
+            <dl class="mt-2">
+                @if (Current.Location != null)
+                {
+                    <dt style="float:left; min-width:24px"><i class="fa fa-map-marker"></i></dt>
+                    <dd>@Current.Location</dd>
+                }
+                @if (Current.Url != null)
+                {
+                    <dt style="float:left; min-width:24px"><i class="fa fa-link"></i></dt>
+                    <dd><a href="@Current.Url" target="_blank">@Current.Url</a></dd>
+                }
+            </dl>
+        </div>
+    </div>
+}
+
+@if (Notes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <NoteListWaterfall Data="@Notes" Paging="@Paging" OnQueryPaging="@OnQueryPaging" />
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    private string Id { get; set; } = null;
+
+    User Current { get; set; }
+
+    PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
+
+    IList<NoteViewModel> Notes { get; set; }
+
+    public void Logout()
+    {
+        var auth = (AuthStateProvider)AuthenticationStateProvider;
+        auth.Logout();
+        UriHelper.NavigateTo("/");
+    }
+
+    protected override async Task OnInitAsync()
+    {
+        var user = (await authenticationStateTask).User;
+
+        if (Id == null)
+        {
+            if (!user.Identity.IsAuthenticated)
+            {
+                UriHelper.NavigateTo("account/login");
+                return;
+            }
+            Id = UserHelper.GetId(user);
+        }
+
+        Current = await UserClient.Get(Id);
+        if (Current != null)
+        {
+            int count = (await NoteClient.Query(userId: Current.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+            Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
+            Paging.CurrentIndex = 1;
+            await OnQueryPaging(Paging.CurrentIndex);
+        }
+    }
+
+    private async Task OnQueryPaging(int pageIndex)
+    {
+        if (Current == null) return;
+
+        Paging.CurrentIndex = pageIndex;
+        int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
+
+        IEnumerable<Note> ms = await NoteClient.Query(userId: Current.Id, offset: offset, count: Paging.ItemCountPerPage);
+        var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
+        foreach (var v in data)
+            await v.Load(CategoryClient, UserClient);
+        Notes = data;
+    }
+}

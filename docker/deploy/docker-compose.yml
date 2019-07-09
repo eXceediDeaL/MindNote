@@ -18,8 +18,8 @@ services:
     depends_on:
       - api
     volumes:
-      - "./config/client_host.json:/app/appsettings.json"
-    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Client.Host.Server.dll"]
+      - "./config/frontend_client.json:/app/appsettings.json"
+    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Frontend.Client.Server.dll"]
   host:
     image: stardustdl/mindnote:dev-host
     environment:
@@ -27,8 +27,8 @@ services:
     depends_on:
       - api
     volumes:
-      - "./config/server_host.json:/app/appsettings.json"
-    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Server.Host.dll"]
+      - "./config/frontend_server.json:/app/appsettings.json"
+    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Frontend.Server.dll"]
   api:
     image: stardustdl/mindnote:dev-api
     environment:
@@ -37,8 +37,8 @@ services:
       - mndb
       - identity
     volumes:
-      - "./config/server_api.json:/app/appsettings.json"
-    entrypoint: ["./wait-for-it.sh", "identity:80", "-t", "0", "--", "dotnet", "MindNote.Server.API.dll"]
+      - "./config/backend_api.json:/app/appsettings.json"
+    entrypoint: ["./wait-for-it.sh", "identity:80", "-t", "0", "--", "dotnet", "MindNote.Backend.API.dll"]
   identity:
     image: stardustdl/mindnote:dev-identity
     environment:
@@ -46,8 +46,8 @@ services:
     depends_on:
       - mndb
     volumes:
-      - "./config/server_identity.json:/app/appsettings.json"
-    entrypoint: ["./wait-for-it.sh", "mndb:3306", "-t", "0", "--", "dotnet", "MindNote.Server.Identity.dll"]
+      - "./config/backend_identity.json:/app/appsettings.json"
+    entrypoint: ["./wait-for-it.sh", "mndb:3306", "-t", "0", "--", "dotnet", "MindNote.Backend.Identity.dll"]
   mndb:
     image: mysql
     environment:

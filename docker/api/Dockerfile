@@ -7,7 +7,7 @@ COPY ./test ./test
 
 RUN dotnet restore
 
-RUN cd ./src/Server/MindNote.Server.API && dotnet publish -c Release -o /build
+RUN cd ./src/Backend/MindNote.Backend.API && dotnet publish -c Release -o /build
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-alpine AS runtime
 RUN apk update \
@@ -21,4 +21,4 @@ COPY ./docker/wait-for-it.sh ./
 RUN chmod +x ./wait-for-it.sh
 EXPOSE 80/tcp
 
-ENTRYPOINT ["dotnet", "MindNote.Server.API.dll"]
+ENTRYPOINT ["dotnet", "MindNote.Backend.API.dll"]

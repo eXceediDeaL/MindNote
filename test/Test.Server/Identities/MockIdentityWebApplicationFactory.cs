@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MindNote.Server.Identity;
+using MindNote.Backend.Identity;
 using System;
 using System.Collections.Generic;
 
 namespace Test.Server.Identities
 {
-    public class MockIdentityWebApplicationFactory : WebApplicationFactory<MindNote.Server.Identity.Startup>
+    public class MockIdentityWebApplicationFactory : WebApplicationFactory<MindNote.Backend.Identity.Startup>
     {
         public const string ClientId = "test";
         public const string ClientSecret = "secret";
@@ -31,14 +31,14 @@ namespace Test.Server.Identities
             {
                 // Mock DB and IdentityServices
 
-                services.AddDbContext<MindNote.Server.Identity.Data.ApplicationDbContext>(options =>
+                services.AddDbContext<MindNote.Backend.Identity.Data.ApplicationDbContext>(options =>
                 {
                     options.UseInMemoryDatabase(Guid.NewGuid().ToString());
                 });
 
                 services.AddDefaultIdentity<IdentityUser>()
                     .AddDefaultUI(UIFramework.Bootstrap4)
-                    .AddEntityFrameworkStores<MindNote.Server.Identity.Data.ApplicationDbContext>();
+                    .AddEntityFrameworkStores<MindNote.Backend.Identity.Data.ApplicationDbContext>();
 
                 services.AddIdentityServer(options =>
                 {

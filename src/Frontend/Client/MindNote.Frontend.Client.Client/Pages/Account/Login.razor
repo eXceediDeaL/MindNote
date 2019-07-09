@@ -1,0 +1,71 @@
+@page "/account/login"
+@using MindNote.Frontend.SDK.API
+@using MindNote.Data
+@inject HttpClient Http
+@inject CustomUsersClient UserClient
+@inject IUriHelper UriHelper
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h1>Log in - @Message</h1>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private LoginModel Model = new LoginModel();
+
+    string Message { get; set; } = "waiting...";
+
+    protected override async Task OnInitAsync()
+    {
+        {
+            var user = (await authenticationStateTask).User;
+            if (user.Identity.IsAuthenticated)
+            {
+                UriHelper.NavigateTo("account");
+                return;
+            }
+        }
+
+        var abUri = UriHelper.GetAbsoluteUri();
+        Console.WriteLine(abUri);
+        int indexQ = abUri.IndexOf('?');
+        if (indexQ != -1)
+        {
+            string[] fragments = abUri.Substring(indexQ + 1).Split('&');
+            if (fragments.Length == 3)
+            {
+                string[] codes = fragments[0].Split('=');
+                string[] sessionStates = fragments[2].Split('=');
+                if (codes.Length == 2 && sessionStates.Length == 2 && codes[0] == "code" && sessionStates[0] == "session_state")
+                {
+                    var auth = (AuthStateProvider)AuthenticationStateProvider;
+                    if (await auth.Login(codes[1], sessionStates[1]))
+                    {
+                        var user = (await authenticationStateTask).User;
+                        var token = UserHelper.GetAccessToken(user);
+                        var id = UserHelper.GetId(user);
+                        UserClient.Token = token;
+                        var profile = await UserClient.Get(id);
+                        if (profile == null)
+                        {
+                            await UserClient.Create(id, new User
+                            {
+                                Name = UserHelper.GetName(user),
+                                Email = UserHelper.GetEmail(user)
+                            });
+                        }
+                        UriHelper.NavigateTo("account");
+                        return;
+                    }
+                }
+            }
+            Message = "failed.";
+        }
+        else
+        {
+            string authUrl = await HostServer.GetAuthorizeUrl(Http);
+            UriHelper.NavigateTo(authUrl);
+        }
+    }
+}

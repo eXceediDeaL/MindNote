@@ -1,8 +1,8 @@
 ﻿using IdentityServer4.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MindNote.Client.SDK.Identity;
+using MindNote.Frontend.SDK.Identity;
 using MindNote.Data.Providers;
-using MindNote.Server.Shared.Configuration;
+using MindNote.Backend.Shared.Configuration;
 using System;
 using System.Collections.Generic;
 using Test.Server.Apis;
@@ -39,7 +39,7 @@ namespace Test.Server
             if (provider == null) provider = new MindNote.Data.Providers.InMemory.DataProvider();
             UseIdentityEnvironment(id =>
             {
-                string token = id.GetBearerToken(user.Username, user.Password, MindNote.Server.Identity.SampleConfig.APIScope);
+                string token = id.GetBearerToken(user.Username, user.Password, MindNote.Backend.Identity.SampleConfig.APIScope);
                 using (var testServer = new MockApiWebApplicationFactory(id.Server, provider, new IdentityDataGetter()))
                 {
                     action(id, testServer, token);
@@ -47,13 +47,13 @@ namespace Test.Server
             });
 
         }
-        public static void UseHostEnvironment(Action<MockHostWebApplicationFactory<MindNote.Server.API.Startup>, string> action, IDataProvider provider = null)
+        public static void UseHostEnvironment(Action<MockHostWebApplicationFactory<MindNote.Backend.API.Startup>, string> action, IDataProvider provider = null)
         {
             TestUser user = Utils.DefaultUser;
             UseApiEnvironment((id, api, token) =>
             {
                 MockTokenIdentityDataGetter idData = new MockTokenIdentityDataGetter(token);
-                using (var testServer = new MockHostWebApplicationFactory<MindNote.Server.API.Startup>(id.Server, api, idData))
+                using (var testServer = new MockHostWebApplicationFactory<MindNote.Backend.API.Startup>(id.Server, api, idData))
                 {
                     action(testServer, token);
                 }

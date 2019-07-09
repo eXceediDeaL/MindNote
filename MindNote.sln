@@ -3,45 +3,43 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28917.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{8D8F24F4-F73E-4DD5-9B95-71F7B6244D68}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{8D8F24F4-F73E-4DD5-9B95-71F7B6244D68}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{E45973FE-C632-4377-A93F-1319225707A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{69900DEC-F1E7-404B-8F1D-76D7BF6B7937}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{B6915F43-46A8-46C8-B7CB-AFDA3D8B490E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{B6915F43-46A8-46C8-B7CB-AFDA3D8B490E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Data", "test\Test.Data\Test.Data.csproj", "{824599C2-529A-455B-AB3A-4DBAC57E7A06}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Server", "test\Test.Server\Test.Server.csproj", "{31A38FF8-750A-416C-9A1C-751F5E496899}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{8D797035-A8B1-4505-BECD-4C9010D1E610}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{8D797035-A8B1-4505-BECD-4C9010D1E610}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SDK", "SDK", "{812254D2-D5A4-47F0-8B56-E23644775571}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Client.SDK.API", "src\Client\SDK\MindNote.Client.SDK.API\MindNote.Client.SDK.API.csproj", "{811FC4F2-C977-4E5C-AFE7-411612365624}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Frontend.SDK.API", "src\Frontend\SDK\MindNote.Frontend.SDK.API\MindNote.Frontend.SDK.API.csproj", "{811FC4F2-C977-4E5C-AFE7-411612365624}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Client.SDK.Identity", "src\Client\SDK\MindNote.Client.SDK.Identity\MindNote.Client.SDK.Identity.csproj", "{2F8BA2A0-23FD-4F58-9535-E16A030E28F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Frontend.SDK.Identity", "src\Frontend\SDK\MindNote.Frontend.SDK.Identity\MindNote.Frontend.SDK.Identity.csproj", "{2F8BA2A0-23FD-4F58-9535-E16A030E28F9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Data", "src\Data\MindNote.Data\MindNote.Data.csproj", "{4B9792B7-BC2A-47F1-889A-53F7E5E2B648}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Data.Providers.SqlServer", "src\Data\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj", "{30AEA122-2A22-4EF7-9BD3-814BC8922FBD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Server.API", "src\Server\MindNote.Server.API\MindNote.Server.API.csproj", "{3CFE1FC9-2333-433F-8181-07781F253303}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Backend.API", "src\Backend\MindNote.Backend.API\MindNote.Backend.API.csproj", "{3CFE1FC9-2333-433F-8181-07781F253303}"
 	ProjectSection(ProjectDependencies) = postProject
 		{30AEA122-2A22-4EF7-9BD3-814BC8922FBD} = {30AEA122-2A22-4EF7-9BD3-814BC8922FBD}
 		{4B9792B7-BC2A-47F1-889A-53F7E5E2B648} = {4B9792B7-BC2A-47F1-889A-53F7E5E2B648}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Server.Host", "src\Server\MindNote.Server.Host\MindNote.Server.Host.csproj", "{96E14666-0935-41A5-9A45-3D3A8D37BC69}"
-	ProjectSection(ProjectDependencies) = postProject
-		{2F8BA2A0-23FD-4F58-9535-E16A030E28F9} = {2F8BA2A0-23FD-4F58-9535-E16A030E28F9}
-		{811FC4F2-C977-4E5C-AFE7-411612365624} = {811FC4F2-C977-4E5C-AFE7-411612365624}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Backend.Identity", "src\Backend\MindNote.Backend.Identity\MindNote.Backend.Identity.csproj", "{11326A40-EEA6-4938-9A7F-D3C346DCB60F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Server.Identity", "src\Server\MindNote.Server.Identity\MindNote.Server.Identity.csproj", "{11326A40-EEA6-4938-9A7F-D3C346DCB60F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Backend.Shared", "src\Backend\MindNote.Backend.Shared\MindNote.Backend.Shared.csproj", "{03D795A2-74CB-439D-9EAD-87687C04909A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Server.Shared", "src\Server\MindNote.Server.Shared\MindNote.Server.Shared.csproj", "{03D795A2-74CB-439D-9EAD-87687C04909A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{CEBF98DB-8F45-4DFC-A1D0-451C2E887A09}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Frontend.Server", "src\Frontend\Server\MindNote.Frontend.Server\MindNote.Frontend.Server.csproj", "{C1C7E41F-EF36-40D1-AEC1-272F018014F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,10 +75,6 @@ Global
 		{3CFE1FC9-2333-433F-8181-07781F253303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CFE1FC9-2333-433F-8181-07781F253303}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CFE1FC9-2333-433F-8181-07781F253303}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96E14666-0935-41A5-9A45-3D3A8D37BC69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96E14666-0935-41A5-9A45-3D3A8D37BC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{96E14666-0935-41A5-9A45-3D3A8D37BC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96E14666-0935-41A5-9A45-3D3A8D37BC69}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11326A40-EEA6-4938-9A7F-D3C346DCB60F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11326A40-EEA6-4938-9A7F-D3C346DCB60F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11326A40-EEA6-4938-9A7F-D3C346DCB60F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -89,6 +83,10 @@ Global
 		{03D795A2-74CB-439D-9EAD-87687C04909A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03D795A2-74CB-439D-9EAD-87687C04909A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03D795A2-74CB-439D-9EAD-87687C04909A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1C7E41F-EF36-40D1-AEC1-272F018014F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1C7E41F-EF36-40D1-AEC1-272F018014F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1C7E41F-EF36-40D1-AEC1-272F018014F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1C7E41F-EF36-40D1-AEC1-272F018014F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,9 +101,10 @@ Global
 		{4B9792B7-BC2A-47F1-889A-53F7E5E2B648} = {E45973FE-C632-4377-A93F-1319225707A2}
 		{30AEA122-2A22-4EF7-9BD3-814BC8922FBD} = {E45973FE-C632-4377-A93F-1319225707A2}
 		{3CFE1FC9-2333-433F-8181-07781F253303} = {8D8F24F4-F73E-4DD5-9B95-71F7B6244D68}
-		{96E14666-0935-41A5-9A45-3D3A8D37BC69} = {8D8F24F4-F73E-4DD5-9B95-71F7B6244D68}
 		{11326A40-EEA6-4938-9A7F-D3C346DCB60F} = {8D8F24F4-F73E-4DD5-9B95-71F7B6244D68}
 		{03D795A2-74CB-439D-9EAD-87687C04909A} = {8D8F24F4-F73E-4DD5-9B95-71F7B6244D68}
+		{CEBF98DB-8F45-4DFC-A1D0-451C2E887A09} = {B6915F43-46A8-46C8-B7CB-AFDA3D8B490E}
+		{C1C7E41F-EF36-40D1-AEC1-272F018014F7} = {CEBF98DB-8F45-4DFC-A1D0-451C2E887A09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED546138-7113-49AF-BF58-98F9C5ACD5DC}

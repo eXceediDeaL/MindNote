@@ -24,9 +24,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Data\MindNote.Data.Providers.SqlServer\MindNote.Data.Providers.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Data\MindNote.Data\MindNote.Data.csproj" />
-    <ProjectReference Include="..\..\src\Server\MindNote.Server.API\MindNote.Server.API.csproj" />
-    <ProjectReference Include="..\..\src\Server\MindNote.Server.Host\MindNote.Server.Host.csproj" />
-    <ProjectReference Include="..\..\src\Server\MindNote.Server.Identity\MindNote.Server.Identity.csproj" />
+    <ProjectReference Include="..\..\src\Backend\MindNote.Backend.API\MindNote.Backend.API.csproj" />
+    <ProjectReference Include="..\..\src\Backend\MindNote.Backend.Identity\MindNote.Backend.Identity.csproj" />
+    <ProjectReference Include="..\..\src\Frontend\Server\MindNote.Frontend.Server\MindNote.Frontend.Server.csproj" />
   </ItemGroup>
 
 </Project>

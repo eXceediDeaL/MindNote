@@ -1,0 +1,36 @@
+﻿@page "/categories/new"
+@attribute [Authorize]
+@using MindNote.Frontend.SDK.API
+@using MindNote.Data
+@inject CustomCategoriesClient CategoryClient
+@inject IUriHelper UriHelper
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/categories">Categories</a></li>
+    <li class="breadcrumb-item active">New</li>
+</ul>
+
+@if (Model == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <CategoryEdit Model="@Model" OnSubmit="@OnSubmit" />
+}
+
+@code {
+    CategoryEditModel Model { get; set; } = new CategoryEditModel();
+
+    private async Task OnSubmit()
+    {
+        Category item = new Category
+        {
+            Name = Model.Name,
+            Color = Model.Color,
+            Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
+        };
+        var id = await CategoryClient.Create(item);
+        UriHelper.NavigateTo($"categories/{id}");
+    }
+}
