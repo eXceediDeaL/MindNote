@@ -10,8 +10,13 @@ namespace MindNote.Client.Host.Server.Controllers
         [HttpGet("[action]")]
         public string ApiServer()
         {
-            Console.WriteLine(Utils.Linked.Api);
             return Utils.Linked.Api;
+        }
+
+        [HttpGet("[action]")]
+        public string ClientHost()
+        {
+            return Utils.Linked.Client;
         }
     }
 }

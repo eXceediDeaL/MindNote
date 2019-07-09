@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using MindNote.Client.Host.Client.Helpers;
 using MindNote.Client.SDK.API;
 
 namespace MindNote.Client.Host.Client
@@ -11,10 +12,12 @@ namespace MindNote.Client.Host.Client
         {
             services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
-            services.AddScoped<INotesClient, NotesClient>();
-            services.AddScoped<ICategoriesClient, CategoriesClient>();
-            services.AddScoped<IUsersClient, UsersClient>();
+            services.AddScoped<CustomNotesClient, CustomNotesClient>();
+            services.AddScoped<CustomCategoriesClient, CustomCategoriesClient>();
+            services.AddScoped<CustomUsersClient, CustomUsersClient>();
             services.AddScoped<IRelationsClient, RelationsClient>();
+
+            services.AddAuthorizationCore();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

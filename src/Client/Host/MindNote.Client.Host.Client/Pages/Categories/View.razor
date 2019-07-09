@@ -3,9 +3,9 @@
 @using MindNote.Client.SDK.API
 @using System.Linq
 @using MindNote.Data
-@inject INotesClient NoteClient
-@inject IUsersClient UserClient
-@inject ICategoriesClient CategoryClient
+@inject CustomNotesClient NoteClient
+@inject CustomUsersClient UserClient
+@inject CustomCategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 @if (Current == null)
@@ -64,8 +64,6 @@ else
 
     string CurrentUserId { get; set; }
 
-    string Token { get; set; }
-
     CategoryViewModel Current { get; set; }
 
     PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
@@ -77,23 +75,15 @@ else
         var user = (await authenticationStateTask).User;
         if (user.Identity.IsAuthenticated)
         {
-            Token = UserHelper.GetAccessToken(user);
             CurrentUserId = UserHelper.GetId(user);
         }
 
-        NoteClient.BaseUrl = Settings.ApiServerUrl;
-        CategoryClient.BaseUrl = Settings.ApiServerUrl;
-        UserClient.BaseUrl = Settings.ApiServerUrl;
-
-        {
-            Current = new CategoryViewModel { Data = await CategoryClient.Get(Token, Id) };
-        }
-
+        Current = new CategoryViewModel { Data = await CategoryClient.Get(Id) };
         if (Current?.Data != null)
         {
-            await Current.Load(UserClient, Token);
+            await Current.Load(UserClient);
 
-            int count = (await NoteClient.Query(Token, categoryId: Current.Data.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+            int count = (await NoteClient.Query(categoryId: Current.Data.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
             Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
 
             await OnQueryPaging(Paging.CurrentIndex);
@@ -107,16 +97,16 @@ else
         Paging.CurrentIndex = pageIndex;
         int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-        IEnumerable<Note> ms = await NoteClient.Query(Token, categoryId: Current.Data.Id, offset: offset, count: Paging.ItemCountPerPage);
+        IEnumerable<Note> ms = await NoteClient.Query(categoryId: Current.Data.Id, offset: offset, count: Paging.ItemCountPerPage);
         var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
         foreach (var v in data)
-            await v.Load(CategoryClient, UserClient, Token);
+            await v.Load(CategoryClient, UserClient);
         Notes = data;
     }
 
     private async Task OnDelete()
     {
-        await CategoryClient.Delete(Token, Id);
-        UriHelper.NavigateTo("/categories");
+        await CategoryClient.Delete(Id);
+        UriHelper.NavigateTo("categories");
     }
 }

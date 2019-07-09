@@ -7,7 +7,8 @@
     "AllowedHosts": "*",
     "server": {
         "Identity": "{ServerIdentity}",
-        "Api": "{ServerApi}"
+        "Api": "{ServerApi}",
+        "Client": "{ClientHost}"
     },
     "identityClient": {
         "ClientId": "client.host",

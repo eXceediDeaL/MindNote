@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MindNote.Server.Shared.Configuration;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
@@ -6,6 +7,16 @@ namespace MindNote.Client.Host.Server
 {
     public static class Utils
     {
+        public static string ClientIdentityRedirectUri
+        {
+            get => $"{Linked.Client}/account/login";
+        }
+
+        public static string ClientIdentityEndSessionRedirectUri
+        {
+            get => $"{Linked.Client}/account/logout/callback";
+        }
+
         public static LinkedServerConfiguration Linked { get; internal set; }
 
         public static IdentityClientConfiguration IdentityClient { get; internal set; }

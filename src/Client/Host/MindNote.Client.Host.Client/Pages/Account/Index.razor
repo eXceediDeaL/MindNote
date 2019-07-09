@@ -5,9 +5,9 @@
 @using MindNote.Client.SDK.API
 @using System.Linq
 @using MindNote.Data
-@inject IUsersClient UserClient
-@inject INotesClient NoteClient
-@inject ICategoriesClient CategoryClient
+@inject CustomUsersClient UserClient
+@inject CustomNotesClient NoteClient
+@inject CustomCategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -20,7 +20,14 @@ else
     <div class="media">
         <Gravatar Class="rounded" Value="@Current.Email" Size="200" />
         <div class="media-body ml-4">
-            <h3>@Current.Name</h3>
+            <div class="d-flex flex-row">
+                <h3>@Current.Name</h3>
+                <AuthorizeView>
+                    <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+                        <a href="account/logout" class="btn btn-light"><i class="fa fa-sign-out-alt"></i></a>
+                    </div>
+                </AuthorizeView>
+            </div>
             <h5 class="text-muted">@Current.Email</h5>
             @if (!String.IsNullOrEmpty(Current.Bio))
             {
@@ -62,8 +69,6 @@ else
 
     PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
 
-    string Token { get; set; } = null;
-
     IList<NoteViewModel> Notes { get; set; }
 
     public void Logout()
@@ -77,30 +82,20 @@ else
     {
         var user = (await authenticationStateTask).User;
 
-        NoteClient.BaseUrl = Settings.ApiServerUrl;
-        CategoryClient.BaseUrl = Settings.ApiServerUrl;
-        UserClient.BaseUrl = Settings.ApiServerUrl;
-
         if (Id == null)
         {
             if (!user.Identity.IsAuthenticated)
             {
-                UriHelper.NavigateTo("/account/login");
+                UriHelper.NavigateTo("account/login");
                 return;
             }
             Id = UserHelper.GetId(user);
         }
 
-        if (user.Identity.IsAuthenticated)
-            Token = UserHelper.GetAccessToken(user);
-
-        {
-            Current = await UserClient.Get(Token, Id);
-        }
-
+        Current = await UserClient.Get(Id);
         if (Current != null)
         {
-            int count = (await NoteClient.Query(Token, userId: Current.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+            int count = (await NoteClient.Query(userId: Current.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
             Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
             Paging.CurrentIndex = 1;
             await OnQueryPaging(Paging.CurrentIndex);
@@ -114,10 +109,10 @@ else
         Paging.CurrentIndex = pageIndex;
         int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-        IEnumerable<Note> ms = await NoteClient.Query(Token, userId: Current.Id, offset: offset, count: Paging.ItemCountPerPage);
+        IEnumerable<Note> ms = await NoteClient.Query(userId: Current.Id, offset: offset, count: Paging.ItemCountPerPage);
         var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
         foreach (var v in data)
-            await v.Load(CategoryClient, UserClient, Token);
+            await v.Load(CategoryClient, UserClient);
         Notes = data;
     }
 }

@@ -14,11 +14,11 @@ namespace MindNote.Client.Host.Server
         public static IWebHost BuildWebHost(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
-.UseConfiguration(new ConfigurationBuilder()
-.AddCommandLine(args)
-.Build())
-.UseStartup<Startup>()
-.Build();
+                .UseConfiguration(new ConfigurationBuilder()
+                .AddCommandLine(args)
+                .Build())
+                .UseStartup<Startup>()
+                .Build();
         }
     }
 }

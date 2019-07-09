@@ -18,17 +18,13 @@ Project Status:
 # Usage
 
 1. Install Docker and Docker-Compose.
-2. Clone this repository.
-3. Enter the deploy directory `docker/deploy`. 
-4. Check templates in `template` directory.
-5. Edit hostnames and identity clients' secrets in `gen.sh`
-6. Use `sh gen.sh` to generate configuration files.
-7. Check the configurations in `config` directory.
-8. Use these commands to start:
+2. Clone this repository and enter the deploy directory `docker/deploy`. 
+3. Generate configuration files:
+   1. Check templates in `template` directory.
+   2. Edit hostnames and identity clients' secrets in `gen.sh` and execute it.
+   3. Check the configurations in `config` directory.
+4. Use `docker-compose up -d` to start:
 
-```sh
-docker-compose up -d
-```
 
 It will create 
 - a MySQL container

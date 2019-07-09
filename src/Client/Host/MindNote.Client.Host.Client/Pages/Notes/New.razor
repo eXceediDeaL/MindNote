@@ -1,8 +1,9 @@
 ﻿@page "/notes/new"
+@attribute [Authorize]
 @using MindNote.Client.SDK.API
 @using MindNote.Data
-@inject ICategoriesClient CategoryClient
-@inject INotesClient NoteClient
+@inject CustomCategoriesClient CategoryClient
+@inject CustomNotesClient NoteClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -26,24 +27,13 @@ else
     [Parameter]
     private int Id { get; set; }
 
-    NoteEditModel Model { get; set; }
+    NoteEditModel Model { get; set; } = new NoteEditModel();
 
     IEnumerable<Category> Categories { get; set; }
 
-    string Token { get; set; } = null;
-
     protected override async Task OnInitAsync()
     {
-        var user = (await authenticationStateTask).User;
-        if (!user.Identity.IsAuthenticated) return;
-
-        Token = UserHelper.GetAccessToken(user);
-
-        NoteClient.BaseUrl = Settings.ApiServerUrl;
-        CategoryClient.BaseUrl = Settings.ApiServerUrl;
-        Categories = await CategoryClient.GetAll(Token);
-
-        Model = new NoteEditModel();
+        Categories = await CategoryClient.GetAll();
     }
 
     private async Task OnSubmit()
@@ -59,7 +49,7 @@ else
             Keywords = Model.Keywords?.Split(';'),
             Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
         };
-        var id = await NoteClient.Create(Token, item);
-        UriHelper.NavigateTo($"/notes/{id}");
+        var id = await NoteClient.Create(item);
+        UriHelper.NavigateTo($"notes/{id}");
     }
 }

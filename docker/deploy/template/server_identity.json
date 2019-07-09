@@ -159,22 +159,29 @@
                 "Description": null,
                 "ClientUri": null,
                 "LogoUri": null,
-                "RequireConsent": true,
+                "RequireConsent": false,
                 "AllowRememberConsent": true,
                 "AllowedGrantTypes": [
-                    "password"
+                    "authorization_code"
                 ],
                 "RequirePkce": false,
                 "AllowPlainTextPkce": false,
                 "AllowAccessTokensViaBrowser": false,
-                "RedirectUris": [],
-                "PostLogoutRedirectUris": [],
+                "RedirectUris": [
+                    "{ClientHost}/account/login"
+                ],
+                "PostLogoutRedirectUris": [
+                    "{ClientHost}/account/logout/callback"
+                ],
                 "FrontChannelLogoutUri": null,
                 "FrontChannelLogoutSessionRequired": true,
                 "BackChannelLogoutUri": null,
                 "BackChannelLogoutSessionRequired": true,
-                "AllowOfflineAccess": false,
+                "AllowOfflineAccess": true,
                 "AllowedScopes": [
+                    "openid",
+                    "profile",
+                    "email",
                     "api"
                 ],
                 "AlwaysIncludeUserClaimsInIdToken": false,
@@ -198,7 +205,9 @@
                 "UserSsoLifetime": null,
                 "UserCodeType": null,
                 "DeviceCodeLifetime": 300,
-                "AllowedCorsOrigins": [],
+                "AllowedCorsOrigins": [
+                    "{ClientHost}"
+                ],
                 "Properties": {}
             }
         ],
@@ -222,9 +231,7 @@
                 "Description": null,
                 "UserClaims": [
                     "profile",
-                    "id",
-                    "email",
-                    "name"
+                    "id"
                 ],
                 "Properties": {}
             }

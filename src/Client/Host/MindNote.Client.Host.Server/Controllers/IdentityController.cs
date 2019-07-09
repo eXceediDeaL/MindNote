@@ -19,8 +19,8 @@ namespace MindNote.Client.Host.Server.Controllers
             this.httpClientFactory = httpClientFactory;
         }
 
-        [HttpPost("[action]")]
-        public async Task<IdentityData> Login([FromBody] LoginRequest request)
+        [HttpGet("[action]")]
+        public async Task<string> AuthorizeUrl()
         {
             using (HttpClient client = httpClientFactory.CreateClient())
             {
@@ -30,35 +30,96 @@ namespace MindNote.Client.Host.Server.Controllers
                     return null;
                 }
 
-                TokenResponse tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-                    ClientId = Utils.IdentityClient.ClientId,
-                    ClientSecret = Utils.IdentityClient.ClientSecret,
+                var ru = new RequestUrl(disco.AuthorizeEndpoint);
+                string url = ru.CreateAuthorizeUrl(
+                    clientId: Utils.IdentityClient.ClientId,
+                    responseType: "code",
+                    scope: "openid profile email api",
+                    redirectUri: Utils.ClientIdentityRedirectUri
+                );
+                return url;
+            }
+        }
 
-                    UserName = request.UserName,
-                    Password = request.Password,
-                    Scope = "api",
-                });
-
-                if (tokenResponse.IsError)
+        [HttpPost("[action]")]
+        public async Task<string> EndSessionUrl([FromBody] IdentityData data)
+        {
+            using (HttpClient client = httpClientFactory.CreateClient())
+            {
+                DiscoveryResponse disco = await client.GetDiscoveryDocumentAsync(Utils.Linked.Identity);
+                if (disco.IsError)
                 {
                     return null;
                 }
 
-                string token = tokenResponse.Json["access_token"].ToString();
-                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                JwtSecurityToken jwt = handler.ReadJwtToken(token);
-                DateTimeOffset expireTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(Utils.GetClaim(jwt.Claims, "exp")));
+                var ru = new RequestUrl(disco.EndSessionEndpoint);
+                string url = ru.CreateEndSessionUrl(
+                    idTokenHint: data.IdentityToken,
+                    state: data.State,
+                    postLogoutRedirectUri: Utils.ClientIdentityEndSessionRedirectUri
+                );
+                return url;
+            }
+        }
 
-                return new IdentityData
+        [HttpPost("[action]")]
+        public async Task<IdentityData> Login([FromBody] string code)
+        {
+            try
+            {
+                using (HttpClient client = httpClientFactory.CreateClient())
                 {
-                    UserId = jwt.Subject,
-                    AccessToken = token,
-                    Name = Utils.GetClaim(jwt.Claims, "name"),
-                    Email = Utils.GetClaim(jwt.Claims, "email"),
-                    ExpiresAt = expireTime
-                };
+                    DiscoveryResponse disco = await client.GetDiscoveryDocumentAsync(Utils.Linked.Identity);
+                    if (disco.IsError)
+                    {
+                        return null;
+                    }
+
+                    TokenResponse tokenResponse = await client.RequestAuthorizationCodeTokenAsync(new AuthorizationCodeTokenRequest
+                    {
+                        Address = disco.TokenEndpoint,
+                        Code = code,
+                        ClientId = Utils.IdentityClient.ClientId,
+                        ClientSecret = Utils.IdentityClient.ClientSecret,
+                        RedirectUri = Utils.ClientIdentityRedirectUri,
+                    });
+
+                    if (tokenResponse.IsError)
+                    {
+                        return null;
+                    }
+
+                    string access_token = tokenResponse.Json["access_token"].ToString();
+
+                    UserInfoResponse userInfoResponse = await client.GetUserInfoAsync(new UserInfoRequest
+                    {
+                        Address = disco.UserInfoEndpoint,
+                        Token = access_token,
+                    });
+
+                    if (userInfoResponse.IsError)
+                    {
+                        return null;
+                    }
+
+                    JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                    JwtSecurityToken jwtAccess = handler.ReadJwtToken(access_token);
+                    DateTimeOffset access_expireTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(Utils.GetClaim(jwtAccess.Claims, "exp")));
+
+                    return new IdentityData
+                    {
+                        UserId = jwtAccess.Subject,
+                        AccessToken = access_token,
+                        IdentityToken = tokenResponse.IdentityToken,
+                        Name = Utils.GetClaim(userInfoResponse.Claims, "name"),
+                        Email = Utils.GetClaim(userInfoResponse.Claims, "email"),
+                        ExpiresAt = access_expireTime
+                    };
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
     }

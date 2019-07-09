@@ -71,7 +71,7 @@ namespace MindNote.Server.Identity
                 }
                 {
                     var obj = idSection.GetSection("Clients").Get<Client[]>();
-                    idServer.AddInMemoryClients(obj ?? SampleConfig.GetClients(server.Host));
+                    idServer.AddInMemoryClients(obj ?? SampleConfig.GetClients(server.Host, server.Client));
                 }
             }
 

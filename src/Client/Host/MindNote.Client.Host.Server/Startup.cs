@@ -4,37 +4,12 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MindNote.Server.Shared.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 
 namespace MindNote.Client.Host.Server
 {
-    public class LinkedServerConfiguration
-    {
-        public string Api { get; set; }
-
-        public string Identity { get; set; }
-
-        public string Host { get; set; }
-
-        public static LinkedServerConfiguration Load(IConfiguration configuration)
-        {
-            return configuration?.GetSection("server")?.Get<LinkedServerConfiguration>();
-        }
-    }
-
-    public class IdentityClientConfiguration
-    {
-        public string ClientId { get; set; }
-
-        public string ClientSecret { get; set; }
-
-        public static IdentityClientConfiguration Load(IConfiguration configuration)
-        {
-            return configuration?.GetSection("identityClient")?.Get<IdentityClientConfiguration>();
-        }
-    }
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -56,6 +31,7 @@ namespace MindNote.Client.Host.Server
             services.AddHttpClient();
 
             services.AddMvc().AddNewtonsoftJson();
+
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(

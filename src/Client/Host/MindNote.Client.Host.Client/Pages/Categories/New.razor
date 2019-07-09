@@ -1,7 +1,8 @@
 ﻿@page "/categories/new"
+@attribute [Authorize]
 @using MindNote.Client.SDK.API
 @using MindNote.Data
-@inject ICategoriesClient CategoryClient
+@inject CustomCategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -19,24 +20,7 @@ else
 }
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-
-    CategoryEditModel Model { get; set; }
-
-    string Token { get; set; } = null;
-
-    protected override async Task OnInitAsync()
-    {
-        var user = (await authenticationStateTask).User;
-        if (!user.Identity.IsAuthenticated) return;
-
-        Token = UserHelper.GetAccessToken(user);
-
-        CategoryClient.BaseUrl = Settings.ApiServerUrl;
-
-        Model = new CategoryEditModel();
-    }
+    CategoryEditModel Model { get; set; } = new CategoryEditModel();
 
     private async Task OnSubmit()
     {
@@ -46,7 +30,7 @@ else
             Color = Model.Color,
             Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
         };
-        var id = await CategoryClient.Create(Token, item);
-        UriHelper.NavigateTo($"/categories/{id}");
+        var id = await CategoryClient.Create(item);
+        UriHelper.NavigateTo($"categories/{id}");
     }
 }

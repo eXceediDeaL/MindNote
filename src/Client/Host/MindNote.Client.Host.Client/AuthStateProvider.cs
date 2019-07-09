@@ -10,7 +10,7 @@ namespace MindNote.Client.Host.Client
 {
     public class AuthStateProvider : AuthenticationStateProvider
     {
-        private static IdentityData Identity { get; set; }
+        internal static IdentityData Identity { get; private set; }
 
         private readonly HttpClient http;
 
@@ -19,13 +19,13 @@ namespace MindNote.Client.Host.Client
             this.http = http;
         }
 
-        public async Task<bool> Login(string name, string password)
+        public async Task<bool> Login(string code, string sessionState)
         {
             if (Identity != null)
             {
                 return false;
             }
-            IdentityData id = await HostServer.Login(http, name, password);
+            IdentityData id = await HostServer.Login(http, code);
             if (id == null)
             {
                 return false;
@@ -33,6 +33,7 @@ namespace MindNote.Client.Host.Client
             else
             {
                 Identity = id;
+                Identity.State = sessionState;
                 base.NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
                 return true;
             }

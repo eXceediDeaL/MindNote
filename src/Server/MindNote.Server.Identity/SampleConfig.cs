@@ -23,11 +23,11 @@ namespace MindNote.Server.Identity
         {
             return new List<ApiResource>
             {
-                new ApiResource(APIScope, "MindNote API", new string[]{ JwtClaimTypes.Profile, JwtClaimTypes.Id, JwtClaimTypes.Email, JwtClaimTypes.Name })
+                new ApiResource(APIScope, "MindNote API", new string[]{ JwtClaimTypes.Profile, JwtClaimTypes.Id })
             };
         }
 
-        public static IEnumerable<Client> GetClients(string serverHostUrl = null)
+        public static IEnumerable<Client> GetClients(string serverHostUrl = null, string clientHostUrl = null)
         {
             var res = new List<Client>
             {
@@ -39,17 +39,31 @@ namespace MindNote.Server.Identity
                     AllowedScopes = { APIScope }
                 }
             };
-            res.Add(new Client
-            {
-                ClientId = "client.host",
-                ClientSecrets = new[] { new Secret("secret".Sha256()) },
-                AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
 
-                AllowedScopes = new List<string>
+            if (clientHostUrl != null)
+            {
+                res.Add(new Client
+                {
+                    ClientId = "client.host",
+                    ClientSecrets = new[] { new Secret("secret".Sha256()) },
+                    AllowedGrantTypes = GrantTypes.Code,
+                    RequireConsent = false,
+
+                    RedirectUris = { $"{clientHostUrl}/account/login" },
+                    PostLogoutRedirectUris = { $"{clientHostUrl}/account/logout/callback" },
+
+                    AllowedCorsOrigins = { clientHostUrl },
+
+                    AllowedScopes = new List<string>
                     {
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Email,
                         APIScope
                     },
-            });
+                    AllowOfflineAccess = true
+                });
+            }
 
             if (serverHostUrl != null)
             {

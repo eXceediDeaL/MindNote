@@ -10,6 +10,8 @@ namespace MindNote.Server.Shared.Configuration
 
         public string Host { get; set; }
 
+        public string Client { get; set; }
+
         public static LinkedServerConfiguration Load(IConfiguration configuration) => configuration?.GetSection("server")?.Get<LinkedServerConfiguration>();
     }
 }

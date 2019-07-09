@@ -61,18 +61,20 @@ namespace MindNote.Server.Host
                             var oldRefreshToken = context.Properties.Items[".Token.refresh_token"];
                             var oldIdToken = context.Properties.Items[".Token.id_token"];
 
-                            HttpClient httpclient = new HttpClient { BaseAddress = new Uri(server.Identity) };
-                            var tokenClient = new Client.SDK.Identity.TokenClient(httpclient);
-                            var tokens = await tokenClient.RefreshToken(idClient.ClientId, idClient.ClientSecret, oldRefreshToken, oldIdToken);
+                            using (HttpClient httpclient = new HttpClient { BaseAddress = new Uri(server.Identity) })
+                            {
+                                var tokenClient = new Client.SDK.Identity.TokenClient(httpclient);
+                                var tokens = await tokenClient.RefreshToken(idClient.ClientId, idClient.ClientSecret, oldRefreshToken, oldIdToken);
 
-                            if (tokens == null)
-                            {
-                                context.RejectPrincipal();
-                            }
-                            else
-                            {
-                                context.Properties.StoreTokens(tokens);
-                                context.ShouldRenew = true;
+                                if (tokens == null)
+                                {
+                                    context.RejectPrincipal();
+                                }
+                                else
+                                {
+                                    context.Properties.StoreTokens(tokens);
+                                    context.ShouldRenew = true;
+                                }
                             }
                         }
                     },

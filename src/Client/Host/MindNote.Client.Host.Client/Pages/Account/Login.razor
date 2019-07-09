@@ -1,32 +1,12 @@
 @page "/account/login"
 @using MindNote.Client.SDK.API
 @using MindNote.Data
-@inject IUsersClient UserClient
+@inject HttpClient Http
+@inject CustomUsersClient UserClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h1>Log in</h1>
-
-<p>@Message</p>
-
-<EditForm Model="@Model" OnValidSubmit="@LoginAsync">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="form-group">
-        <label class="control-label">Name</label>
-        <InputText class="form-control" @bind-Value="@Model.Name" />
-    </div>
-
-    <div class="form-group">
-        <label class="control-label">Password</label>
-        <InputText class="form-control" @bind-Value="@Model.Password" type="password" />
-    </div>
-
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Log in</button>
-    </div>
-</EditForm>
+<h1>Log in - @Message</h1>
 
 @code {
     [CascadingParameter]
@@ -34,39 +14,58 @@
 
     private LoginModel Model = new LoginModel();
 
-    string Message { get; set; }
+    string Message { get; set; } = "waiting...";
 
     protected override async Task OnInitAsync()
     {
-        var user = (await authenticationStateTask).User;
-        if (user.Identity.IsAuthenticated)
-        {
-            UriHelper.NavigateTo("/account");
-        }
-    }
-
-    private async Task LoginAsync()
-    {
-        var auth = (AuthStateProvider)AuthenticationStateProvider;
-        if (await auth.Login(Model.Name, Model.Password))
         {
             var user = (await authenticationStateTask).User;
-            var token = UserHelper.GetAccessToken(user);
-            var id = UserHelper.GetId(user);
-            var profile = await UserClient.Get(token, id);
-            if (profile == null)
+            if (user.Identity.IsAuthenticated)
             {
-                await UserClient.Create(token, id, new User
-                {
-                    Name = UserHelper.GetName(user),
-                    Email = UserHelper.GetEmail(user)
-                });
+                UriHelper.NavigateTo("account");
+                return;
             }
-            UriHelper.NavigateTo("/account");
+        }
+
+        var abUri = UriHelper.GetAbsoluteUri();
+        Console.WriteLine(abUri);
+        int indexQ = abUri.IndexOf('?');
+        if (indexQ != -1)
+        {
+            string[] fragments = abUri.Substring(indexQ + 1).Split('&');
+            if (fragments.Length == 3)
+            {
+                string[] codes = fragments[0].Split('=');
+                string[] sessionStates = fragments[2].Split('=');
+                if (codes.Length == 2 && sessionStates.Length == 2 && codes[0] == "code" && sessionStates[0] == "session_state")
+                {
+                    var auth = (AuthStateProvider)AuthenticationStateProvider;
+                    if (await auth.Login(codes[1], sessionStates[1]))
+                    {
+                        var user = (await authenticationStateTask).User;
+                        var token = UserHelper.GetAccessToken(user);
+                        var id = UserHelper.GetId(user);
+                        UserClient.Token = token;
+                        var profile = await UserClient.Get(id);
+                        if (profile == null)
+                        {
+                            await UserClient.Create(id, new User
+                            {
+                                Name = UserHelper.GetName(user),
+                                Email = UserHelper.GetEmail(user)
+                            });
+                        }
+                        UriHelper.NavigateTo("account");
+                        return;
+                    }
+                }
+            }
+            Message = "failed.";
         }
         else
         {
-            Message = "Login failed.";
+            string authUrl = await HostServer.GetAuthorizeUrl(Http);
+            UriHelper.NavigateTo(authUrl);
         }
     }
 }

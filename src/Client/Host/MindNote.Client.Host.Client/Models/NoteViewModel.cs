@@ -1,3 +1,4 @@
+using MindNote.Client.Host.Client.Helpers;
 using MindNote.Client.SDK.API;
 using MindNote.Data;
 using System.Threading.Tasks;
@@ -13,17 +14,17 @@ namespace MindNote.Client.Host.Client.Models
 
         public User User { get; set; }
 
-        public async Task Load(ICategoriesClient categoriesClient, IUsersClient usersClient, string token)
+        public async Task Load(CustomCategoriesClient categoriesClient, CustomUsersClient usersClient)
         {
-            await LoadCategory(categoriesClient, token);
-            await LoadUser(usersClient, token);
+            await LoadCategory(categoriesClient);
+            await LoadUser(usersClient);
         }
 
-        public async Task LoadCategory(ICategoriesClient client, string token)
+        public async Task LoadCategory(CustomCategoriesClient client)
         {
             if (Data.CategoryId.HasValue)
             {
-                Category = await client.Get(token, Data.CategoryId.Value);
+                Category = await client.Get(Data.CategoryId.Value);
             }
             else
             {
@@ -31,9 +32,9 @@ namespace MindNote.Client.Host.Client.Models
             }
         }
 
-        public async Task LoadUser(IUsersClient client, string token)
+        public async Task LoadUser(CustomUsersClient client)
         {
-            User = await client.Get(token, Data.UserId);
+            User = await client.Get(Data.UserId);
             if (User == null)
             {
                 User = new User

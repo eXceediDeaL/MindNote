@@ -3,18 +3,17 @@
 @using MindNote.Client.SDK.API
 @using System.Linq
 @using MindNote.Data
-@inject INotesClient NoteClient
-@inject IUsersClient UserClient
-@inject ICategoriesClient CategoryClient
+@inject CustomNotesClient NoteClient
+@inject CustomUsersClient UserClient
+@inject CustomCategoriesClient CategoryClient
 
 <div class="d-flex flex-row">
     <h1>Notes</h1>
-    @if (IsAuthenticated)
-    {
+    <AuthorizeView>
         <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
-            <a href="/notes/new" class="btn btn-success"><i class="fa fa-plus"></i></a>
+            <a href="notes/new" class="btn btn-success"><i class="fa fa-plus"></i></a>
         </div>
-    }
+    </AuthorizeView>
 </div>
 
 @if (Data == null)
@@ -34,24 +33,9 @@ else
 
     IList<NoteViewModel> Data { get; set; }
 
-    string Token { get; set; } = null;
-
-    bool IsAuthenticated { get; set; } = false;
-
     protected override async Task OnInitAsync()
     {
-        var user = (await authenticationStateTask).User;
-        if (user.Identity.IsAuthenticated)
-        {
-            Token = UserHelper.GetAccessToken(user);
-            IsAuthenticated = true;
-        }
-
-        NoteClient.BaseUrl = Settings.ApiServerUrl;
-        CategoryClient.BaseUrl = Settings.ApiServerUrl;
-        UserClient.BaseUrl = Settings.ApiServerUrl;
-
-        int count = (await NoteClient.Query(Token, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+        int count = (await NoteClient.Query(targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
         Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
         Paging.CurrentIndex = 1;
         await OnQueryPaging(Paging.CurrentIndex);
@@ -62,10 +46,10 @@ else
         Paging.CurrentIndex = pageIndex;
         int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-        IEnumerable<Note> ms = await NoteClient.Query(Token, offset: offset, count: Paging.ItemCountPerPage);
+        IEnumerable<Note> ms = await NoteClient.Query(offset: offset, count: Paging.ItemCountPerPage);
         var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
         foreach (var v in data)
-            await v.Load(CategoryClient, UserClient, Token);
+            await v.Load(CategoryClient, UserClient);
         Data = data;
     }
 }

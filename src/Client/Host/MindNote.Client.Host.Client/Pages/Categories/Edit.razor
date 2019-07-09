@@ -1,17 +1,18 @@
 ﻿@page "/categories/{id:int}/edit"
+@attribute [Authorize]
 @using MindNote.Client.Host.Shared
 @using MindNote.Client.SDK.API
 @using MindNote.Data
 @using System.Linq
-@inject INotesClient NoteClient
-@inject IUsersClient UserClient
-@inject ICategoriesClient CategoryClient
+@inject CustomNotesClient NoteClient
+@inject CustomUsersClient UserClient
+@inject CustomCategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
-    <li class="breadcrumb-item"><a href="/categories">Categories</a></li>
+    <li class="breadcrumb-item"><a href="categories">Categories</a></li>
     <li class="breadcrumb-item">
-        <a href="/categories/@Id">@Id</a>
+        <a href="categories/@Id">@Id</a>
     </li>
     <li class="breadcrumb-item active">Edit</li>
 </ul>
@@ -34,20 +35,10 @@ else
 
     CategoryEditModel Model { get; set; }
 
-    string Token { get; set; } = null;
-
     protected override async Task OnInitAsync()
     {
         var user = (await authenticationStateTask).User;
-        if (!user.Identity.IsAuthenticated) return;
-
-        Token = UserHelper.GetAccessToken(user);
-
-        NoteClient.BaseUrl = Settings.ApiServerUrl;
-        CategoryClient.BaseUrl = Settings.ApiServerUrl;
-        UserClient.BaseUrl = Settings.ApiServerUrl;
-
-        Category item = await CategoryClient.Get(Token, Id);
+        Category item = await CategoryClient.Get(Id);
         if (item.UserId != UserHelper.GetId(user)) return;
 
         Model = new CategoryEditModel(item);
@@ -55,7 +46,7 @@ else
 
     private async Task OnSubmit()
     {
-        var id = await CategoryClient.Update(Token, Id, Model.ToModel());
-        UriHelper.NavigateTo($"/categories/{id}");
+        var id = await CategoryClient.Update(Id, Model.ToModel());
+        UriHelper.NavigateTo($"categories/{id}");
     }
 }

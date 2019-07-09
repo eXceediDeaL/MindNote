@@ -70,10 +70,12 @@ jobs:
         - cd ./docker/deploy && chmod +x ./gen.sh
         - ./gen.sh
         - docker-compose up -d && sleep 30
+        - docker stats --no-stream
         - curl http://mindnote.com > /dev/null
         - curl http://api.mindnote.com > /dev/null
         - curl http://id.mindnote.com > /dev/null
         - curl http://client.mindnote.com > /dev/null
+        - docker stats --no-stream
         - docker-compose stop && docker-compose logs -t
     - stage: deploy
       if: branch = master AND NOT (type = pull_request)

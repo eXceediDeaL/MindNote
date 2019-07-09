@@ -1,7 +1,7 @@
 @using MindNote.Client.SDK.API
 @using MindNote.Data
 
-@inject INotesClient NoteClient
+@inject CustomNotesClient NoteClient
 
 <div class="card-columns @(!Column.HasValue ? "waterfall-card-columns" : "")" style="@(Column.HasValue ? $"column-count: {Column.Value}" : "")">
     @foreach (var item in Data)
@@ -10,15 +10,17 @@
             <div class="card-body">
                 <div class="card-title d-flex flex-row mb-1">
                     <h4>
-                        <a href="/notes/@item.Data.Id" style="color:black">@item.Data.Title</a>
+                        <a href="notes/@item.Data.Id" style="color:black">@item.Data.Title</a>
                     </h4>
-                    @if (item.Data.UserId != null && item.Data.UserId == CurrentUserId)
-                    {
-                        <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
-                            <button class="btn btn-sm btn-outline-danger m-1" @onclick="@(async e => await OnDelete(item.Data.Id))"><i class="fa fa-trash"></i></button>
-                            <a href="/notes/@item.Data.Id/edit" class="btn btn-sm btn-outline-primary m-1"><i class="fa fa-edit"></i></a>
-                        </div>
-                    }
+                    <AuthorizeView>
+                        @if (item.Data.UserId != null && item.Data.UserId == UserHelper.GetId(context.User))
+                        {
+                            <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
+                                <button class="btn btn-sm btn-outline-danger m-1" @onclick="@(async e => await OnDelete(item.Data.Id))"><i class="fa fa-trash"></i></button>
+                                <a href="notes/@item.Data.Id/edit" class="btn btn-sm btn-outline-primary m-1"><i class="fa fa-edit"></i></a>
+                            </div>
+                        }
+                    </AuthorizeView>
                 </div>
 
                 <div class="card-subtitle mb-2">
@@ -28,7 +30,7 @@
                 <p class="card-text mb-1">
                     <TextClipper value="@item.Data.Content" />
                 </p>
-                <a href="/notes/@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
+                <a href="notes/@item.Data.Id" class="card-link" style="color: #555; border-bottom: 1px solid #666;">Read more</a>
             </div>
         </div>
     }
@@ -56,9 +58,6 @@
 }
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-
     [Parameter]
     private IList<NoteViewModel> Data { get; set; } = null;
 
@@ -71,20 +70,6 @@
     [Parameter]
     private EventCallback<int> OnQueryPaging { get; set; }
 
-    string CurrentUserId { get; set; }
-
-    string Token { get; set; }
-
-    protected override async Task OnInitAsync()
-    {
-        var user = (await authenticationStateTask).User;
-        if (user.Identity.IsAuthenticated)
-        {
-            CurrentUserId = UserHelper.GetId(user);
-            Token = UserHelper.GetAccessToken(user);
-        }
-    }
-
     private async Task ClickPage(int pageIndex)
     {
         await OnQueryPaging.InvokeAsync(pageIndex);
@@ -92,7 +77,7 @@
 
     private async Task OnDelete(int id)
     {
-        await NoteClient.Delete(Token, id);
+        await NoteClient.Delete(id);
         await ClickPage(Paging.CurrentIndex);
     }
 }
