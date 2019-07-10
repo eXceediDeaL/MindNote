@@ -31,7 +31,7 @@ namespace MindNote.Data.Providers.SqlServer
                 id = Guid.NewGuid().ToString();
             }
             data.Id = id;
-            Models.User raw = Models.User.FromModel(data);
+            RawUser raw = ProviderExtensions.FromModel(data);
             context.Users.Add(raw);
             await context.SaveChangesAsync();
             return raw.Id;
@@ -39,7 +39,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<string> Delete(string id)
         {
-            Models.User raw = await context.Users.FindAsync(id);
+            RawUser raw = await context.Users.FindAsync(id);
             if (raw == null)
             {
                 return null;
@@ -52,27 +52,27 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<User> Get(string id)
         {
-            IQueryable<Models.User> query = context.Users.Where(x => x.Id == id);
+            IQueryable<RawUser> query = context.Users.Where(x => x.Id == id);
 
             return (await query.FirstOrDefaultAsync())?.ToModel();
         }
 
         public async Task<IEnumerable<User>> GetAll()
         {
-            IQueryable<Models.User> query = context.Users.AsQueryable();
+            IQueryable<RawUser> query = context.Users.AsQueryable();
 
             return (await query.ToArrayAsync()).Select(x => x.ToModel()).ToArray();
         }
 
         public async Task<string> Update(string id, User data)
         {
-            Models.User raw = await context.Users.FindAsync(id);
+            RawUser raw = await context.Users.FindAsync(id);
             if (raw == null)
             {
                 return null;
             }
 
-            Models.User value = Models.User.FromModel(data);
+            RawUser value = ProviderExtensions.FromModel(data);
             raw.Name = value.Name;
             raw.Location = value.Location;
             raw.Url = value.Url;

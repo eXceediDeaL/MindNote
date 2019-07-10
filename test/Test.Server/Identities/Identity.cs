@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Backend.Identity;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Test.Server.Identities
 {

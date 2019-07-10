@@ -1,5 +1,6 @@
 ﻿using HotChocolate;
 using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Voyager;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -47,6 +48,7 @@ namespace MindNote.Backend.API
                 }
             });
             services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.DataProvider>();
+            services.AddScoped<Data.Repositories.IDataRepository, Data.Providers.SqlServer.DataRepository>();
         }
 
         public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
@@ -68,7 +70,9 @@ namespace MindNote.Backend.API
         {
             services.AddGraphQL(sp => SchemaBuilder.New()
                 .AddServices(sp)
+                .AddAuthorizeDirectiveType()
                 .AddQueryType<AppQueryType>()
+                .AddMutationType<AppMutationType>()
                 .Create());
         }
 
@@ -120,6 +124,8 @@ namespace MindNote.Backend.API
 
         public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
         {
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -149,8 +155,6 @@ namespace MindNote.Backend.API
             ConfigureGraphQLServices(server, services);
 
             services.AddSingleton<IIdentityDataGetter, IdentityDataGetter>();
-
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             ConfigureFinalServices(Configuration, services);
         }
@@ -191,7 +195,8 @@ namespace MindNote.Backend.API
             app.UseReDoc();
 
             app.UseGraphQL("/graphql")
-                .UsePlayground("/graphql", "/ui/playground");
+                .UsePlayground("/graphql", "/ui/playground")
+                .UseVoyager("/graphql", "/ui/voyager");
 
             app.UseCors();
             app.UseMvc();

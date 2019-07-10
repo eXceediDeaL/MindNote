@@ -24,7 +24,7 @@ namespace MindNote.Data.Providers.SqlServer
             if (identity == null) return;
 
             await parent.RelationsProvider.Clear(identity);
-            IQueryable<Models.Note> query = context.Notes.AsQueryable();
+            IQueryable<RawNote> query = context.Notes.AsQueryable();
             if (identity != null)
             {
                 query = query.Where(x => x.UserId == identity);
@@ -51,7 +51,7 @@ namespace MindNote.Data.Providers.SqlServer
                 }
             }
 
-            Models.Note raw = Models.Note.FromModel(data);
+            RawNote raw = ProviderExtensions.FromModel(data);
             raw.CreationTime = raw.ModificationTime = DateTimeOffset.Now;
             raw.UserId = identity;
 
@@ -64,7 +64,7 @@ namespace MindNote.Data.Providers.SqlServer
         {
             if (identity == null) return null;
 
-            Models.Note raw = await context.Notes.FindAsync(id);
+            RawNote raw = await context.Notes.FindAsync(id);
             if (raw == null || raw.UserId != identity)
             {
                 return null;
@@ -81,7 +81,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<Note> Get(int id, string identity)
         {
-            IQueryable<Models.Note> query = context.Notes.Where(x => x.Id == id);
+            IQueryable<RawNote> query = context.Notes.Where(x => x.Id == id);
             if (identity == null)
                 query = query.Where(x => x.Status == ItemStatus.Public);
             else
@@ -92,7 +92,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<IEnumerable<Note>> GetAll(string identity)
         {
-            IQueryable<Models.Note> query = context.Notes.AsQueryable();
+            IQueryable<RawNote> query = context.Notes.AsQueryable();
             if (identity == null)
                 query = query.Where(x => x.Status == ItemStatus.Public);
             else
@@ -105,13 +105,13 @@ namespace MindNote.Data.Providers.SqlServer
         {
             if (identity == null) return null;
 
-            Models.Note raw = await context.Notes.FindAsync(id);
+            RawNote raw = await context.Notes.FindAsync(id);
             if (raw == null || raw.UserId != identity)
             {
                 return null;
             }
 
-            Models.Note value = Models.Note.FromModel(data);
+            RawNote value = ProviderExtensions.FromModel(data);
             raw.Title = value.Title;
             raw.Content = value.Content;
             raw.CategoryId = value.CategoryId;
@@ -127,7 +127,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<IEnumerable<Note>> Query(int? id, string title, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId, string identity)
         {
-            IQueryable<Models.Note> query = context.Notes.AsQueryable();
+            IQueryable<RawNote> query = context.Notes.AsQueryable();
             if (identity == null)
                 query = query.Where(x => x.Status == ItemStatus.Public);
             else

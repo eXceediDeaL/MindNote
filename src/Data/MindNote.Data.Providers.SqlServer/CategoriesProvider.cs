@@ -17,9 +17,9 @@ namespace MindNote.Data.Providers.SqlServer
             parent = dataProvider;
         }
 
-        private void ClearNodeTag(IEnumerable<Models.Note> notes)
+        private void ClearNodeTag(IEnumerable<RawNote> notes)
         {
-            foreach (Models.Note v in notes)
+            foreach (RawNote v in notes)
             {
                 v.CategoryId = null;
                 context.Notes.Update(v);
@@ -31,8 +31,8 @@ namespace MindNote.Data.Providers.SqlServer
             if (identity == null)
                 return;
 
-            IQueryable<Models.Category> query = context.Categories.AsQueryable();
-            IQueryable<Models.Note> queryNode = context.Notes.AsQueryable();
+            IQueryable<RawCategory> query = context.Categories.AsQueryable();
+            IQueryable<RawNote> queryNode = context.Notes.AsQueryable();
             if (identity != null)
             {
                 query = query.Where(x => x.UserId == identity);
@@ -48,7 +48,7 @@ namespace MindNote.Data.Providers.SqlServer
             if (identity == null)
                 return null;
 
-            Models.Category raw = Models.Category.FromModel(data);
+            RawCategory raw = ProviderExtensions.FromModel(data);
             raw.UserId = identity;
 
             context.Categories.Add(raw);
@@ -61,7 +61,7 @@ namespace MindNote.Data.Providers.SqlServer
             if (identity == null)
                 return null;
 
-            Models.Category raw = await context.Categories.FindAsync(id);
+            RawCategory raw = await context.Categories.FindAsync(id);
             if (raw == null || raw.UserId != identity)
             {
                 return null;
@@ -69,7 +69,7 @@ namespace MindNote.Data.Providers.SqlServer
 
             context.Categories.Remove(raw);
             {
-                IQueryable<Models.Note> queryNode = context.Notes.AsQueryable();
+                IQueryable<RawNote> queryNode = context.Notes.AsQueryable();
                 queryNode = queryNode.Where(x => x.UserId == identity);
                 queryNode = queryNode.Where(x => x.CategoryId == id);
                 ClearNodeTag(queryNode);
@@ -80,7 +80,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<Category> Get(int id, string identity)
         {
-            IQueryable<Models.Category> query = context.Categories.Where(x => x.Id == id);
+            IQueryable<RawCategory> query = context.Categories.Where(x => x.Id == id);
             if (identity == null)
                 query = query.Where(x => x.Status == ItemStatus.Public);
             else
@@ -91,7 +91,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<IEnumerable<Category>> Query(int? id, string name, string color, string userId, string identity)
         {
-            IQueryable<Models.Category> query = context.Categories.AsQueryable();
+            IQueryable<RawCategory> query = context.Categories.AsQueryable();
             if (identity == null)
                 query = query.Where(x => x.Status == ItemStatus.Public);
             else
@@ -118,7 +118,7 @@ namespace MindNote.Data.Providers.SqlServer
 
         public async Task<IEnumerable<Category>> GetAll(string identity)
         {
-            IQueryable<Models.Category> query = context.Categories.AsQueryable();
+            IQueryable<RawCategory> query = context.Categories.AsQueryable();
             if (identity == null)
                 query = query.Where(x => x.Status == ItemStatus.Public);
             else
@@ -132,13 +132,13 @@ namespace MindNote.Data.Providers.SqlServer
             if (identity == null)
                 return null;
 
-            Models.Category raw = await context.Categories.FindAsync(id);
+            RawCategory raw = await context.Categories.FindAsync(id);
             if (raw == null || raw.UserId != identity)
             {
                 return null;
             }
 
-            Models.Category value = Models.Category.FromModel(data);
+            RawCategory value = ProviderExtensions.FromModel(data);
             raw.Name = value.Name;
             raw.Color = value.Color;
             raw.Status = value.Status;

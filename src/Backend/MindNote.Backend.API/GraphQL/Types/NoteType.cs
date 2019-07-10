@@ -1,17 +1,18 @@
 ﻿using HotChocolate.Types;
 using MindNote.Data;
+using System.Linq;
 
 namespace MindNote.Backend.API.GraphQL.Types
 {
-    public class NoteType : ObjectType<Note>
+    public class NoteType : ObjectType<RawNote>
     {
-        protected override void Configure(IObjectTypeDescriptor<Note> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<RawNote> descriptor)
         {
+            descriptor.Name("Note");
             descriptor.Field(x => x.Clone()).Ignore();
-            descriptor.Field(x => x.Equals(default)).Ignore();
-            descriptor.Field(x => x.Equals(default(object))).Ignore();
-            descriptor.Field(x => x.GetHashCode()).Ignore();
             descriptor.Field(x => x.Status).Type<ItemStatusType>();
+            descriptor.Field(x => x.Id).Type<IdType>();
+            descriptor.Field(x => x.Title).Type<NonNullType<StringType>>();
         }
     }
 }

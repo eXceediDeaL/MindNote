@@ -3,15 +3,15 @@ using MindNote.Data;
 
 namespace MindNote.Backend.API.GraphQL.Types
 {
-    public class CategoryType : ObjectType<Category>
+    public class CategoryType : ObjectType<RawCategory>
     {
-        protected override void Configure(IObjectTypeDescriptor<Category> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<RawCategory> descriptor)
         {
+            descriptor.Name("Category");
             descriptor.Field(x => x.Clone()).Ignore();
-            descriptor.Field(x => x.Equals(default)).Ignore();
-            descriptor.Field(x => x.Equals(default(object))).Ignore();
-            descriptor.Field(x => x.GetHashCode()).Ignore();
             descriptor.Field(x => x.Status).Type<ItemStatusType>();
+            descriptor.Field(x => x.Id).Type<IdType>();
+            descriptor.Field(x => x.Name).Type<NonNullType<StringType>>();
         }
     }
 }

@@ -8,7 +8,9 @@
   <ItemGroup>
     <PackageReference Include="HotChocolate" Version="9.0.4" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="9.0.4" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="9.0.4" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="9.0.4" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="9.0.4" />
     <PackageReference Include="IdentityModel" Version="3.10.10" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
