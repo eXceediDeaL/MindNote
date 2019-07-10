@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MindNote.Backend.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     [EnableCors]
     public class UsersController : ControllerBase

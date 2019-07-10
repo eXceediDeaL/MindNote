@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MindNote.Backend.Identity.Data;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using System;
 using System.Threading.Tasks;
 

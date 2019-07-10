@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 

@@ -29,7 +29,7 @@ namespace Test.Server.Apis
                     "0",
                     "1"
                     };
-                    res.AddRange(sub.Select(x => "/Notes/" + x));
+                    res.AddRange(sub.Select(x => "/api/Notes/" + x));
                 }
                 {
                     string[] sub = new string[]
@@ -41,7 +41,7 @@ namespace Test.Server.Apis
                     "Adjacents/0",
                     "Adjacents/1",
                     };
-                    res.AddRange(sub.Select(x => "/Relations/" + x));
+                    res.AddRange(sub.Select(x => "/api/Relations/" + x));
                 }
                 {
                     string[] sub = new string[]
@@ -51,7 +51,7 @@ namespace Test.Server.Apis
                     "0",
                     "1"
                     };
-                    res.AddRange(sub.Select(x => "/Categories/" + x));
+                    res.AddRange(sub.Select(x => "/api/Categories/" + x));
                 }
                 {
                     string[] sub = new string[]
@@ -59,7 +59,7 @@ namespace Test.Server.Apis
                     "All",
                     "user"
                     };
-                    res.AddRange(sub.Select(x => "/Users/" + x));
+                    res.AddRange(sub.Select(x => "/api/Users/" + x));
                 }
                 return res.Select(x => new object[] { x });
             }

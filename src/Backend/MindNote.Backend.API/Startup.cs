@@ -1,13 +1,19 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using HotChocolate;
+using HotChocolate.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using MindNote.Backend.API.GraphQL;
+using MindNote.Backend.API.GraphQL.Types;
 using MindNote.Frontend.SDK.Identity;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using System;
@@ -56,6 +62,14 @@ namespace MindNote.Backend.API
 
                 options.Audience = "api";
             });
+        }
+
+        public static void ConfigureGraphQLServices(LinkedServerConfiguration server, IServiceCollection services)
+        {
+            services.AddGraphQL(sp => SchemaBuilder.New()
+                .AddServices(sp)
+                .AddQueryType<AppQueryType>()
+                .Create());
         }
 
         public static void ConfigureDocumentServices(LinkedServerConfiguration server, IServiceCollection services)
@@ -132,7 +146,11 @@ namespace MindNote.Backend.API
 
             ConfigureDocumentServices(server, services);
 
-            services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();
+            ConfigureGraphQLServices(server, services);
+
+            services.AddSingleton<IIdentityDataGetter, IdentityDataGetter>();
+
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             ConfigureFinalServices(Configuration, services);
         }
@@ -171,6 +189,9 @@ namespace MindNote.Backend.API
             });
 
             app.UseReDoc();
+
+            app.UseGraphQL("/graphql")
+                .UsePlayground("/graphql", "/ui/playground");
 
             app.UseCors();
             app.UseMvc();

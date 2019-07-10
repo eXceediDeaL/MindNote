@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Frontend.SDK.Identity;
 using MindNote.Data.Providers;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using System;
 using System.Collections.Generic;
 using Test.Server.Apis;

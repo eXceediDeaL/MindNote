@@ -6,11 +6,11 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "{ServerIdentity}",
-        "Api": "{ServerApi}"
+        "Identity": "{BackendIdenty}",
+        "Api": "{BackendApi}"
     },
     "identityClient": {
         "ClientId": "frontend.server",
-        "ClientSecret": "{SecretServerHost}"
+        "ClientSecret": "{SecretFrontendServer}"
     }
 }

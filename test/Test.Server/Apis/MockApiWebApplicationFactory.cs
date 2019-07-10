@@ -46,6 +46,8 @@ namespace Test.Server.Apis
 
                 Startup.ConfigureDocumentServices(Utils.ServerConfiguration, services);
 
+                Startup.ConfigureGraphQLServices(Utils.ServerConfiguration, services);
+
                 // Mock IdentityDataGetter
                 services.AddSingleton(idData);
 

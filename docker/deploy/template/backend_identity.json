@@ -6,7 +6,7 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "{ServerIdentity}"
+        "Identity": "{BackendIdenty}"
     },
     "db": {
         "ConnectionString": "server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mniddb;",
@@ -21,7 +21,7 @@
                 "ClientSecrets": [
                     {
                         "Description": null,
-                        "Value": "{EncodedSecretServerHost}",
+                        "Value": "{EncodedSecretFrontendServer}",
                         "Expiration": null,
                         "Type": "SharedSecret"
                     }
@@ -40,10 +40,10 @@
                 "AllowPlainTextPkce": false,
                 "AllowAccessTokensViaBrowser": false,
                 "RedirectUris": [
-                    "{ServerHost}/signin-oidc"
+                    "{FrontendServer}/signin-oidc"
                 ],
                 "PostLogoutRedirectUris": [
-                    "{ServerHost}/signout-callback-oidc"
+                    "{FrontendServer}/signout-callback-oidc"
                 ],
                 "FrontChannelLogoutUri": null,
                 "FrontChannelLogoutSessionRequired": true,
@@ -79,7 +79,7 @@
                 "UserCodeType": null,
                 "DeviceCodeLifetime": 300,
                 "AllowedCorsOrigins": [
-                    "{ServerHost}"
+                    "{FrontendServer}"
                 ],
                 "Properties": {}
             },
@@ -90,7 +90,7 @@
                 "ClientSecrets": [
                     {
                         "Description": null,
-                        "Value": "{EncodedSecretServerApi}",
+                        "Value": "{EncodedSecretBackendApi}",
                         "Expiration": null,
                         "Type": "SharedSecret"
                     }
@@ -149,7 +149,7 @@
                 "ClientSecrets": [
                     {
                         "Description": null,
-                        "Value": "{EncodedSecretClientHost}",
+                        "Value": "{EncodedSecretFrontendClient}",
                         "Expiration": null,
                         "Type": "SharedSecret"
                     }
@@ -168,10 +168,10 @@
                 "AllowPlainTextPkce": false,
                 "AllowAccessTokensViaBrowser": false,
                 "RedirectUris": [
-                    "{ClientHost}/account/login"
+                    "{FrontendClient}/account/login"
                 ],
                 "PostLogoutRedirectUris": [
-                    "{ClientHost}/account/logout/callback"
+                    "{FrontendClient}/account/logout/callback"
                 ],
                 "FrontChannelLogoutUri": null,
                 "FrontChannelLogoutSessionRequired": true,
@@ -206,7 +206,7 @@
                 "UserCodeType": null,
                 "DeviceCodeLifetime": 300,
                 "AllowedCorsOrigins": [
-                    "{ClientHost}"
+                    "{FrontendClient}"
                 ],
                 "Properties": {}
             }

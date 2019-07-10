@@ -1,4 +1,4 @@
-﻿using MindNote.Backend.Shared.Configuration;
+﻿using MindNote.Shared.Web.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;

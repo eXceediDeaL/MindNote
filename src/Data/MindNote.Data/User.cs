@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MindNote.Data
 {
-    public class User : ICloneable
+    public class User : ICloneable, IHasId<string>
     {
         public string Id { get; set; }
 

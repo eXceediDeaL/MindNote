@@ -30,6 +30,7 @@ namespace MindNote.Frontend.SDK.Identity
 
         public string GetClaim(IEnumerable<Claim> claims, string name)
         {
+            if (claims == null) return null;
             return (from x in claims where x.Type == name select x.Value).FirstOrDefault();
         }
 

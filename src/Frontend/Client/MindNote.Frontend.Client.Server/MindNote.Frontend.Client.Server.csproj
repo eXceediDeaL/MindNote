@@ -18,7 +18,7 @@
     <ProjectReference Include="..\MindNote.Frontend.Client.Client\MindNote.Frontend.Client.Client.csproj" />
     <ProjectReference Include="..\MindNote.Frontend.Client.Shared\MindNote.Frontend.Client.Shared.csproj" />
     <ProjectReference Include="..\..\SDK\MindNote.Frontend.SDK.Identity\MindNote.Frontend.SDK.Identity.csproj" />
-    <ProjectReference Include="..\..\..\Backend\MindNote.Backend.Shared\MindNote.Backend.Shared.csproj" />
+    <ProjectReference Include="..\..\..\Shared\MindNote.Shared.Web\MindNote.Shared.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

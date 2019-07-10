@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MindNote.Data
 {
-    public class Category : ICloneable, IEquatable<Category>
+    public class Category : ICloneable, IEquatable<Category>, IHasId<int>
     {
         public int Id { get; set; }
 

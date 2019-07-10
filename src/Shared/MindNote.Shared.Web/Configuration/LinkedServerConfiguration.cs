@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace MindNote.Backend.Shared.Configuration
+namespace MindNote.Shared.Web.Configuration
 {
     public class LinkedServerConfiguration
     {

@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using MindNote.Frontend.SDK.API;
 using MindNote.Frontend.SDK.Identity;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -130,7 +130,7 @@ namespace MindNote.Frontend.Server
 
             ConfigureClientServices(server, services);
 
-            services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();
+            services.AddSingleton<IIdentityDataGetter, IdentityDataGetter>();
 
             ConfigureFinalServices(Configuration, services);
         }
