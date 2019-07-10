@@ -64,17 +64,17 @@ jobs:
         - docker-compose build
         - docker tag mindnote:api $DOCKER_USERNAME/mindnote:dev-api
         - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:dev-identity
-        - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
-        - docker tag mindnote:client $DOCKER_USERNAME/mindnote:dev-client
+        # - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
+        # - docker tag mindnote:client $DOCKER_USERNAME/mindnote:dev-client
         - sudo sh -c "echo \"\n127.0.0.1 mindnote.com\n127.0.0.1 client.mindnote.com\n127.0.0.1 api.mindnote.com\n127.0.0.1 id.mindnote.com\" >> /etc/hosts"
         - cd ./docker/deploy && chmod +x ./gen.sh
         - ./gen.sh
         - docker-compose up -d && sleep 30
         - docker stats --no-stream
-        - curl http://mindnote.com > /dev/null
         - curl http://api.mindnote.com > /dev/null
         - curl http://id.mindnote.com > /dev/null
-        - curl http://client.mindnote.com > /dev/null
+        # - curl http://mindnote.com > /dev/null
+        # - curl http://client.mindnote.com > /dev/null
         - docker stats --no-stream
         - docker-compose stop && docker-compose logs -t
     - stage: deploy
@@ -88,10 +88,10 @@ jobs:
       - docker push $DOCKER_USERNAME/mindnote:api
       - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:identity
       - docker push $DOCKER_USERNAME/mindnote:identity
-      - docker tag mindnote:host $DOCKER_USERNAME/mindnote:host
-      - docker push $DOCKER_USERNAME/mindnote:host
-      - docker tag mindnote:client $DOCKER_USERNAME/mindnote:client
-      - docker push $DOCKER_USERNAME/mindnote:client
+      # - docker tag mindnote:host $DOCKER_USERNAME/mindnote:host
+      # - docker push $DOCKER_USERNAME/mindnote:host
+      # - docker tag mindnote:client $DOCKER_USERNAME/mindnote:client
+      # - docker push $DOCKER_USERNAME/mindnote:client
     - stage: deploy
       if: NOT (branch = master) AND NOT (type = pull_request)
       name: dev image
@@ -103,7 +103,7 @@ jobs:
       - docker push $DOCKER_USERNAME/mindnote:dev-api
       - docker tag mindnote:identity $DOCKER_USERNAME/mindnote:dev-identity
       - docker push $DOCKER_USERNAME/mindnote:dev-identity
-      - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
-      - docker push $DOCKER_USERNAME/mindnote:dev-host
-      - docker tag mindnote:client $DOCKER_USERNAME/mindnote:dev-client
-      - docker push $DOCKER_USERNAME/mindnote:dev-client
+      # - docker tag mindnote:host $DOCKER_USERNAME/mindnote:dev-host
+      # - docker push $DOCKER_USERNAME/mindnote:dev-host
+      # - docker tag mindnote:client $DOCKER_USERNAME/mindnote:dev-client
+      # - docker push $DOCKER_USERNAME/mindnote:dev-client

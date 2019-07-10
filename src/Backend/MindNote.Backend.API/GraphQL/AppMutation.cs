@@ -1,6 +1,7 @@
 ﻿using HotChocolate;
 using Microsoft.AspNetCore.Http;
 using MindNote.Data;
+using MindNote.Data.Mutations;
 using MindNote.Data.Repositories;
 using MindNote.Frontend.SDK.Identity;
 using System.Threading.Tasks;

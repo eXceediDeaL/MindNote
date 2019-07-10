@@ -5,8 +5,6 @@ using MindNote.Data.Providers;
 using MindNote.Shared.Web.Configuration;
 using System;
 using System.Collections.Generic;
-using Test.Server.Apis;
-using Test.Server.Hosts;
 using Test.Server.Identities;
 
 namespace Test.Server
@@ -32,6 +30,8 @@ namespace Test.Server
                 action(id);
             }
         }
+
+        /*
 
         public static void UseApiEnvironment(Action<MockIdentityWebApplicationFactory, MockApiWebApplicationFactory, string> action, IDataProvider provider = null)
         {
@@ -94,5 +94,7 @@ namespace Test.Server
             }
             return res;
         }
+
+    */
     }
 }

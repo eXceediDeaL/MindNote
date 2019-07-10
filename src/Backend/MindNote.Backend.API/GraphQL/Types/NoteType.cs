@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using MindNote.Data;
+using MindNote.Data.Raws;
 using System.Linq;
 
 namespace MindNote.Backend.API.GraphQL.Types

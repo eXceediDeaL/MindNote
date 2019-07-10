@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Types;
 using MindNote.Data;
+using MindNote.Data.Raws;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MindNote.Data.Raws;
+using System;
 using System.Linq;
 
 namespace MindNote.Data.Providers.SqlServer.Models

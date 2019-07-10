@@ -47,7 +47,6 @@ namespace MindNote.Backend.API
                     options.UseSqlServer(db.ConnectionString);
                 }
             });
-            services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.DataProvider>();
             services.AddScoped<Data.Repositories.IDataRepository, Data.Providers.SqlServer.DataRepository>();
         }
 
