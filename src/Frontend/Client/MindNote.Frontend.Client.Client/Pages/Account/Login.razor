@@ -1,8 +1,7 @@
 @page "/account/login"
-@using MindNote.Frontend.SDK.API
-@using MindNote.Data
+@using MindNote.Data.Raws
 @inject HttpClient Http
-@inject CustomUsersClient UserClient
+@inject UsersClient UserClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -28,7 +27,6 @@
         }
 
         var abUri = UriHelper.GetAbsoluteUri();
-        Console.WriteLine(abUri);
         int indexQ = abUri.IndexOf('?');
         if (indexQ != -1)
         {
@@ -45,12 +43,12 @@
                         var user = (await authenticationStateTask).User;
                         var token = UserHelper.GetAccessToken(user);
                         var id = UserHelper.GetId(user);
-                        UserClient.Token = token;
                         var profile = await UserClient.Get(id);
                         if (profile == null)
                         {
-                            await UserClient.Create(id, new User
+                            await UserClient.Create(new RawUser
                             {
+                                Id = id,
                                 Name = UserHelper.GetName(user),
                                 Email = UserHelper.GetEmail(user)
                             });

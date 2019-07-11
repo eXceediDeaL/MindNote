@@ -1,7 +1,4 @@
-@using MindNote.Frontend.SDK.API
-@using MindNote.Data
-
-@inject CustomNotesClient NoteClient
+@inject NotesClient NotesClient
 
 <div class="card-columns @(!Column.HasValue ? "waterfall-card-columns" : "")" style="@(Column.HasValue ? $"column-count: {Column.Value}" : "")">
     @foreach (var item in Data)
@@ -13,7 +10,7 @@
                         <a href="notes/@item.Data.Id" style="color:black">@item.Data.Title</a>
                     </h4>
                     <AuthorizeView>
-                        @if (item.Data.UserId != null && item.Data.UserId == UserHelper.GetId(context.User))
+                        @if (item.Data.User != null && item.Data.User.Id == UserHelper.GetId(context.User))
                         {
                             <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
                                 <button class="btn btn-sm btn-outline-danger m-1" @onclick="@(async e => await OnDelete(item.Data.Id))"><i class="fa fa-trash"></i></button>
@@ -77,7 +74,7 @@
 
     private async Task OnDelete(int id)
     {
-        await NoteClient.Delete(id);
+        await NotesClient.Delete(id);
         await ClickPage(Paging.CurrentIndex);
     }
 }

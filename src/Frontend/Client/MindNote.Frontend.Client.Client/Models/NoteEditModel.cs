@@ -1,6 +1,9 @@
 ﻿using MindNote.Frontend.SDK.API;
 using MindNote.Data;
 using System.ComponentModel.DataAnnotations;
+using MindNote.Data.Raws;
+using MindNote.Frontend.SDK.API.Models;
+using MindNote.Data.Mutations;
 
 namespace MindNote.Frontend.Client.Client.Models
 {
@@ -22,25 +25,25 @@ namespace MindNote.Frontend.Client.Client.Models
         {
             Title = item.Title;
             Content = item.Content;
-            CategoryId = item.CategoryId?.ToString();
+            CategoryId = item.Category?.Id.ToString();
             Keywords = item.Keywords == null ? "" : string.Join(";", item.Keywords);
             IsPublic = item.Status == ItemStatus.Public;
         }
 
         public NoteEditModel() { }
 
-        public Note ToModel()
+        public MutationNote ToMutation()
         {
             int? catId = null;
             if (int.TryParse(CategoryId, out int res))
                 catId = res;
-            Note item = new Note
+            var item = new MutationNote
             {
-                Title = Title,
-                Content = Content,
-                CategoryId = catId,
-                Keywords = Keywords?.Split(';'),
-                Status = IsPublic ? ItemStatus.Public : ItemStatus.Private,
+                Title = new Mutation<string>(Title),
+                Content = new Mutation<string>(Content),
+                CategoryId = new Mutation<int?>(catId),
+                Keywords = new Mutation<string[]>(Keywords?.Split(';')),
+                Status = new Mutation<ItemStatus>(IsPublic ? ItemStatus.Public : ItemStatus.Private),
             };
             return item;
         }

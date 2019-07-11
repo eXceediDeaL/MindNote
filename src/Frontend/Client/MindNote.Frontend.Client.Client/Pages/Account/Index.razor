@@ -5,9 +5,7 @@
 @using MindNote.Frontend.SDK.API
 @using System.Linq
 @using MindNote.Data
-@inject CustomUsersClient UserClient
-@inject CustomNotesClient NoteClient
-@inject CustomCategoriesClient CategoryClient
+@inject UsersClient UserClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -96,7 +94,7 @@ else
         Current = await UserClient.Get(Id);
         if (Current != null)
         {
-            int count = (await NoteClient.Query(userId: Current.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+            int count = Current.Notes.TotalCount.Value;
             Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
             Paging.CurrentIndex = 1;
             await OnQueryPaging(Paging.CurrentIndex);
@@ -108,12 +106,9 @@ else
         if (Current == null) return;
 
         Paging.CurrentIndex = pageIndex;
-        int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-        IEnumerable<Note> ms = await NoteClient.Query(userId: Current.Id, offset: offset, count: Paging.ItemCountPerPage);
+        IEnumerable<Note> ms = Current.Notes.Nodes;
         var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
-        foreach (var v in data)
-            await v.Load(CategoryClient, UserClient);
         Notes = data;
     }
 }

@@ -1,11 +1,7 @@
 ﻿@page "/notes"
 @using MindNote.Frontend.Client.Shared
-@using MindNote.Frontend.SDK.API
 @using System.Linq
-@using MindNote.Data
-@inject CustomNotesClient NoteClient
-@inject CustomUsersClient UserClient
-@inject CustomCategoriesClient CategoryClient
+@inject NotesClient NoteClient
 
 <div class="d-flex flex-row">
     <h1>Notes</h1>
@@ -35,7 +31,7 @@ else
 
     protected override async Task OnInitAsync()
     {
-        int count = (await NoteClient.Query(targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+        int count = (await NoteClient.Query()).TotalCount.Value;
         Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
         Paging.CurrentIndex = 1;
         await OnQueryPaging(Paging.CurrentIndex);
@@ -46,10 +42,8 @@ else
         Paging.CurrentIndex = pageIndex;
         int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-        IEnumerable<Note> ms = await NoteClient.Query(offset: offset, count: Paging.ItemCountPerPage);
+        IEnumerable<Note> ms = (await NoteClient.Query()).Nodes;
         var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
-        foreach (var v in data)
-            await v.Load(CategoryClient, UserClient);
         Data = data;
     }
 }

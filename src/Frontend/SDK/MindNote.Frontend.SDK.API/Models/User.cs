@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MindNote.Data
+﻿namespace MindNote.Frontend.SDK.API.Models
 {
-    public class User : ICloneable, IHasId<string>
+    public class User
     {
         public string Id { get; set; }
 
@@ -19,6 +16,6 @@ namespace MindNote.Data
 
         public string Location { get; set; }
 
-        public object Clone() => MemberwiseClone();
+        public PagingEnumerable<Note> Notes { get; set; }
     }
 }

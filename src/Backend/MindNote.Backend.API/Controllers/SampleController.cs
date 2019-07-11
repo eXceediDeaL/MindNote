@@ -7,5 +7,10 @@ namespace MindNote.Backend.API.Controllers
     [ApiController]
     public class SampleController : ControllerBase
     {
+        [HttpGet]
+        public string Hello()
+        {
+            return "Hello";
+        }
     }
 }

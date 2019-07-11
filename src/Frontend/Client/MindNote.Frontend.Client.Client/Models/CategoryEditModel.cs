@@ -1,6 +1,9 @@
 ﻿using MindNote.Frontend.SDK.API;
 using MindNote.Data;
 using System.ComponentModel.DataAnnotations;
+using MindNote.Frontend.SDK.API.Models;
+using MindNote.Data.Raws;
+using MindNote.Data.Mutations;
 
 namespace MindNote.Frontend.Client.Client.Models
 {
@@ -24,13 +27,13 @@ namespace MindNote.Frontend.Client.Client.Models
             IsPublic = item.Status == ItemStatus.Public;
         }
 
-        public Category ToModel()
+        public MutationCategory ToMutation()
         {
-            Category item = new Category
+            var item = new MutationCategory
             {
-                Name = Name,
-                Color = Color,
-                Status = IsPublic ? ItemStatus.Public : ItemStatus.Private,
+                Name = new Mutation<string>(Name),
+                Color = new Mutation<string>(Color),
+                Status = new Mutation<ItemStatus>(IsPublic ? ItemStatus.Public : ItemStatus.Private),
             };
             return item;
         }

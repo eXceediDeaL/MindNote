@@ -31,9 +31,9 @@ namespace MindNote.Backend.API.GraphQL
             return identityDataGetter.GetClaimId(httpContextAccessor.HttpContext.User);
         }
 
-        public async Task<IQueryable<RawUser>> Users([Service]IDataRepository provider, string id = null, string name = null, string bio = null, string email = null, string url = null, string company = null, string location = null)
+        public async Task<IQueryable<RawUser>> GetUsers([Service]IDataRepository repository, string id = null, string name = null, string bio = null, string email = null, string url = null, string company = null, string location = null)
         {
-            var query = await provider.Users.Query(GetIdentity());
+            var query = await repository.Users.Query(GetIdentity());
             if (id != null)
             {
                 query = query.Where(item => item.Id == id);
@@ -65,14 +65,14 @@ namespace MindNote.Backend.API.GraphQL
             return query;
         }
 
-        public async Task<RawUser> User(string id, [Service]IDataRepository provider)
+        public async Task<RawUser> GetUser(string id, [Service]IDataRepository repository)
         {
-            return await provider.Users.Get(id, GetIdentity());
+            return await repository.Users.Get(id, GetIdentity());
         }
 
-        public async Task<IQueryable<RawNote>> Notes([Service]IDataRepository provider, int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, string userId = null)
+        public async Task<IQueryable<RawNote>> GetNotes([Service]IDataRepository repository, int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, string userId = null)
         {
-            var query = await provider.Notes.Query(GetIdentity());
+            var query = await repository.Notes.Query(GetIdentity());
             if (userId != null)
             {
                 query = query.Where(item => item.UserId == userId);
@@ -100,14 +100,14 @@ namespace MindNote.Backend.API.GraphQL
             return query;
         }
 
-        public async Task<RawNote> Note(int id, [Service]IDataRepository provider)
+        public async Task<RawNote> GetNote(int id, [Service]IDataRepository repository)
         {
-            return await provider.Notes.Get(id, GetIdentity());
+            return await repository.Notes.Get(id, GetIdentity());
         }
 
-        public async Task<IQueryable<RawCategory>> Categories([Service]IDataRepository provider, int? id = null, string name = null, string color = null, string userId = null)
+        public async Task<IQueryable<RawCategory>> GetCategories([Service]IDataRepository repository, int? id = null, string name = null, string color = null, string userId = null)
         {
-            var query = await provider.Categories.Query(GetIdentity());
+            var query = await repository.Categories.Query(GetIdentity());
             if (userId != null)
             {
                 query = query.Where(item => item.UserId == userId);
@@ -127,9 +127,9 @@ namespace MindNote.Backend.API.GraphQL
             return query;
         }
 
-        public async Task<RawCategory> Category(int id, [Service]IDataRepository provider)
+        public async Task<RawCategory> GetCategory(int id, [Service]IDataRepository repository)
         {
-            return await provider.Categories.Get(id, GetIdentity());
+            return await repository.Categories.Get(id, GetIdentity());
         }
     }
 }

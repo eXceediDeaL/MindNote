@@ -1,12 +1,6 @@
 ﻿@page "/categories/{id:int}/edit"
 @attribute [Authorize]
-@using MindNote.Frontend.Client.Shared
-@using MindNote.Frontend.SDK.API
-@using MindNote.Data
-@using System.Linq
-@inject CustomNotesClient NoteClient
-@inject CustomUsersClient UserClient
-@inject CustomCategoriesClient CategoryClient
+@inject CategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -39,14 +33,14 @@ else
     {
         var user = (await authenticationStateTask).User;
         Category item = await CategoryClient.Get(Id);
-        if (item.UserId != UserHelper.GetId(user)) return;
+        if (item.User.Id != UserHelper.GetId(user)) return;
 
         Model = new CategoryEditModel(item);
     }
 
     private async Task OnSubmit()
     {
-        var id = await CategoryClient.Update(Id, Model.ToModel());
+        var id = await CategoryClient.Update(Id, Model.ToMutation());
         UriHelper.NavigateTo($"categories/{id}");
     }
 }

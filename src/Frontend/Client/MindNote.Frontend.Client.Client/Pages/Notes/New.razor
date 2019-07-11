@@ -1,9 +1,8 @@
 ﻿@page "/notes/new"
 @attribute [Authorize]
-@using MindNote.Frontend.SDK.API
-@using MindNote.Data
-@inject CustomCategoriesClient CategoryClient
-@inject CustomNotesClient NoteClient
+@using MindNote.Data.Raws
+@inject CategoriesClient CategoryClient
+@inject NotesClient NoteClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -11,7 +10,7 @@
     <li class="breadcrumb-item active">New</li>
 </ul>
 
-@if (Model == null)
+@if (Model == null || Categories == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -33,7 +32,7 @@ else
 
     protected override async Task OnInitAsync()
     {
-        Categories = await CategoryClient.GetAll();
+        Categories = (await CategoryClient.Query()).Nodes;
     }
 
     private async Task OnSubmit()
@@ -41,12 +40,12 @@ else
         int? catId = null;
         if (int.TryParse(Model.CategoryId, out int res))
             catId = res;
-        Note item = new Note
+        var item = new RawNote
         {
             Title = Model.Title,
             Content = Model.Content,
             CategoryId = catId,
-            Keywords = Model.Keywords?.Split(';'),
+            Keywords = Model.Keywords,
             Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
         };
         var id = await NoteClient.Create(item);

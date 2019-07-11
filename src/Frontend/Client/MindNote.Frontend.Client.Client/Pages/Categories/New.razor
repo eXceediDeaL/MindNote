@@ -1,8 +1,7 @@
 ﻿@page "/categories/new"
 @attribute [Authorize]
-@using MindNote.Frontend.SDK.API
-@using MindNote.Data
-@inject CustomCategoriesClient CategoryClient
+@using MindNote.Data.Raws
+@inject CategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -24,7 +23,7 @@ else
 
     private async Task OnSubmit()
     {
-        Category item = new Category
+        var item = new RawCategory
         {
             Name = Model.Name,
             Color = Model.Color,

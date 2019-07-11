@@ -8,6 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Pages\Account\Index.razor" />
+    <None Include="Pages\Account\Login.razor" />
+    <None Include="Pages\Account\Logout.razor" />
+    <None Include="Pages\Account\Manage.razor" />
+    <None Include="Pages\Categories\Edit.razor" />
+    <None Include="Pages\Categories\Index.razor" />
+    <None Include="Pages\Categories\New.razor" />
+    <None Include="Pages\Categories\View.razor" />
+    <None Include="Pages\Notes\Edit.razor" />
+    <None Include="Pages\Notes\Index.razor" />
+    <None Include="Pages\Notes\New.razor" />
+    <None Include="Pages\Notes\View.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL.Client" Version="2.0.0-alpha.3" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview6.19307.2" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.0.0-preview6.19307.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.0.48" />

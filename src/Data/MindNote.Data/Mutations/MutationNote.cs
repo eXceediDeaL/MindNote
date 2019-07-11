@@ -1,4 +1,6 @@
-﻿namespace MindNote.Data.Mutations
+﻿using MindNote.Data.Raws;
+
+namespace MindNote.Data.Mutations
 {
     public class MutationNote
     {

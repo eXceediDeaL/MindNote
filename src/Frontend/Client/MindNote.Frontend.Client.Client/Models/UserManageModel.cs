@@ -1,4 +1,6 @@
 ﻿using MindNote.Data;
+using MindNote.Data.Mutations;
+using MindNote.Frontend.SDK.API.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace MindNote.Frontend.Client.Client.Models
@@ -27,15 +29,15 @@ namespace MindNote.Frontend.Client.Client.Models
             Location = item.Location;
         }
 
-        public User ToModel()
+        public MutationUser ToMutation()
         {
-            User item = new User
+            var item = new MutationUser
             {
-                Name = Name,
-                Bio = Bio,
-                Company = Company,
-                Url = Url,
-                Location = Location,
+                Name = new Mutation<string>(Name),
+                Bio = new Mutation<string>(Bio),
+                Company = new Mutation<string>(Company),
+                Url = new Mutation<string>(Url),
+                Location = new Mutation<string>(Location),
             };
             return item;
         }

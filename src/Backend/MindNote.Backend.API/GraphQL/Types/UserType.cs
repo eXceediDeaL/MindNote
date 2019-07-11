@@ -1,4 +1,6 @@
 ﻿using HotChocolate.Types;
+using HotChocolate.Types.Relay;
+using MindNote.Backend.API.GraphQL.Resolvers;
 using MindNote.Data;
 using MindNote.Data.Raws;
 using System;
@@ -16,6 +18,8 @@ namespace MindNote.Backend.API.GraphQL.Types
             descriptor.Field(x => x.Clone()).Ignore();
             descriptor.Field(x => x.Id).Type<NonNullType<IdType>>();
             descriptor.Field(x => x.Name).Type<NonNullType<StringType>>();
+            ((IObjectTypeDescriptor)descriptor).Field<UserResolver>(x => x.GetNotes(default, default))
+                .Type<NonNullType<ListType<NonNullType<NoteType>>>>().UsePaging<NoteType>();
         }
     }
 }

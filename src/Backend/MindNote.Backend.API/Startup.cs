@@ -67,6 +67,7 @@ namespace MindNote.Backend.API
 
         public static void ConfigureGraphQLServices(LinkedServerConfiguration server, IServiceCollection services)
         {
+            services.AddDataLoaderRegistry();
             services.AddGraphQL(sp => SchemaBuilder.New()
                 .AddServices(sp)
                 .AddAuthorizeDirectiveType()
@@ -179,6 +180,8 @@ namespace MindNote.Backend.API
 
             app.UseAuthentication();
 
+            app.UseCors();
+
             app.UseOpenApi();
 
             var idClient = IdentityClientConfiguration.Load(configuration);
@@ -197,7 +200,6 @@ namespace MindNote.Backend.API
                 .UsePlayground("/graphql", "/ui/playground")
                 .UseVoyager("/graphql", "/ui/voyager");
 
-            app.UseCors();
             app.UseMvc();
         }
 

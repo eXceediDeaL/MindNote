@@ -1,11 +1,8 @@
 ﻿@page "/categories/{id:int}"
 @using MindNote.Frontend.Client.Shared
-@using MindNote.Frontend.SDK.API
 @using System.Linq
 @using MindNote.Data
-@inject CustomNotesClient NoteClient
-@inject CustomUsersClient UserClient
-@inject CustomCategoriesClient CategoryClient
+@inject CategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 @if (Current == null)
@@ -24,7 +21,7 @@ else
             <h1>
                 <CategoryDisplay value="@Current.Data" />
             </h1>
-            @if (Current.Data.UserId != null && Current.Data.UserId == CurrentUserId)
+            @if (Current.Data.User != null && Current.Data.User.Id == CurrentUserId)
             {
                 <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
                     <button class="btn btn-outline-danger m-1" @onclick="@(async e => await OnDelete())"><i class="fa fa-trash"></i></button>
@@ -33,12 +30,12 @@ else
             }
         </div>
 
-        @if (Current.User != null)
+        @if (Current.Data.User != null)
         {
             <div>
                 <small>
-                    <a href="/account/@Current.User.Id" style="color: #555;">
-                        <UserDisplay Value="@Current.User" />
+                    <a href="/account/@Current.Data.User.Id" style="color: #555;">
+                        <UserDisplay Value="@Current.Data.User" />
                     </a>
                 </small>
             </div>
@@ -81,9 +78,7 @@ else
         Current = new CategoryViewModel { Data = await CategoryClient.Get(Id) };
         if (Current?.Data != null)
         {
-            await Current.Load(UserClient);
-
-            int count = (await NoteClient.Query(categoryId: Current.Data.Id, targets: MindNote.Data.Providers.Queries.NoteTargets.Count)).Count();
+            int count = Current.Data.Notes.TotalCount.Value;
             Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
 
             await OnQueryPaging(Paging.CurrentIndex);
@@ -97,10 +92,8 @@ else
         Paging.CurrentIndex = pageIndex;
         int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
 
-        IEnumerable<Note> ms = await NoteClient.Query(categoryId: Current.Data.Id, offset: offset, count: Paging.ItemCountPerPage);
+        IEnumerable<Note> ms = Current.Data.Notes.Nodes;
         var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
-        foreach (var v in data)
-            await v.Load(CategoryClient, UserClient);
         Notes = data;
     }
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using MindNote.Data;
 using MindNote.Data.Mutations;
+using MindNote.Data.Raws;
 using MindNote.Data.Repositories;
 using MindNote.Frontend.SDK.Identity;
 using System.Threading.Tasks;
@@ -24,49 +25,64 @@ namespace MindNote.Backend.API.GraphQL
             return identityDataGetter.GetClaimId(httpContextAccessor.HttpContext.User);
         }
 
-        public async Task<bool> ClearNotes([Service]IDataRepository provider)
+        public async Task<bool> ClearNotes([Service]IDataRepository repository)
         {
-            return await provider.Notes.Clear(GetIdentity());
+            return await repository.Notes.Clear(GetIdentity());
         }
 
-        public async Task<bool> ClearCategories([Service]IDataRepository provider)
+        public async Task<bool> ClearCategories([Service]IDataRepository repository)
         {
-            return await provider.Categories.Clear(GetIdentity());
+            return await repository.Categories.Clear(GetIdentity());
         }
 
-        public async Task<bool> ClearUsers([Service]IDataRepository provider)
+        public async Task<bool> ClearUsers([Service]IDataRepository repository)
         {
-            return await provider.Users.Clear(GetIdentity());
+            return await repository.Users.Clear(GetIdentity());
         }
 
-        public async Task<int?> DeleteNote([Service]IDataRepository provider, int id)
+        public async Task<int?> DeleteNote([Service]IDataRepository repository, int id)
         {
-            return await provider.Notes.Delete(id, GetIdentity());
+            return await repository.Notes.Delete(id, GetIdentity());
         }
 
-        public async Task<int?> DeleteCategory([Service]IDataRepository provider, int id)
+        public async Task<int?> DeleteCategory([Service]IDataRepository repository, int id)
         {
-            return await provider.Categories.Delete(id, GetIdentity());
+            return await repository.Categories.Delete(id, GetIdentity());
         }
 
-        public async Task<string> DeleteUser([Service]IDataRepository provider, string id)
+        public async Task<string> DeleteUser([Service]IDataRepository repository, string id)
         {
-            return await provider.Users.Delete(id, GetIdentity());
+            return await repository.Users.Delete(id, GetIdentity());
         }
 
-        public async Task<int?> UpdateNote([Service]IDataRepository provider, int id, MutationNote mutation)
+        public async Task<int?> UpdateNote([Service]IDataRepository repository, int id, MutationNote mutation)
         {
-            return await provider.Notes.Update(id, mutation, GetIdentity());
+            return await repository.Notes.Update(id, mutation, GetIdentity());
         }
 
-        public async Task<string> UpdateUser([Service]IDataRepository provider, string id, MutationUser mutation)
+        public async Task<string> UpdateUser([Service]IDataRepository repository, string id, MutationUser mutation)
         {
-            return await provider.Users.Update(id, mutation, GetIdentity());
+            return await repository.Users.Update(id, mutation, GetIdentity());
         }
 
-        public async Task<int?> UpdateCategory([Service]IDataRepository provider, int id, MutationCategory mutation)
+        public async Task<int?> UpdateCategory([Service]IDataRepository repository, int id, MutationCategory mutation)
         {
-            return await provider.Categories.Update(id, mutation, GetIdentity());
+            return await repository.Categories.Update(id, mutation, GetIdentity());
+        }
+
+        public async Task<int?> CreateNote([Service]IDataRepository repository, RawNote data)
+        {
+            return await repository.Notes.Create(data, GetIdentity());
+        }
+
+        public async Task<string> CreateUser([Service]IDataRepository repository, RawUser data)
+        {
+            return await repository.Users.Create(data, GetIdentity());
+        }
+
+        public async Task<int?> CreateCategory([Service]IDataRepository repository, int id, RawCategory data)
+        {
+            return await repository.Categories.Create(data, GetIdentity());
         }
     }
 }

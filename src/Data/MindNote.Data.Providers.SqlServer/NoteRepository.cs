@@ -123,7 +123,7 @@ namespace MindNote.Data.Providers.SqlServer
             mutation.Title?.Apply(s => raw.Title = string.IsNullOrEmpty(s) ? DefaultTitle : s);
             mutation.Content?.Apply(s => raw.Content = s);
             mutation.CategoryId?.Apply(s => raw.CategoryId = s);
-            mutation.Keywords?.Apply(s => raw.Keywords = ProviderExtensions.KeywordsToString(s));
+            mutation.Keywords?.Apply(s => raw.Keywords = TransformHelper.KeywordsToString(s));
             mutation.Status?.Apply(s => raw.Status = s);
 
             raw.ModificationTime = DateTimeOffset.Now;

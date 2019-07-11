@@ -3,8 +3,7 @@
 @using MindNote.Frontend.SDK.API
 @using System.Linq
 @using MindNote.Data
-@inject CustomUsersClient UserClient
-@inject CustomCategoriesClient CategoryClient
+@inject CategoriesClient CategoryClient
 
 <div class="d-flex flex-row">
     <h1>Categories</h1>
@@ -52,16 +51,16 @@ else
                         </a>
                     </td>
                     <td>
-                        @if (item.User != null)
+                        @if (item.Data.User != null)
                         {
                             <a>
-                                <UserDisplay value="@item.User" />
+                                <UserDisplay value="@item.Data.User" />
                             </a>
                         }
                     </td>
                     <td>
                         <AuthorizeView>
-                            @if (item.Data.UserId != null && item.Data.UserId == UserHelper.GetId(context.User))
+                            @if (item.Data.User != null && item.Data.User.Id == UserHelper.GetId(context.User))
                             {
                                 <div class="btn-group-sm">
                                     <a href="categories/@item.Data.Id/edit" class="btn btn-outline-primary">
@@ -90,10 +89,8 @@ else
 
     private async Task Update()
     {
-        var ms = await CategoryClient.GetAll();
+        var ms = (await CategoryClient.Query()).Nodes;
         var data = ms.Select(x => new CategoryViewModel { Data = x }).ToList();
-        foreach (var v in data)
-            await v.Load(UserClient);
         Data = data;
     }
 

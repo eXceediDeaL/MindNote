@@ -1,4 +1,4 @@
-﻿namespace MindNote.Data
+﻿namespace MindNote.Data.Raws
 {
     public enum ItemStatus
     {
