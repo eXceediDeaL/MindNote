@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using MindNote.Data.Raws;
 using MindNote.Data.Mutations;
 using MindNote.Frontend.SDK.API.Models;
+using System;
+using Newtonsoft.Json;
 
 namespace MindNote.Frontend.Client.Client.Helpers
 {
@@ -13,7 +15,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
     createNote(data: $data)
 }");
         static readonly string SUpdate = GraphQLStrings.CreateMutation(nameof(SUpdate), @"
-($id: Int!, $mutation: MutationNote) {
+($id: Int!, $mutation: MutationNoteInput) {
     updateNote(id: $id, mutation: $mutation)
 }");
         static readonly string SDelete = GraphQLStrings.CreateMutation(nameof(SDelete), @"
@@ -31,9 +33,12 @@ namespace MindNote.Frontend.Client.Client.Helpers
     }
 }") + GraphQLStrings.NoteListItem;
         static readonly string SQuery = GraphQLStrings.CreateQuery(nameof(SQuery), @"
-($id: Int = null) {
-    notes(id: $id) {
+($id: Int = null, $title: String = null, $content: String = null, $categoryId: Int = null, $keyword: String = null, $userId: String = null, $first: PaginationAmount = null, $last: PaginationAmount = null, $before: String = null, $after: String = null) {
+    notes(id: $id, first: $first, last: $last, before: $before, after: $after, title: $title, content: $content, categoryId: $categoryId, keyword: $keyword, userId: $userId) {
         totalCount
+        pageInfo {
+            hasNextPage, hasPreviousPage, startCursor, endCursor
+        }
         nodes {
             ..." + nameof(GraphQLStrings.NoteListItem) + @"
         }
@@ -62,7 +67,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
             {
                 Query = SCreate,
                 OperationName = nameof(SCreate),
-                Variables = new { data = data },
+                Variables = new { data },
             })).GetDataFieldAs<int?>("createNote");
         }
 
@@ -72,7 +77,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
             {
                 Query = SDelete,
                 OperationName = nameof(SDelete),
-                Variables = new { id = id },
+                Variables = new { id },
             })).GetDataFieldAs<int?>("deleteNote");
         }
 
@@ -82,17 +87,17 @@ namespace MindNote.Frontend.Client.Client.Helpers
             {
                 Query = SGet,
                 OperationName = nameof(SGet),
-                Variables = new { id = id },
+                Variables = new { id },
             })).GetDataFieldAs<Note>("note");
         }
 
-        public async Task<PagingEnumerable<Note>> Query(int? id = null, string name = null, string content = null, int? categoryId = null, string keyword = null, string userId = null)
+        public async Task<PagingEnumerable<Note>> Query(int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null)
         {
             return (await innerClient.Query(new GraphQL.Common.Request.GraphQLRequest
             {
                 Query = SQuery,
                 OperationName = nameof(SQuery),
-                Variables = new { id = id },
+                Variables = new { id, first, last, before, after, title, content, categoryId, keyword, userId },
             })).GetDataFieldAs<PagingEnumerable<Note>>("notes");
         }
 
@@ -102,7 +107,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
             {
                 Query = SUpdate,
                 OperationName = nameof(SUpdate),
-                Variables = new { id = id, mutation = mutation },
+                Variables = new { id, mutation },
             })).GetDataFieldAs<int?>("updateNote");
         }
     }

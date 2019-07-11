@@ -1,8 +1,9 @@
 ﻿@page "/categories/{id:int}"
 @using MindNote.Frontend.Client.Shared
 @using System.Linq
-@using MindNote.Data
+@using MindNote.Frontend.SDK.API.Models
 @inject CategoriesClient CategoryClient
+@inject NotesClient NoteClient
 @inject IUriHelper UriHelper
 
 @if (Current == null)
@@ -49,7 +50,11 @@ else
 }
 else
 {
-    <NoteListWaterfall Data="@Notes" Paging="@Paging" OnQueryPaging="@OnQueryPaging" />
+    <PagingWaterfall Data="@Notes" Column="1" OnUpdatePage="@OnUpdateNotePage" OnNextPage="@OnNextNotePage" OnPreviousPage="@OnPreviousNotePage">
+        <ItemTemplate>
+            <NoteItemCard Data="@context" OnDelete="@OnDeleteNote"></NoteItemCard>
+        </ItemTemplate>
+    </PagingWaterfall>
 }
 
 @code {
@@ -63,9 +68,9 @@ else
 
     CategoryViewModel Current { get; set; }
 
-    PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
+    const int Count = 4;
 
-    IList<NoteViewModel> Notes { get; set; }
+    PagingEnumerable<Note> Notes { get; set; }
 
     protected override async Task OnInitAsync()
     {
@@ -76,30 +81,34 @@ else
         }
 
         Current = new CategoryViewModel { Data = await CategoryClient.Get(Id) };
-        if (Current?.Data != null)
-        {
-            int count = Current.Data.Notes.TotalCount.Value;
-            Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
-
-            await OnQueryPaging(Paging.CurrentIndex);
-        }
-    }
-
-    private async Task OnQueryPaging(int pageIndex)
-    {
-        if (Current?.Data == null) return;
-
-        Paging.CurrentIndex = pageIndex;
-        int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
-
-        IEnumerable<Note> ms = Current.Data.Notes.Nodes;
-        var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
-        Notes = data;
+        if (Current != null)
+            Notes = await NoteClient.Query(categoryId: Id, first: Count);
     }
 
     private async Task OnDelete()
     {
         await CategoryClient.Delete(Id);
         UriHelper.NavigateTo("categories");
+    }
+
+    private async Task OnDeleteNote(Note data)
+    {
+        await NoteClient.Delete(data.Id);
+        await OnUpdateNotePage();
+    }
+
+    private async Task OnUpdateNotePage()
+    {
+        Notes = await NoteClient.Query(categoryId: Id, after: Notes.PageInfo.StartCursor, first: Count);
+    }
+
+    private async Task OnPreviousNotePage()
+    {
+        Notes = await NoteClient.Query(categoryId: Id, before: Notes.PageInfo.StartCursor, last: Count);
+    }
+
+    private async Task OnNextNotePage()
+    {
+        Notes = await NoteClient.Query(categoryId: Id, after: Notes.PageInfo.EndCursor, first: Count);
     }
 }

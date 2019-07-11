@@ -16,14 +16,12 @@
     [JSInvokable]
     public string GetValue()
     {
-        Console.WriteLine("GetValue");
         return Value;
     }
 
     [JSInvokable]
     public async Task SetValue(string value)
     {
-        Console.WriteLine("SetValue");
         Value = value;
         await Viewer.Render(Value);
     }

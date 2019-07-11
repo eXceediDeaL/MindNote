@@ -1,11 +1,10 @@
 ﻿@page "/account"
 @page "/account/{id}"
 
-@using MindNote.Frontend.Client.Shared
-@using MindNote.Frontend.SDK.API
+@using MindNote.Frontend.SDK.API.Models
 @using System.Linq
-@using MindNote.Data
 @inject UsersClient UserClient
+@inject NotesClient NoteClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -54,7 +53,11 @@ else
 }
 else
 {
-    <NoteListWaterfall Data="@Notes" Paging="@Paging" OnQueryPaging="@OnQueryPaging" />
+<PagingWaterfall Data="@Notes" Column="1" OnUpdatePage="@OnUpdateNotePage" OnNextPage="@OnNextNotePage" OnPreviousPage="@OnPreviousNotePage">
+    <ItemTemplate>
+        <NoteItemCard Data="@context" OnDelete="@OnDeleteNote"></NoteItemCard>
+    </ItemTemplate>
+</PagingWaterfall>
 }
 
 @code {
@@ -66,9 +69,9 @@ else
 
     User Current { get; set; }
 
-    PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
+    const int Count = 4;
 
-    IList<NoteViewModel> Notes { get; set; }
+    PagingEnumerable<Note> Notes { get; set; }
 
     public void Logout()
     {
@@ -93,22 +96,27 @@ else
 
         Current = await UserClient.Get(Id);
         if (Current != null)
-        {
-            int count = Current.Notes.TotalCount.Value;
-            Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
-            Paging.CurrentIndex = 1;
-            await OnQueryPaging(Paging.CurrentIndex);
-        }
+            Notes = await NoteClient.Query(userId: Current.Id, first: Count);
     }
 
-    private async Task OnQueryPaging(int pageIndex)
+    private async Task OnDeleteNote(Note data)
     {
-        if (Current == null) return;
+        await NoteClient.Delete(data.Id);
+        await OnUpdateNotePage();
+    }
 
-        Paging.CurrentIndex = pageIndex;
+    private async Task OnUpdateNotePage()
+    {
+        Notes = await NoteClient.Query(userId: Current.Id, after: Notes.PageInfo.StartCursor, first: Count);
+    }
 
-        IEnumerable<Note> ms = Current.Notes.Nodes;
-        var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
-        Notes = data;
+    private async Task OnPreviousNotePage()
+    {
+        Notes = await NoteClient.Query(userId: Current.Id, before: Notes.PageInfo.StartCursor, last: Count);
+    }
+
+    private async Task OnNextNotePage()
+    {
+        Notes = await NoteClient.Query(userId: Current.Id, after: Notes.PageInfo.EndCursor, first: Count);
     }
 }

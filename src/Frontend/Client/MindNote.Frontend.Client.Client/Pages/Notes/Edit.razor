@@ -1,6 +1,7 @@
 ﻿@page "/notes/{id:int}/edit"
 @attribute [Authorize]
 @using MindNote.Frontend.Client.Shared
+@using MindNote.Frontend.SDK.API.Models
 @using System.Linq
 @inject NotesClient NoteClient
 @inject CategoriesClient CategoriesClient

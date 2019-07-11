@@ -1,3 +1,5 @@
+@using MindNote.Frontend.SDK.API.Models
+
 <EditForm Model="@Model" OnValidSubmit="@(async e => { Model.Content = ContentEditor.GetValue(); await OnSubmit.InvokeAsync(null); })">
     <DataAnnotationsValidator />
     <ValidationSummary />

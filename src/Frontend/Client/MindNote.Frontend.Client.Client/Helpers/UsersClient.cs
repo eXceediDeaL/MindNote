@@ -18,7 +18,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
     createUser(data: $data)
 }");
         static readonly string SUpdate = GraphQLStrings.CreateMutation(nameof(SUpdate), @"
-($id: String, $mutation: MutationUser) {
+($id: String, $mutation: MutationUserInput) {
     updateUser(id: $id, mutation: $mutation)
 }");
         static readonly string SDelete = GraphQLStrings.CreateMutation(nameof(SDelete), @"

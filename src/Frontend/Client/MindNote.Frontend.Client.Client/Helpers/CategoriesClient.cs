@@ -13,7 +13,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
     createCategory(data: $data)
 }");
         static readonly string SUpdate = GraphQLStrings.CreateMutation(nameof(SUpdate), @"
-($id: Int!, $mutation: MutationNote) {
+($id: Int!, $mutation: MutationCategoryInput) {
     updateCategory(id: $id, mutation: $mutation)
 }");
         static readonly string SDelete = GraphQLStrings.CreateMutation(nameof(SDelete), @"
@@ -31,17 +31,11 @@ namespace MindNote.Frontend.Client.Client.Helpers
         user {
             id, name
         }
-        notes {
-            totalCount
-            nodes {
-                ..." + nameof(GraphQLStrings.NoteListItem) + @"
-            }
-        }
     }
-}") + GraphQLStrings.NoteListItem;
+}");
         static readonly string SQuery = GraphQLStrings.CreateQuery(nameof(SQuery), @"
-($id: Int = null) {
-    categories(id: $id){
+($id: Int = null, $name: String = null, $color: String = null, $userId: String = null, $first: PaginationAmount = null, $last: PaginationAmount = null, $before: String = null, $after: String = null) {
+    categories(id: $id, first: $first, last: $last, before: $before, after: $after, name: $name, color: $color, userId: $userId){
         totalCount
         nodes{
             id, name, color
@@ -98,13 +92,13 @@ namespace MindNote.Frontend.Client.Client.Helpers
             })).GetDataFieldAs<Category>("category");
         }
 
-        public async Task<PagingEnumerable<Category>> Query(int? id = null, string name = null, string color = null, string userId = null)
+        public async Task<PagingEnumerable<Category>> Query(int? id = null, string name = null, string color = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null)
         {
             return (await innerClient.Query(new GraphQL.Common.Request.GraphQLRequest
             {
                 Query = SQuery,
                 OperationName = nameof(SQuery),
-                Variables = new { id = id },
+                Variables = new { id, first, last, after, before, name, color, userId},
             })).GetDataFieldAs<PagingEnumerable<Category>>("categories");
         }
 

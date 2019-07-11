@@ -3,6 +3,7 @@ using GraphQL.Common.Request;
 using GraphQL.Common.Response;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -18,7 +19,15 @@ namespace MindNote.Frontend.SDK.API
             Options = options;
             innerClient = Client.AsGraphQLClient(new GraphQLHttpClientOptions
             {
-                EndPoint = new System.Uri("http://localhost")
+                EndPoint = new System.Uri("http://localhost"),
+                JsonSerializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+                    Converters = new List<JsonConverter>
+                    {
+                        new Newtonsoft.Json.Converters.StringEnumConverter()
+                    }
+                }
             });
         }
 
@@ -31,8 +40,8 @@ namespace MindNote.Frontend.SDK.API
             innerClient.EndPoint = await Options.GetEndpoint();
             var token = await Options.GetToken();
             if (token != null) Client.SetBearerToken(token);
-            var response =  await innerClient.SendQueryAsync(request);
-            if(response.Errors != null)
+            var response = await innerClient.SendQueryAsync(request);
+            if (response.Errors != null)
             {
                 throw new Exception(JsonConvert.SerializeObject(response.Errors));
             }

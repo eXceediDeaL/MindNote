@@ -1,6 +1,7 @@
 ﻿@page "/notes"
 @using MindNote.Frontend.Client.Shared
 @using System.Linq
+@using MindNote.Frontend.SDK.API.Models
 @inject NotesClient NoteClient
 
 <div class="d-flex flex-row">
@@ -18,32 +19,44 @@
 }
 else
 {
-    <NoteListWaterfall Data="@Data" Column="1" Paging="@Paging" OnQueryPaging="@OnQueryPaging" />
+    <PagingWaterfall Data="@Data" Column="1" OnUpdatePage="@OnUpdatePage" OnNextPage="@OnNextPage" OnPreviousPage="@OnPreviousPage">
+        <ItemTemplate>
+            <NoteItemCard Data="@context" OnDelete="@OnDelete"></NoteItemCard>
+        </ItemTemplate>
+    </PagingWaterfall>
 }
 
 @code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    PagingSettings Paging { get; set; } = new PagingSettings { ItemCountPerPage = 4 };
+    const int Count = 4;
 
-    IList<NoteViewModel> Data { get; set; }
+    PagingEnumerable<Note> Data { get; set; }
 
     protected override async Task OnInitAsync()
     {
-        int count = (await NoteClient.Query()).TotalCount.Value;
-        Paging.MaximumIndex = (count / Paging.ItemCountPerPage) + (count % Paging.ItemCountPerPage > 0 ? 1 : 0);
-        Paging.CurrentIndex = 1;
-        await OnQueryPaging(Paging.CurrentIndex);
+        Data = await NoteClient.Query(first: Count);
     }
 
-    private async Task OnQueryPaging(int pageIndex)
+    private async Task OnDelete(Note data)
     {
-        Paging.CurrentIndex = pageIndex;
-        int offset = (Paging.CurrentIndex - 1) * Paging.ItemCountPerPage;
+        await NoteClient.Delete(data.Id);
+        await OnUpdatePage();
+    }
 
-        IEnumerable<Note> ms = (await NoteClient.Query()).Nodes;
-        var data = ms.Select(x => new NoteViewModel { Data = x }).ToList();
-        Data = data;
+    private async Task OnUpdatePage()
+    {
+        Data = await NoteClient.Query(after: Data.PageInfo.StartCursor, first: Count);
+    }
+
+    private async Task OnPreviousPage()
+    {
+        Data = await NoteClient.Query(before: Data.PageInfo.StartCursor, last: Count);
+    }
+
+    private async Task OnNextPage()
+    {
+        Data = await NoteClient.Query(after: Data.PageInfo.EndCursor, first: Count);
     }
 }

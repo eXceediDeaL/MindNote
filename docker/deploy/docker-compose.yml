@@ -5,30 +5,30 @@ services:
     ports:
       - "80:80"
     depends_on:
-      # - client
+      - client
       # - host
       - api
       - identity
     volumes:
       - "./config/nginx_default.conf:/etc/nginx/conf.d/default.conf"
-  # client:
-    # image: stardustdl/mindnote:dev-client
-    # environment:
-      # - ASPNETCORE_ENVIRONMENT=Development
-    # depends_on:
-      # - api
-    # volumes:
-      # - "./config/frontend_client.json:/app/appsettings.json"
-    # entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Frontend.Client.Server.dll"]
+  client:
+    image: stardustdl/mindnote:dev-client
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - api
+    volumes:
+      - "./config/frontend_client.json:/app/appsettings.json"
+    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Frontend.Client.Server.dll"]
   # host:
-    # image: stardustdl/mindnote:dev-host
-    # environment:
-      # - ASPNETCORE_ENVIRONMENT=Development
-    # depends_on:
-      # - api
-    # volumes:
-      # - "./config/frontend_server.json:/app/appsettings.json"
-    # entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Frontend.Server.dll"]
+  #   image: stardustdl/mindnote:dev-host
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #   depends_on:
+  #     - api
+  #   volumes:
+  #     - "./config/frontend_server.json:/app/appsettings.json"
+  #   entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Frontend.Server.dll"]
   api:
     image: stardustdl/mindnote:dev-api
     environment:
