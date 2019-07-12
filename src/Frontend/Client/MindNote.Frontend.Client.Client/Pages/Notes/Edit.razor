@@ -1,12 +1,10 @@
 ﻿@page "/notes/{id:int}/edit"
 @attribute [Authorize]
 @using MindNote.Frontend.Client.Shared
-@using MindNote.Frontend.SDK.API
+@using MindNote.Frontend.SDK.API.Models
 @using System.Linq
-@using MindNote.Data
-@inject CustomNotesClient NoteClient
-@inject CustomUsersClient UserClient
-@inject CustomCategoriesClient CategoryClient
+@inject NotesClient NoteClient
+@inject CategoriesClient CategoriesClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -17,7 +15,7 @@
     <li class="breadcrumb-item active">Edit</li>
 </ul>
 
-@if (Model == null)
+@if (Model == null || Categories == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -42,15 +40,16 @@ else
         var user = (await authenticationStateTask).User;
 
         Note item = await NoteClient.Get(Id);
-        if (item.UserId != UserHelper.GetId(user)) return;
-        Categories = await CategoryClient.GetAll();
+        if (item.User.Id != UserHelper.GetId(user)) return;
+
+        Categories = (await CategoriesClient.Query()).Nodes;
 
         Model = new NoteEditModel(item);
     }
 
     private async Task OnSubmit()
     {
-        var id = await NoteClient.Update(Id, Model.ToModel());
+        var id = await NoteClient.Update(Id, Model.ToMutation());
         UriHelper.NavigateTo($"notes/{id}");
     }
 }

@@ -23,29 +23,30 @@ namespace MindNote.Frontend.SDK.Identity
 
     public class IdentityDataGetter : IIdentityDataGetter
     {
-        public async Task<string> GetAccessToken(HttpContext context)
+        public virtual async Task<string> GetAccessToken(HttpContext context)
         {
             return await context.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
         }
 
-        public string GetClaim(IEnumerable<Claim> claims, string name)
+        public virtual string GetClaim(IEnumerable<Claim> claims, string name)
         {
+            if (claims == null) return null;
             return (from x in claims where x.Type == name select x.Value).FirstOrDefault();
         }
 
-        public string GetClaimEmail(ClaimsPrincipal user)
+        public virtual string GetClaimEmail(ClaimsPrincipal user)
         {
-            return GetClaim(user.Claims, "email");
+            return GetClaim(user?.Claims, "email");
         }
 
-        public string GetClaimName(ClaimsPrincipal user)
+        public virtual string GetClaimName(ClaimsPrincipal user)
         {
-            return GetClaim(user.Claims, "name");
+            return GetClaim(user?.Claims, "name");
         }
 
-        public string GetClaimId(ClaimsPrincipal user)
+        public virtual string GetClaimId(ClaimsPrincipal user)
         {
-            return GetClaim(user.Claims, "sub");
+            return GetClaim(user?.Claims, "sub");
         }
     }
 }

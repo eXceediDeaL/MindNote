@@ -50,7 +50,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
 
         public static async Task<string> GetClientHostUrl(HttpClient http)
         {
-            HttpResponseMessage response = await http.GetAsync("api/Server/ClientHost");
+            HttpResponseMessage response = await http.GetAsync("api/Server/FrontendClient");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();

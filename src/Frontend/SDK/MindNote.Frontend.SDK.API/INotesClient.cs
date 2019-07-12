@@ -1,85 +1,22 @@
-﻿using MindNote.Data;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using MindNote.Data.Mutations;
+using MindNote.Data.Raws;
+using MindNote.Frontend.SDK.API.Models;
 
 namespace MindNote.Frontend.SDK.API
 {
-    public interface INotesClient : IBaseClient
+    public interface INotesClient
     {
-        Task<IEnumerable<Note>> GetAll(string token);
+        Task<bool> Clear();
 
-        Task<IEnumerable<Note>> Query(string token, int? id = null, string name = null, string content = null, int? categoryId = null, string keyword = null, int? offset = null, int? count = null, string targets = null, string userId = null);
+        Task<int?> Create(RawNote data);
 
-        Task<Note> Get(string token, int id);
+        Task<int?> Delete(int id);
 
-        Task<int?> Delete(string token, int id);
+        Task<Note> Get(int id);
 
-        Task Clear(string token);
+        Task<PagingEnumerable<Note>> Query(int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null);
 
-        Task<int?> Update(string token, int id, Note data);
-
-        Task<int?> Create(string token, Note data);
-    }
-
-    public class NotesClient : INotesClient
-    {
-        public NotesClient(HttpClient client)
-        {
-            Client = client;
-            Raw = new RawNotesClient(Client);
-        }
-
-        public string BaseUrl
-        {
-            get => Raw.BaseUrl;
-            set => Raw.BaseUrl = value;
-        }
-
-        public HttpClient Client { get; private set; }
-
-        private RawNotesClient Raw { get; set; }
-
-        public async Task Clear(string token)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            await Raw.ClearAsync();
-        }
-
-        public async Task<int?> Create(string token, Note data)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            return await Raw.CreateAsync(data);
-        }
-
-        public async Task<int?> Delete(string token, int id)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            return await Raw.DeleteAsync(id);
-        }
-
-        public async Task<Note> Get(string token, int id)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            return await Raw.GetAsync(id);
-        }
-
-        public async Task<IEnumerable<Note>> GetAll(string token)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            return await Raw.GetAllAsync();
-        }
-
-        public async Task<IEnumerable<Note>> Query(string token, int? id, string name, string content, int? categoryId, string keyword, int? offset, int? count, string targets, string userId)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            return await Raw.QueryAsync(id, name, content, categoryId, keyword, offset, count, targets, userId);
-        }
-
-        public async Task<int?> Update(string token, int id, Note data)
-        {
-            if (token != null) Client.SetBearerToken(token);
-            return await Raw.UpdateAsync(id, data);
-        }
+        Task<int?> Update(int id, MutationNote mutation);
     }
 }

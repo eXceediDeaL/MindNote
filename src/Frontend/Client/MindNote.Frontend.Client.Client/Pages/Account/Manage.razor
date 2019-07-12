@@ -5,9 +5,7 @@
 @using MindNote.Frontend.SDK.API
 @using System.Linq
 @using MindNote.Data
-@inject CustomUsersClient UserClient
-@inject CustomNotesClient NoteClient
-@inject CustomCategoriesClient CategoryClient
+@inject UsersClient UserClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -94,7 +92,7 @@ else
 
     private async Task OnSubmit()
     {
-        var id = await UserClient.Update(Id, Model.ToModel());
+        var id = await UserClient.Update(Id, Model.ToMutation());
         UriHelper.NavigateTo($"account");
     }
 }

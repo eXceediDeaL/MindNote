@@ -1,9 +1,4 @@
-@using MindNote.Frontend.Client.Shared
-@using MindNote.Frontend.SDK.API
-@using MindNote.Data
-@using System.Linq
-@inject CustomUsersClient UserClient
-@inject CustomCategoriesClient CategoryClient
+@using MindNote.Frontend.SDK.API.Models
 
 <EditForm Model="@Model" OnValidSubmit="@(async e => { Model.Content = ContentEditor.GetValue(); await OnSubmit.InvokeAsync(null); })">
     <DataAnnotationsValidator />

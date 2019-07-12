@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Test.Server
 {
-    public class MockTokenIdentityDataGetter : IIdentityDataGetter
+    public class MockTokenIdentityDataGetter : IdentityDataGetter
     {
         private readonly string accessToken;
 
@@ -16,29 +16,9 @@ namespace Test.Server
             this.accessToken = accessToken;
         }
 
-        public Task<string> GetAccessToken(HttpContext context)
+        public override Task<string> GetAccessToken(HttpContext context)
         {
             return Task.FromResult(accessToken);
-        }
-
-        public string GetClaim(IEnumerable<Claim> claims, string name)
-        {
-            return (from x in claims where x.Type == name select x.Value).FirstOrDefault();
-        }
-
-        public string GetClaimEmail(ClaimsPrincipal user)
-        {
-            return GetClaim(user.Claims, "email");
-        }
-
-        public string GetClaimName(ClaimsPrincipal user)
-        {
-            return GetClaim(user.Claims, "name");
-        }
-
-        public string GetClaimId(ClaimsPrincipal user)
-        {
-            return GetClaim(user.Claims, "sub");
         }
     }
 }

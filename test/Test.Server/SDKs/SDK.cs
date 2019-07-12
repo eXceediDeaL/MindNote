@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net.Http;
 using Test.Server.Apis;
 using Test.Server.Identities;
+using MindNote.Data.Raws;
 
 namespace Test.Server.SDKs
 {
@@ -18,24 +19,54 @@ namespace Test.Server.SDKs
     public class SDK
     {
         [TestMethod]
+        public void RawGraphQLClient()
+        {
+            Utils.UseApiEnvironment((_, api, token) =>
+            {
+                using (var baseClient = api.CreateClient())
+                {
+                    var client = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    Assert.ThrowsException<AggregateException>(() =>
+                    {
+                        client.Query(new GraphQL.Common.Request.GraphQLRequest
+                        {
+                            Query = "mutation"
+                        }).Wait();
+                    });
+                    Assert.ThrowsException<AggregateException>(() =>
+                    {
+                        client.Mutation(new GraphQL.Common.Request.GraphQLRequest
+                        {
+                            Query = "query"
+                        }).Wait();
+                    });
+                }
+            });
+        }
+
+        [TestMethod]
         public void Notes()
         {
             Utils.UseApiEnvironment((_, api, token) =>
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    INotesClient client = new NotesClient(baseClient);
+                    var graphqlClient = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    INotesClient client = new NotesClient(graphqlClient);
 
-                    Assert.IsFalse(client.GetAll(token).Result.Any());
-                    Assert.IsNull(client.Get(token, 0).Result);
-                    client.Clear(token).Wait();
+                    Assert.IsFalse(client.Query().Result.Nodes.Any());
+                    Assert.IsNull(client.Get(0).Result);
+                    client.Clear().Wait();
                     {
-                        Note node = new Note { Title = "name" };
-                        int id = client.Create(token, node).Result.Value;
-                        Assert.AreEqual(node.Title, client.Query(token, id).Result.First().Title);
+                        var node = new RawNote { Title = "name" };
+                        int id = client.Create(node).Result.Value;
+                        Assert.AreEqual(node.Title, client.Query(id).Result.Nodes.First().Title);
+                        Assert.IsFalse(client.Query(id, "", "", 0, "").Result.Nodes.Any());
                         node.Content = "content";
-                        Assert.IsTrue(client.Update(token, id, node).Result.HasValue);
-                        Assert.IsTrue(client.Delete(token, id).Result.HasValue);
+                        Assert.IsTrue(client.Update(id, new MindNote.Data.Mutations.MutationNote
+                        {
+                        }).Result.HasValue);
+                        Assert.IsTrue(client.Delete(id).Result.HasValue);
                     }
                 }
             });
@@ -48,53 +79,28 @@ namespace Test.Server.SDKs
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    ICategoriesClient client = new CategoriesClient(baseClient);
+                    var graphqlClient = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    ICategoriesClient client = new CategoriesClient(graphqlClient);
 
-                    Assert.IsFalse(client.GetAll(token).Result.Any());
-                    Assert.IsNull(client.Get(token, 0).Result);
-                    client.Clear(token).Wait();
+                    Assert.IsFalse(client.Query().Result.Nodes.Any());
+                    Assert.IsNull(client.Get(0).Result);
+                    client.Clear().Wait();
                     {
-                        Category tag = new Category { Name = "tag", Color = "black" };
-                        int id = client.Create(token, tag).Result.Value;
-                        Assert.AreEqual(tag.Name, client.Query(token, id).Result.First().Name);
-                        Assert.AreEqual(tag.Color, client.Get(token, id).Result.Color);
+                        var tag = new RawCategory { Name = "tag", Color = "black" };
+                        int id = client.Create(tag).Result.Value;
+                        Assert.AreEqual(tag.Name, client.Query(id).Result.Nodes.First().Name);
+                        Assert.IsFalse(client.Query(id, "", "", "").Result.Nodes.Any());
+                        Assert.AreEqual(tag.Color, client.Get(id).Result.Color);
                         tag.Color = "white";
-                        Assert.IsTrue(client.Update(token, id, tag).Result.HasValue);
-                        Assert.IsTrue(client.Delete(token, id).Result.HasValue);
+                        Assert.IsTrue(client.Update(id, new MindNote.Data.Mutations.MutationCategory
+                        {
+                        }).Result.HasValue);
+                        Assert.IsTrue(client.Delete(id).Result.HasValue);
                     }
                 }
             });
         }
 
-        [TestMethod]
-        public void Relations()
-        {
-            MindNote.Data.Providers.InMemory.DataProvider provider = new MindNote.Data.Providers.InMemory.DataProvider();
-            int a = provider.NotesProvider.Create(new MindNote.Data.Note { Title = "node1" }, Utils.DefaultUser.SubjectId).Result.Value;
-            int b = provider.NotesProvider.Create(new MindNote.Data.Note { Title = "node2" }, Utils.DefaultUser.SubjectId).Result.Value;
-            Utils.UseApiEnvironment((_, api, token) =>
-            {
-                using (var baseClient = api.CreateClient())
-                {
-                    IRelationsClient client = new RelationsClient(baseClient);
-
-                    Assert.IsFalse(client.GetAll(token).Result.Any());
-                    Assert.IsNull(client.Get(token, 0).Result);
-                    client.Clear(token).Wait();
-                    {
-                        Relation rel = new Relation { From = a, To = b };
-                        int id = client.Create(token, rel).Result.Value;
-                        Assert.AreEqual(rel.From, client.Query(token, id, null, null).Result.First().From);
-                        Assert.AreEqual(1, client.GetAdjacents(token, b).Result.Count());
-                        rel.To = a;
-                        Assert.IsTrue(client.Update(token, id, rel).Result.HasValue);
-                        Assert.AreEqual(0, client.GetAdjacents(token, b).Result.Count());
-                        Assert.IsTrue(client.Delete(token, id).Result.HasValue);
-                        Assert.IsTrue(client.ClearAdjacents(token, a).Result.HasValue);
-                    }
-                }
-            }, provider);
-        }
 
         [TestMethod]
         public void Users()
@@ -103,18 +109,21 @@ namespace Test.Server.SDKs
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    IUsersClient client = new UsersClient(baseClient);
+                    var graphqlClient = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    IUsersClient client = new UsersClient(graphqlClient);
 
-                    Assert.IsFalse(client.GetAll(token).Result.Any());
-                    Assert.IsNull(client.Get(token, "0").Result);
-                    client.Clear(token).Wait();
+                    // Assert.IsFalse(client.Query().Result.Any());
+                    Assert.IsNull(client.Get("0").Result);
+                    client.Clear().Wait();
                     {
-                        User tag = new User { Name = "user" };
-                        string id = client.Create(token, Guid.NewGuid().ToString(), tag).Result;
-                        Assert.AreEqual(tag.Name, client.Get(token, id).Result?.Name);
+                        var tag = new RawUser { Name = "user", Id = Guid.NewGuid().ToString() };
+                        string id = client.Create(tag).Result;
+                        Assert.AreEqual(tag.Name, client.Get(id).Result?.Name);
                         tag.Name = "user2";
-                        Assert.IsNotNull(client.Update(token, id, tag).Result);
-                        Assert.IsNotNull(client.Delete(token, id).Result);
+                        Assert.IsNotNull(client.Update(id, new MindNote.Data.Mutations.MutationUser
+                        {
+                        }).Result);
+                        Assert.IsNotNull(client.Delete(id).Result);
                     }
                 }
             });

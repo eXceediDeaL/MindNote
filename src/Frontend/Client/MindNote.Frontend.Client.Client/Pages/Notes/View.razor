@@ -1,10 +1,6 @@
 ﻿@page "/notes/{id:int}"
 @using MindNote.Frontend.Client.Shared
-@using MindNote.Frontend.SDK.API
-@using MindNote.Data
-@inject CustomNotesClient NoteClient
-@inject CustomUsersClient UserClient
-@inject CustomCategoriesClient CategoryClient
+@inject NotesClient NoteClient
 @inject IUriHelper UriHelper
 
 @if (Current == null)
@@ -22,7 +18,7 @@ else
         <div class="d-flex flex-row">
             <h1 class="display-4">@Current.Data.Title</h1>
             <AuthorizeView>
-                @if (Current.Data.UserId != null && Current.Data.UserId == UserHelper.GetId(context.User))
+                @if (Current.Data.User != null && Current.Data.User.Id == UserHelper.GetId(context.User))
                 {
                     <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
                         <button class="btn btn-outline-danger m-1" @onclick="@(async e => await OnDelete())"><i class="fa fa-trash"></i></button>
@@ -50,11 +46,6 @@ else
     protected override async Task OnInitAsync()
     {
         Current = new NoteViewModel { Data = await NoteClient.Get(Id) };
-
-        if (Current.Data != null)
-        {
-            await Current.Load(CategoryClient, UserClient);
-        }
     }
 
     private async Task OnDelete()

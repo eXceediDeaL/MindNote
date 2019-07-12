@@ -11,8 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MindNote.Backend.Identity.Data;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MindNote.Backend.Identity
@@ -41,7 +42,7 @@ namespace MindNote.Backend.Identity
             });
         }
 
-        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IConfiguration configuration, IServiceCollection services)
+        public static void ConfigureIdentityServices(LinkedServerConfiguration server, IConfiguration configuration, IServiceCollection services, Action<IIdentityServerBuilder> configIdentityServer)
         {
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
@@ -60,22 +61,22 @@ namespace MindNote.Backend.Identity
                 .AddDeveloperSigningCredential();
 
             {
-                var idSection = configuration.GetSection("identityServer");
+                var idSection = configuration?.GetSection("identityServer");
                 {
-                    var obj = idSection.GetSection("IdentityResources").Get<IdentityResource[]>();
+                    var obj = idSection?.GetSection("IdentityResources").Get<IdentityResource[]>();
                     idServer.AddInMemoryIdentityResources(obj ?? SampleConfig.GetIdentityResources());
                 }
                 {
-                    var obj = idSection.GetSection("ApiResources").Get<ApiResource[]>();
+                    var obj = idSection?.GetSection("ApiResources").Get<ApiResource[]>();
                     idServer.AddInMemoryApiResources(obj ?? SampleConfig.GetApiResources());
                 }
                 {
-                    var obj = idSection.GetSection("Clients").Get<Client[]>();
+                    var obj = idSection?.GetSection("Clients").Get<Client[]>();
                     idServer.AddInMemoryClients(obj ?? SampleConfig.GetClients(server.Host, server.Client));
                 }
             }
 
-            idServer.AddAspNetIdentity<IdentityUser>();
+            configIdentityServer?.Invoke(idServer);
         }
 
         public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
@@ -109,7 +110,10 @@ namespace MindNote.Backend.Identity
             ConfigureDBServices(db, services);
 
             LinkedServerConfiguration server = LinkedServerConfiguration.Load(Configuration);
-            ConfigureIdentityServices(server, Configuration, services);
+            ConfigureIdentityServices(server, Configuration, services, idServer =>
+            {
+                idServer.AddAspNetIdentity<IdentityUser>();
+            });
 
             ConfigureFinalServices(Configuration, services);
         }
@@ -159,7 +163,8 @@ namespace MindNote.Backend.Identity
                     using (ApplicationDbContext context = services.GetRequiredService<ApplicationDbContext>())
                     {
                         await context.Database.EnsureCreatedAsync();
-                        await context.Database.MigrateAsync();
+                        if ((await context.Database.GetPendingMigrationsAsync()).Any())
+                            await context.Database.MigrateAsync();
                         await Database.SeedData.Initialize(context);
                     }
                 }

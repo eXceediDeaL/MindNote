@@ -2,12 +2,14 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Frontend.SDK.Identity;
 using MindNote.Data.Providers;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using System;
 using System.Collections.Generic;
-using Test.Server.Apis;
-using Test.Server.Hosts;
 using Test.Server.Identities;
+using Test.Server.Apis;
+using Microsoft.EntityFrameworkCore;
+using Test.Shared;
+using MindNote.Data.Repositories;
 
 namespace Test.Server
 {
@@ -24,6 +26,18 @@ namespace Test.Server
             Password = "pwd",
         };
 
+        public static readonly IdentityClientConfiguration identityClientConfiguration = new IdentityClientConfiguration
+        {
+            ClientId = "client",
+            ClientSecret = "secret",
+        };
+
+        public static readonly DBConfiguration dBConfiguration = new DBConfiguration
+        {
+            ConnectionString = "",
+            Type = DBType.MySql,
+        };
+
         public static void UseIdentityEnvironment(Action<MockIdentityWebApplicationFactory> action)
         {
             TestUser user = Utils.DefaultUser;
@@ -33,21 +47,29 @@ namespace Test.Server
             }
         }
 
-        public static void UseApiEnvironment(Action<MockIdentityWebApplicationFactory, MockApiWebApplicationFactory, string> action, IDataProvider provider = null)
+
+        public static void UseApiEnvironment(Action<MockIdentityWebApplicationFactory, MockApiWebApplicationFactory, string> action, IDataRepository repository = null)
         {
             TestUser user = Utils.DefaultUser;
-            if (provider == null) provider = new MindNote.Data.Providers.InMemory.DataProvider();
+
+            MindNote.Data.Providers.SqlServer.Models.DataContext database = null;
+            if (repository == null)
+            {
+                database = DBHelper.CreateContext<MindNote.Data.Providers.SqlServer.Models.DataContext>(Guid.NewGuid().ToString());
+                repository = new MindNote.Data.Providers.SqlServer.DataRepository(database);
+            }
             UseIdentityEnvironment(id =>
             {
                 string token = id.GetBearerToken(user.Username, user.Password, MindNote.Backend.Identity.SampleConfig.APIScope);
-                using (var testServer = new MockApiWebApplicationFactory(id.Server, provider, new IdentityDataGetter()))
+                using (var testServer = new MockApiWebApplicationFactory(id.Server, repository, new IdentityDataGetter()))
                 {
                     action(id, testServer, token);
                 }
             });
+            database?.Dispose();
 
         }
-        public static void UseHostEnvironment(Action<MockHostWebApplicationFactory<MindNote.Backend.API.Startup>, string> action, IDataProvider provider = null)
+        /*public static void UseHostEnvironment(Action<MockHostWebApplicationFactory<MindNote.Backend.API.Startup>, string> action, IDataProvider provider = null)
         {
             TestUser user = Utils.DefaultUser;
             UseApiEnvironment((id, api, token) =>
@@ -94,5 +116,7 @@ namespace Test.Server
             }
             return res;
         }
+
+    */
     }
 }

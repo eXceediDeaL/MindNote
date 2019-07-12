@@ -6,7 +6,7 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "{ServerIdentity}"
+        "Identity": "{BackendIdenty}"
     },
     "db": {
         "ConnectionString": "server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;",
@@ -14,6 +14,6 @@
     },
     "identityClient": {
         "ClientId": "backend.api",
-        "ClientSecret": "{SecretServerApi}"
+        "ClientSecret": "{SecretBackendApi}"
     }
 }

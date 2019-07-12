@@ -3,20 +3,20 @@ services:
   client:
     build:
       context: .
-      dockerfile: ./docker/client/Dockerfile
+      dockerfile: ./docker/frontend/client/Dockerfile
     image: mindnote:client
-  host:
-    build:
-      context: .
-      dockerfile: ./docker/host/Dockerfile
-    image: mindnote:host
+  # host:
+    # build:
+      # context: .
+      # dockerfile: ./docker/frontend/host/Dockerfile
+    # image: mindnote:host
   api:
     build:
       context: .
-      dockerfile: ./docker/api/Dockerfile
+      dockerfile: ./docker/backend/api/Dockerfile
     image: mindnote:api
   identity:
     build:
       context: .
-      dockerfile: ./docker/identity/Dockerfile
+      dockerfile: ./docker/backend/identity/Dockerfile
     image: mindnote:identity

@@ -1,13 +1,20 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using HotChocolate;
+using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Voyager;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using MindNote.Backend.API.GraphQL;
+using MindNote.Backend.API.GraphQL.Types;
 using MindNote.Frontend.SDK.Identity;
-using MindNote.Backend.Shared.Configuration;
+using MindNote.Shared.Web.Configuration;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using System;
@@ -40,7 +47,7 @@ namespace MindNote.Backend.API
                     options.UseSqlServer(db.ConnectionString);
                 }
             });
-            services.AddScoped<Data.Providers.IDataProvider, Data.Providers.SqlServer.DataProvider>();
+            services.AddScoped<Data.Repositories.IDataRepository, Data.Providers.SqlServer.DataRepository>();
         }
 
         public static void ConfigureIdentityServices(LinkedServerConfiguration server, IServiceCollection services)
@@ -56,6 +63,17 @@ namespace MindNote.Backend.API
 
                 options.Audience = "api";
             });
+        }
+
+        public static void ConfigureGraphQLServices(LinkedServerConfiguration server, IServiceCollection services)
+        {
+            services.AddDataLoaderRegistry();
+            services.AddGraphQL(sp => SchemaBuilder.New()
+                .AddServices(sp)
+                .AddAuthorizeDirectiveType()
+                .AddQueryType<AppQueryType>()
+                .AddMutationType<AppMutationType>()
+                .Create());
         }
 
         public static void ConfigureDocumentServices(LinkedServerConfiguration server, IServiceCollection services)
@@ -106,6 +124,8 @@ namespace MindNote.Backend.API
 
         public static void ConfigureFinalServices(IConfiguration configuration, IServiceCollection services)
         {
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
@@ -132,7 +152,9 @@ namespace MindNote.Backend.API
 
             ConfigureDocumentServices(server, services);
 
-            services.AddScoped<IIdentityDataGetter, IdentityDataGetter>();
+            ConfigureGraphQLServices(server, services);
+
+            services.AddSingleton<IIdentityDataGetter, IdentityDataGetter>();
 
             ConfigureFinalServices(Configuration, services);
         }
@@ -158,6 +180,8 @@ namespace MindNote.Backend.API
 
             app.UseAuthentication();
 
+            app.UseCors();
+
             app.UseOpenApi();
 
             var idClient = IdentityClientConfiguration.Load(configuration);
@@ -172,8 +196,13 @@ namespace MindNote.Backend.API
 
             app.UseReDoc();
 
-            app.UseCors();
+            app.UseGraphQL("/graphql")
+                .UsePlayground("/graphql", "/ui/playground")
+                .UseVoyager("/graphql", "/ui/voyager");
+
             app.UseMvc();
+
+            InitializeDatabase(app.ApplicationServices).Wait();
         }
 
         public static async Task InitializeDatabase(IServiceProvider provider)
@@ -203,7 +232,6 @@ namespace MindNote.Backend.API
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             ConfigureApp(Configuration, app, env);
-            InitializeDatabase(app.ApplicationServices).Wait();
         }
     }
 }

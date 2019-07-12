@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MindNote.Data.Raws;
 
 namespace MindNote.Data.Providers.SqlServer.Models
 {
@@ -8,12 +9,10 @@ namespace MindNote.Data.Providers.SqlServer.Models
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<RawUser> Users { get; set; }
 
-        public DbSet<Note> Notes { get; set; }
+        public DbSet<RawNote> Notes { get; set; }
 
-        public DbSet<Relation> Relations { get; set; }
-
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<RawCategory> Categories { get; set; }
     }
 }

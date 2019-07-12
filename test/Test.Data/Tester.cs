@@ -1,9 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MindNote.Data;
-using MindNote.Data.Providers;
+using MindNote.Data.Mutations;
+using MindNote.Data.Providers.SqlServer.Models;
+using MindNote.Data.Raws;
+using MindNote.Data.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Test.Data
 {
@@ -14,35 +17,29 @@ namespace Test.Data
         private const int UserCount = 5;
         private const double DeleteRate = 0.5;
 
-        public IDataProvider Provider
+        public IDataRepository Repository
         {
             get; private set;
         }
 
         private readonly string[] usernames;
 
-        public Tester(IDataProvider provider)
+        public Tester(IDataRepository provider)
         {
-            Provider = provider;
+            Repository = provider;
             random = new Random();
             usernames = Enumerable.Range(0, UserCount).Select(x => x.ToString()).ToArray();
         }
 
-        public void Valid(Note item, string userId)
+        public void Valid(RawNote item, string userId)
         {
             if (item.CategoryId.HasValue)
             {
-                Assert.IsNotNull(Provider.CategoriesProvider.Get(item.CategoryId.Value, userId).Result, "no tag with from id {0}", item.CategoryId.Value);
+                Assert.IsNotNull(Repository.Categories.Get(item.CategoryId.Value, userId).Result, "no tag with from id {0}", item.CategoryId.Value);
             }
         }
 
-        public void Valid(Relation item, string userId)
-        {
-            Assert.IsNotNull(Provider.NotesProvider.Get(item.From, userId).Result, "no node with from id {0}", item.From);
-            Assert.IsNotNull(Provider.NotesProvider.Get(item.To, userId).Result, "no node with to id {0}", item.To);
-        }
-
-        public void Valid(Category item)
+        public void Valid(RawCategory item)
         {
             Assert.IsFalse(string.IsNullOrEmpty(item.Name), "name is null/empty");
         }
@@ -51,31 +48,33 @@ namespace Test.Data
         {
             foreach (var username in usernames)
             {
-                Provider.NotesProvider.Clear(username);
-                Assert.IsFalse(Provider.NotesProvider.GetAll(username).Result.Any(), "clear failed");
-                Provider.RelationsProvider.Clear(username);
-                Assert.IsFalse(Provider.RelationsProvider.GetAll(username).Result.Any(), "clear failed");
-                Provider.CategoriesProvider.Clear(username);
-                Assert.IsFalse(Provider.CategoriesProvider.GetAll(username).Result.Any(), "clear failed");
+                Repository.Notes.Clear(username);
+                Assert.IsFalse(Repository.Notes.Query(username).Result.Any(), "clear failed");
+                Repository.Categories.Clear(username);
+                Assert.IsFalse(Repository.Categories.Query(username).Result.Any(), "clear failed");
             }
         }
 
         private void NoteBasic()
         {
-            INotesProvider pro = Provider.NotesProvider;
+            INoteRepository pro = Repository.Notes;
             Clear();
             for (int i = 0; i < TestCount; i++)
             {
-                Note data = new Note
+                var data = new RawNote
                 {
                     Title = $"item {i}",
                     Content = $"item content {i}",
                     CategoryId = null,
+                    Keywords = TransformHelper.KeywordsToString(new string[]
+                    {
+                        "key1",
+                        "key2",
+                    }),
                 };
+                Assert.AreEqual(2, TransformHelper.KeywordsToArray(data.Keywords).Length);
                 string username = random.Choice(usernames);
                 data.UserId = username;
-
-                Assert.AreEqual(data, data.Clone(), "clone failed");
 
                 int id;
                 {
@@ -85,7 +84,7 @@ namespace Test.Data
 
                     Assert.IsNotNull(pro.Get(id, username), "get after create failed");
 
-                    Note actual = pro.Get(id, username).Result;
+                    var actual = pro.Get(id, username).Result;
                     Valid(actual, username);
 
                     data.Id = id;
@@ -96,15 +95,17 @@ namespace Test.Data
                 {
                     data.Title = $"item {i} update";
                     data.Content = $"item {i} update";
-                    data.Id = random.Next();
-                    Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
+                    Assert.AreEqual(id, pro.Update(id, new MindNote.Data.Mutations.MutationNote
+                    {
+                        Title = new Mutation<string>(data.Title),
+                        Content = new Mutation<string>(data.Content)
+                    }, username).Result, "update failed");
 
-                    IEnumerable<Note> items = pro.Query(id, data.Title, data.Content, null, null, null, null, null, null, username).Result;
+                    IEnumerable<RawNote> items = pro.Query(username, x => x.Id == id && x.Title == data.Title && x.Content == data.Content).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
-                    Note actual = items.First();
+                    RawNote actual = items.First();
                     Valid(actual, username);
 
-                    data.Id = id;
                     Assert.AreEqual(data.Title, actual.Title, "query failed");
                     Assert.AreEqual(data.Content, actual.Content, "query failed");
                 }
@@ -118,8 +119,8 @@ namespace Test.Data
 
             foreach (string user in usernames)
             {
-                IEnumerable<Note> items = pro.GetAll(user).Result;
-                foreach (Note v in items)
+                IEnumerable<RawNote> items = pro.Query(user).Result;
+                foreach (RawNote v in items)
                 {
                     Valid(v, user);
                 }
@@ -129,211 +130,70 @@ namespace Test.Data
         private void NoteFailed()
         {
             string username = random.Choice(usernames);
-            Provider.CategoriesProvider.Clear(username).Wait();
-            INotesProvider pro = Provider.NotesProvider;
-            Assert.IsNull(pro.Create(new Note { Title = null }, username).Result, "node name is null");
-            Assert.IsNull(pro.Create(new Note { Title = "" }, username).Result, "node name is empty");
-            Assert.IsNull(pro.Create(new Note { Title = "a", CategoryId = 0 }, username).Result, "no this tag but create node");
-        }
-
-        private void RelationBasic()
-        {
-            Clear();
-
-            INotesProvider npro = Provider.NotesProvider;
-
-            IRelationsProvider pro = Provider.RelationsProvider;
-
-            string[] usernames = new string[] { "user" };
-
-            List<int> nodes = new List<int>();
-
-            for (int i = 0; i < TestCount; i++)
-            {
-                Note data = new Note
-                {
-                    Title = $"item {i}",
-                    Content = $"item content {i}",
-                    CategoryId = null,
-                };
-                string username = random.Choice(usernames);
-                int? tid = npro.Create(data, username).Result;
-                Assert.IsTrue(tid.HasValue, "create failed");
-                nodes.Add(tid.Value);
-            }
-
-            for (int i = 0; i < TestCount; i++)
-            {
-                Relation data = new Relation
-                {
-                    From = random.Choice(nodes),
-                    To = random.Choice(nodes),
-                };
-                string username = random.Choice(usernames);
-                Assert.AreEqual(data, data.Clone());
-
-                int id;
-                {
-                    int? tid = pro.Create(data, username).Result;
-                    Assert.IsTrue(tid.HasValue, "create failed");
-                    id = tid.Value;
-
-                    Assert.IsNotNull(pro.Get(id, username), "get after create failed");
-
-                    Relation actual = pro.Get(id, username).Result;
-                    Valid(actual, username);
-
-                    data.Id = id;
-                    Assert.AreEqual(data, actual, "get failed");
-                    Assert.AreEqual(data.GetHashCode(), actual.GetHashCode(), "get failed");
-                }
-
-                {
-                    data.From = random.Choice(nodes);
-                    data.To = random.Choice(nodes);
-                    data.Id = random.Next();
-                    Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
-
-                    IEnumerable<Relation> items = pro.Query(id, data.From, data.To, username).Result;
-                    Assert.AreEqual(1, items.Count(), "query failed");
-                    Relation actual = items.First();
-                    Valid(actual, username);
-
-                    data.Id = id;
-                    Assert.AreEqual(data, actual, "query failed");
-                }
-
-                if (random.NextDouble() < DeleteRate)
-                {
-                    Assert.IsNotNull(pro.Delete(id, username).Result, "delete failed");
-                    Assert.IsNull(pro.Get(id, username).Result, "get after delete failed");
-                }
-            }
-
-            foreach (string user in usernames)
-            {
-                IEnumerable<Relation> items = pro.GetAll(user).Result;
-                foreach (Relation v in items)
-                {
-                    Valid(v, user);
-                }
-            }
-        }
-
-        private void RelationFailed()
-        {
-            string username = random.Choice(usernames);
-            Provider.CategoriesProvider.Clear(username).Wait();
-            int id = Provider.NotesProvider.Create(new Note { Title = "name" }, username).Result.Value;
-            IRelationsProvider pro = Provider.RelationsProvider;
-            Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id + 1 }, username).Result);
-            Assert.IsNull(pro.Create(new Relation { From = id, To = id + 1 }, username).Result);
-            Assert.IsNull(pro.Create(new Relation { From = id - 1, To = id }, username).Result);
-        }
-
-        private void RelationSpecial()
-        {
-            Clear();
-
-            INotesProvider npro = Provider.NotesProvider;
-
-            IRelationsProvider pro = Provider.RelationsProvider;
-
-            string[] usernames = new string[] { "user" };
-
-            List<(int, string)> nodes = new List<(int, string)>();
-            Dictionary<int, HashSet<int>> adjs = new Dictionary<int, HashSet<int>>();
-
-            for (int i = 0; i < TestCount; i++)
-            {
-                Note data = new Note
-                {
-                    Title = $"item {i}",
-                    Content = $"item content {i}",
-                    CategoryId = null,
-                };
-                string username = random.Choice(usernames);
-                int? tid = npro.Create(data, username).Result;
-                Assert.IsTrue(tid.HasValue, "create failed");
-                nodes.Add((tid.Value, username));
-                adjs.Add(tid.Value, new HashSet<int>());
-            }
-
-            for (int i = 0; i < TestCount; i++)
-            {
-                Relation data = new Relation
-                {
-                    From = random.Choice(nodes).Item1,
-                    To = random.Choice(nodes).Item1,
-                };
-                string username = random.Choice(usernames);
-
-                {
-                    int? tid = pro.Create(data, username).Result;
-                    Assert.IsTrue(tid.HasValue, "create failed");
-                    adjs[data.From].Add(data.To);
-                    adjs[data.To].Add(data.From);
-                }
-            }
-
-            foreach ((int id, string user) in nodes)
-            {
-                IEnumerable<Relation> actual = pro.GetAdjacents(id, user).Result;
-                CollectionAssert.AreEquivalent(adjs[id].ToArray(), new HashSet<int>(actual.Select(x => x.From ^ x.To ^ id)).ToArray());
-            }
-            foreach ((int id, string user) in nodes)
-            {
-                pro.ClearAdjacents(id, user).Wait();
-                Assert.IsFalse(pro.GetAdjacents(id, user).Result.Any());
-            }
+            Repository.Categories.Clear(username).Wait();
+            var pro = Repository.Notes;
+            Assert.IsFalse(pro.Create(null, null).Result >= 0);
+            Assert.IsFalse(pro.Create(new RawNote { Title = null }, username).Result >= 0, "note title is null");
+            Assert.IsFalse(pro.Create(new RawNote { Title = "" }, username).Result >= 0, "note title is empty");
+            Assert.IsFalse(pro.Create(new RawNote { Title = "a", CategoryId = 0 }, username).Result >= 0, "no this tag but create note");
+            Assert.IsFalse(pro.Update(0, null, null).Result >= 0);
+            Assert.IsFalse(pro.Update(0, null, username).Result >= 0);
+            Assert.IsFalse(pro.Update(0, new MutationNote { }, username).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, null).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, username).Result >= 0);
+            Assert.IsFalse(pro.Clear(null).Result);
         }
 
         private void CategoryBasic()
         {
             Clear();
 
-            ICategoriesProvider pro = Provider.CategoriesProvider;
+            var pro = Repository.Categories;
 
             for (int i = 0; i < TestCount; i++)
             {
-                Category data = new Category
+                var data = new RawCategory
                 {
                     Name = $"item {i}",
                     Color = random.NextString(),
                 };
                 string username = random.Choice(usernames);
                 data.UserId = username;
-                Assert.AreEqual(data, data.Clone());
 
                 int id;
                 {
                     int? tid = pro.Create(data, username).Result;
                     Assert.IsTrue(tid.HasValue, "create failed");
                     id = tid.Value;
+                    data.Id = id;
 
                     Assert.IsNotNull(pro.Get(id, ""), "get after create failed");
 
-                    Category actual = pro.Get(id, username).Result;
+                    var actual = pro.Get(id, username).Result;
                     Valid(actual);
 
-                    data.Id = id;
-                    Assert.AreEqual(data, actual, "get failed");
-                    Assert.AreEqual(data.GetHashCode(), actual.GetHashCode(), "get failed");
+                    Assert.AreEqual(data.Id, actual.Id, "get failed");
+                    Assert.AreEqual(data.Name, actual.Name, "get failed");
+                    Assert.AreEqual(data.Color, actual.Color, "get failed");
                 }
 
                 {
                     data.Name = $"item {i} update";
                     data.Color = random.NextString();
-                    data.Id = random.Next();
-                    Assert.AreEqual(id, pro.Update(id, data, username).Result, "update failed");
+                    Assert.AreEqual(id, pro.Update(id, new MutationCategory
+                    {
+                        Name = new Mutation<string>(data.Name),
+                        Color = new Mutation<string>(data.Color)
+                    }, username).Result, "update failed");
 
-                    IEnumerable<Category> items = pro.Query(id, data.Name, data.Color, null, username).Result;
+                    IEnumerable<RawCategory> items = pro.Query(username, x => x.Id == id && x.Name == data.Name && x.Color == data.Color).Result;
                     Assert.AreEqual(1, items.Count(), "query failed");
-                    Category actual = items.First();
+                    var actual = items.First();
                     Valid(actual);
 
-                    data.Id = id;
-                    Assert.AreEqual(data, actual, "query failed");
+                    Assert.AreEqual(data.Id, actual.Id, "query failed");
+                    Assert.AreEqual(data.Name, actual.Name, "query failed");
+                    Assert.AreEqual(data.Color, actual.Color, "query failed");
                 }
 
                 if (random.NextDouble() < DeleteRate)
@@ -345,8 +205,8 @@ namespace Test.Data
 
             foreach (string user in usernames)
             {
-                IEnumerable<Category> items = pro.GetAll(user).Result;
-                foreach (Category v in items)
+                var items = pro.Query(user).Result;
+                foreach (var v in items)
                 {
                     Valid(v);
                 }
@@ -355,19 +215,23 @@ namespace Test.Data
 
         private void CategoryFailed()
         {
+            var pro = Repository.Categories;
+            string username = random.Choice(usernames);
+            Assert.IsFalse(pro.Create(null, null).Result >= 0);
+            Assert.IsFalse(pro.Create(new RawCategory { Name = null }, username).Result >= 0, "category name is null");
+            Assert.IsFalse(pro.Create(new RawCategory { Name = "" }, username).Result >= 0, "category name is empty");
+            Assert.IsFalse(pro.Update(0, null, null).Result >= 0);
+            Assert.IsFalse(pro.Update(0, null, username).Result >= 0);
+            Assert.IsFalse(pro.Update(0, new MutationCategory { }, username).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, null).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, username).Result >= 0);
+            Assert.IsFalse(pro.Clear(null).Result);
         }
 
         public void NoteIndependent()
         {
             NoteBasic();
             NoteFailed();
-        }
-
-        public void RelationIndependent()
-        {
-            RelationBasic();
-            RelationSpecial();
-            RelationFailed();
         }
 
         public void CategoryIndependent()
@@ -378,17 +242,21 @@ namespace Test.Data
 
         public void UserIndependent()
         {
-            IUsersProvider provider = Provider.UsersProvider;
-            provider.Clear().Wait();
-            Assert.IsFalse(provider.GetAll().Result.Any());
+            var provider = Repository.Users;
+            Assert.IsFalse(provider.Query(null).Result.Any());
             foreach (var v in usernames)
             {
-                Assert.AreEqual(v, provider.Create(v, new User()).Result);
-                Assert.IsNotNull(provider.Get(v).Result);
-                Assert.AreEqual(v, provider.Update(v, new User()).Result);
-                Assert.AreEqual(v, provider.Delete(v).Result);
-                Assert.IsNull(provider.Get(v).Result);
+                Assert.AreEqual(v, provider.Create(new RawUser { Id = v }, v).Result);
+                Assert.IsNotNull(provider.Get(v, v).Result);
+                Assert.IsNotNull(provider.Query(v, x => x.Id == v).Result);
+                Assert.AreEqual(v, provider.Update(v, new MutationUser(), v).Result);
+                Assert.AreEqual(v, provider.Delete(v, v).Result);
+                Assert.IsNull(provider.Get(v, v).Result);
             }
+
+            Assert.IsNotNull(provider.Create(new RawUser(), null).Result);
+            Assert.IsNull(provider.Delete(null, null).Result);
+            Assert.IsNull(provider.Update(null, new MutationUser(), null).Result);
         }
     }
 }

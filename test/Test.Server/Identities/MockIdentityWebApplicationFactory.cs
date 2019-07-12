@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Backend.Identity;
+using MindNote.Shared.Web.Configuration;
 using System;
 using System.Collections.Generic;
 
@@ -31,37 +32,31 @@ namespace Test.Server.Identities
             {
                 // Mock DB and IdentityServices
 
-                services.AddDbContext<MindNote.Backend.Identity.Data.ApplicationDbContext>(options =>
+                services.AddDbContext<MindNote.Backend.Identity.Data.ApplicationDbContext>(optionsAction: options =>
                 {
                     options.UseInMemoryDatabase(Guid.NewGuid().ToString());
                 });
 
-                services.AddDefaultIdentity<IdentityUser>()
-                    .AddDefaultUI(UIFramework.Bootstrap4)
-                    .AddEntityFrameworkStores<MindNote.Backend.Identity.Data.ApplicationDbContext>();
-
-                services.AddIdentityServer(options =>
+                LinkedServerConfiguration server = new LinkedServerConfiguration
                 {
-                    options.PublicOrigin = Utils.ServerConfiguration.Identity;
-                    options.UserInteraction = new IdentityServer4.Configuration.UserInteractionOptions
-                    {
-                        LoginUrl = "/Identity/Account/Login",
-                        LogoutUrl = "/Identity/Account/Logout",
-                        ErrorUrl = "/Identity/Account/Error",
-                    };
-                })
-                 .AddDeveloperSigningCredential()
-                 .AddInMemoryIdentityResources(SampleConfig.GetIdentityResources())
-                 .AddInMemoryApiResources(SampleConfig.GetApiResources())
-                 .AddInMemoryClients(new[]{
-                    new Client
-                    {
-                        ClientId=ClientId,
-                        ClientSecrets = new [] { new Secret(ClientSecret.Sha256()) },
-                        AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                        AllowedScopes = { SampleConfig.APIScope }
-                    }})
-                 .AddTestUsers(users);
+                    Api = "",
+                    Host = "",
+                    Client = "",
+                    Identity = ""
+                };
+
+                Startup.ConfigureIdentityServices(server, null, services, idServer =>
+                {
+                    idServer.AddInMemoryClients(new[]{
+                        new Client
+                        {
+                            ClientId=ClientId,
+                            ClientSecrets = new [] { new Secret(ClientSecret.Sha256()) },
+                            AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                            AllowedScopes = { SampleConfig.APIScope }
+                        }})
+                    .AddTestUsers(users);
+                });
 
                 Startup.ConfigureFinalServices(null, services);
             });

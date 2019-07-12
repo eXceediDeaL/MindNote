@@ -20,7 +20,7 @@ namespace MindNote.Frontend.Client.Server.Controllers
         }
 
         [HttpGet("[action]")]
-        public string ClientHost()
+        public string FrontendClient()
         {
             return Utils.Linked.Client;
         }

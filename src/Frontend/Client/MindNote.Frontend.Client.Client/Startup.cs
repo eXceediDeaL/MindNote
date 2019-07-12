@@ -12,10 +12,11 @@ namespace MindNote.Frontend.Client.Client
         {
             services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
 
-            services.AddScoped<CustomNotesClient, CustomNotesClient>();
-            services.AddScoped<CustomCategoriesClient, CustomCategoriesClient>();
-            services.AddScoped<CustomUsersClient, CustomUsersClient>();
-            services.AddScoped<IRelationsClient, RelationsClient>();
+            services.AddScoped<IGraphQLClientOptions, GraphQLClientOptions>();
+            services.AddScoped<IGraphQLClient, GraphQLClient>();
+            services.AddScoped<INotesClient, NotesClient>();
+            services.AddScoped<ICategoriesClient, CategoriesClient>();
+            services.AddScoped<IUsersClient, UsersClient>();
 
             services.AddAuthorizationCore();
         }

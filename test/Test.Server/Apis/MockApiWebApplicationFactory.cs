@@ -5,18 +5,19 @@ using Microsoft.Extensions.DependencyInjection;
 using MindNote.Frontend.SDK.Identity;
 using MindNote.Data.Providers;
 using MindNote.Backend.API;
+using MindNote.Data.Repositories;
 
 namespace Test.Server.Apis
 {
     public class MockApiWebApplicationFactory : WebApplicationFactory<MindNote.Backend.API.Startup>
     {
-        private readonly IDataProvider dataProvider;
+        private readonly IDataRepository dataRepository;
         private readonly TestServer idServer;
         private readonly IIdentityDataGetter idData;
 
-        public MockApiWebApplicationFactory(TestServer idServer, IDataProvider dataProvider, IIdentityDataGetter idData)
+        public MockApiWebApplicationFactory(TestServer idServer, IDataRepository dataRepository, IIdentityDataGetter idData)
         {
-            this.dataProvider = dataProvider;
+            this.dataRepository = dataRepository;
             this.idServer = idServer;
             this.idData = idData;
         }
@@ -26,7 +27,7 @@ namespace Test.Server.Apis
             builder.ConfigureServices(services =>
             {
                 // Mock DataProvider
-                services.AddSingleton(dataProvider);
+                services.AddSingleton(dataRepository);
 
                 // Mock IdentityServices
                 {
@@ -45,6 +46,8 @@ namespace Test.Server.Apis
                 }
 
                 Startup.ConfigureDocumentServices(Utils.ServerConfiguration, services);
+
+                Startup.ConfigureGraphQLServices(Utils.ServerConfiguration, services);
 
                 // Mock IdentityDataGetter
                 services.AddSingleton(idData);
