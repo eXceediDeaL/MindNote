@@ -80,7 +80,7 @@ namespace MindNote.Backend.API.GraphQL
             return await repository.Users.Create(data, GetIdentity());
         }
 
-        public async Task<int?> CreateCategory([Service]IDataRepository repository, int id, RawCategory data)
+        public async Task<int?> CreateCategory([Service]IDataRepository repository, RawCategory data)
         {
             return await repository.Categories.Create(data, GetIdentity());
         }

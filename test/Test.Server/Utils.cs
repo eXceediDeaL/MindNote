@@ -6,6 +6,10 @@ using MindNote.Shared.Web.Configuration;
 using System;
 using System.Collections.Generic;
 using Test.Server.Identities;
+using Test.Server.Apis;
+using Microsoft.EntityFrameworkCore;
+using Test.Shared;
+using MindNote.Data.Repositories;
 
 namespace Test.Server
 {
@@ -31,23 +35,29 @@ namespace Test.Server
             }
         }
 
-        /*
 
-        public static void UseApiEnvironment(Action<MockIdentityWebApplicationFactory, MockApiWebApplicationFactory, string> action, IDataProvider provider = null)
+        public static void UseApiEnvironment(Action<MockIdentityWebApplicationFactory, MockApiWebApplicationFactory, string> action, IDataRepository repository = null)
         {
             TestUser user = Utils.DefaultUser;
-            if (provider == null) provider = new MindNote.Data.Providers.InMemory.DataProvider();
+
+            MindNote.Data.Providers.SqlServer.Models.DataContext database = null;
+            if (repository == null)
+            {
+                database = DBHelper.CreateContext<MindNote.Data.Providers.SqlServer.Models.DataContext>(Guid.NewGuid().ToString());
+                repository = new MindNote.Data.Providers.SqlServer.DataRepository(database);
+            }
             UseIdentityEnvironment(id =>
             {
                 string token = id.GetBearerToken(user.Username, user.Password, MindNote.Backend.Identity.SampleConfig.APIScope);
-                using (var testServer = new MockApiWebApplicationFactory(id.Server, provider, new IdentityDataGetter()))
+                using (var testServer = new MockApiWebApplicationFactory(id.Server, repository, new IdentityDataGetter()))
                 {
                     action(id, testServer, token);
                 }
             });
+            database?.Dispose();
 
         }
-        public static void UseHostEnvironment(Action<MockHostWebApplicationFactory<MindNote.Backend.API.Startup>, string> action, IDataProvider provider = null)
+        /*public static void UseHostEnvironment(Action<MockHostWebApplicationFactory<MindNote.Backend.API.Startup>, string> action, IDataProvider provider = null)
         {
             TestUser user = Utils.DefaultUser;
             UseApiEnvironment((id, api, token) =>

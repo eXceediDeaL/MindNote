@@ -28,7 +28,7 @@ namespace MindNote.Backend.API.GraphQL
 
         private string GetIdentity()
         {
-            return identityDataGetter.GetClaimId(httpContextAccessor.HttpContext.User);
+            return identityDataGetter.GetClaimId(httpContextAccessor.HttpContext?.User);
         }
 
         public async Task<IQueryable<RawUser>> GetUsers([Service]IDataRepository repository, string id = null, string name = null, string bio = null, string email = null, string url = null, string company = null, string location = null)

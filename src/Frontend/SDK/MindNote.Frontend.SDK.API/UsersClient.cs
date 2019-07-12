@@ -1,5 +1,4 @@
-﻿using MindNote.Frontend.SDK.API;
-using MindNote.Data;
+﻿using MindNote.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +8,9 @@ using MindNote.Data.Raws;
 using MindNote.Data.Mutations;
 using MindNote.Frontend.SDK.API.Models;
 
-namespace MindNote.Frontend.Client.Client.Helpers
+namespace MindNote.Frontend.SDK.API
 {
-    public class UsersClient
+    public class UsersClient : IUsersClient
     {
         static readonly string SCreate = GraphQLStrings.CreateMutation(nameof(SCreate), @"
 ($data: RawUserInput) {
@@ -58,24 +57,24 @@ namespace MindNote.Frontend.Client.Client.Helpers
             })).GetDataFieldAs<bool>("clearUsers");
         }
 
-        public async Task<int?> Create(RawUser data)
+        public async Task<string> Create(RawUser data)
         {
             return (await innerClient.Mutation(new GraphQL.Common.Request.GraphQLRequest
             {
                 Query = SCreate,
                 OperationName = nameof(SCreate),
-                Variables = new { data = data },
-            })).GetDataFieldAs<int?>("createUser");
+                Variables = new { data },
+            })).GetDataFieldAs<string>("createUser");
         }
 
-        public async Task<int?> Delete(string id)
+        public async Task<string> Delete(string id)
         {
             return (await innerClient.Mutation(new GraphQL.Common.Request.GraphQLRequest
             {
                 Query = SDelete,
                 OperationName = nameof(SDelete),
-                Variables = new { id = id },
-            })).GetDataFieldAs<int?>("deleteUser");
+                Variables = new { id },
+            })).GetDataFieldAs<string>("deleteUser");
         }
 
         public async Task<User> Get(string id)
@@ -84,7 +83,7 @@ namespace MindNote.Frontend.Client.Client.Helpers
             {
                 Query = SGet,
                 OperationName = nameof(SGet),
-                Variables = new { id = id },
+                Variables = new { id },
             })).GetDataFieldAs<User>("user");
         }
 
@@ -93,14 +92,14 @@ namespace MindNote.Frontend.Client.Client.Helpers
             return null;
         }
 
-        public async Task<int?> Update(string id, MutationUser mutation)
+        public async Task<string> Update(string id, MutationUser mutation)
         {
             return (await innerClient.Mutation(new GraphQL.Common.Request.GraphQLRequest
             {
                 Query = SUpdate,
                 OperationName = nameof(SUpdate),
                 Variables = new { id = id, mutation = mutation },
-            })).GetDataFieldAs<int?>("updateUser");
+            })).GetDataFieldAs<string>("updateUser");
         }
     }
 }

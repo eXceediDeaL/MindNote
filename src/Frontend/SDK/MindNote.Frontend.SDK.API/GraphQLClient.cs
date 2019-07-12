@@ -43,7 +43,7 @@ namespace MindNote.Frontend.SDK.API
             var response = await innerClient.SendQueryAsync(request);
             if (response.Errors != null)
             {
-                throw new Exception(JsonConvert.SerializeObject(response.Errors));
+                throw new Exception(JsonConvert.SerializeObject(new { request.Query, request.OperationName, request.Variables, response.Errors, response.Data }));
             }
             return response;
         }
@@ -56,7 +56,7 @@ namespace MindNote.Frontend.SDK.API
             var response = await innerClient.SendMutationAsync(request);
             if (response.Errors != null)
             {
-                throw new Exception(JsonConvert.SerializeObject(response.Errors));
+                throw new Exception(JsonConvert.SerializeObject(new { request.Query, request.OperationName, request.Variables, response.Errors, response.Data }));
             }
             return response;
         }

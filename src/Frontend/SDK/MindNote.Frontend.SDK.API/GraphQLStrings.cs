@@ -1,4 +1,4 @@
-﻿namespace MindNote.Frontend.Client.Client.Helpers
+﻿namespace MindNote.Frontend.SDK.API
 {
     public static class GraphQLStrings
     {

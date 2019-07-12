@@ -14,9 +14,9 @@ namespace MindNote.Frontend.Client.Client
 
             services.AddScoped<IGraphQLClientOptions, GraphQLClientOptions>();
             services.AddScoped<IGraphQLClient, GraphQLClient>();
-            services.AddScoped<NotesClient>();
-            services.AddScoped<CategoriesClient>();
-            services.AddScoped<UsersClient>();
+            services.AddScoped<INotesClient, NotesClient>();
+            services.AddScoped<ICategoriesClient, CategoriesClient>();
+            services.AddScoped<IUsersClient, UsersClient>();
 
             services.AddAuthorizationCore();
         }

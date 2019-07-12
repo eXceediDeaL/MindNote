@@ -5,7 +5,7 @@ else {
     switch ($args[0]) {
         "run" {
             dotnet build
-            dotnet run -p ./MindNote.Frontend.Client.Server
+            dotnet run -p ./Client/MindNote.Frontend.Client.Server
         }
         default {
             Write-Output "The type is not found."

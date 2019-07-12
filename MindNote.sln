@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{93630D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MindNote.Shared.Web", "src\Shared\MindNote.Shared.Web\MindNote.Shared.Web.csproj", "{C6D84994-DBE8-47D7-A2F0-81D9E9D515FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Shared", "test\Test.Shared\Test.Shared.csproj", "{628DC35F-A760-4E84-8B5A-A09EB037C3DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{C6D84994-DBE8-47D7-A2F0-81D9E9D515FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6D84994-DBE8-47D7-A2F0-81D9E9D515FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6D84994-DBE8-47D7-A2F0-81D9E9D515FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{628DC35F-A760-4E84-8B5A-A09EB037C3DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{628DC35F-A760-4E84-8B5A-A09EB037C3DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{628DC35F-A760-4E84-8B5A-A09EB037C3DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{628DC35F-A760-4E84-8B5A-A09EB037C3DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{11326A40-EEA6-4938-9A7F-D3C346DCB60F} = {8D8F24F4-F73E-4DD5-9B95-71F7B6244D68}
 		{CEBF98DB-8F45-4DFC-A1D0-451C2E887A09} = {B6915F43-46A8-46C8-B7CB-AFDA3D8B490E}
 		{C6D84994-DBE8-47D7-A2F0-81D9E9D515FB} = {93630D99-EAFB-49B5-BF84-661D0A747822}
+		{628DC35F-A760-4E84-8B5A-A09EB037C3DF} = {69900DEC-F1E7-404B-8F1D-76D7BF6B7937}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED546138-7113-49AF-BF58-98F9C5ACD5DC}
