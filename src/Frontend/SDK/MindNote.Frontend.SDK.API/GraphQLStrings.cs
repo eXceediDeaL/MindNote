@@ -4,7 +4,7 @@
     {
         public static readonly string NoteListItem = GraphQLStrings.CreateFragment(nameof(NoteListItem), "Note", @"
 {
-    id, title, content, creationTime, modificationTime, status
+    id, title, content, creationTime, modificationTime, status, keywords
     category {
         id, name, color
     }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MindNote.Data.Mutations;
+using MindNote.Data.Providers.SqlServer.Models;
 using MindNote.Data.Raws;
 using MindNote.Data.Repositories;
 using System;
@@ -65,7 +66,13 @@ namespace Test.Data
                     Title = $"item {i}",
                     Content = $"item content {i}",
                     CategoryId = null,
+                    Keywords = TransformHelper.KeywordsToString(new string[]
+                    {
+                        "key1",
+                        "key2",
+                    }),
                 };
+                Assert.AreEqual(2, TransformHelper.KeywordsToArray(data.Keywords).Length);
                 string username = random.Choice(usernames);
                 data.UserId = username;
 
@@ -125,9 +132,16 @@ namespace Test.Data
             string username = random.Choice(usernames);
             Repository.Categories.Clear(username).Wait();
             var pro = Repository.Notes;
-            Assert.IsFalse(pro.Create(new RawNote { Title = null }, username).Result >= 0, "node name is null");
-            Assert.IsFalse(pro.Create(new RawNote { Title = "" }, username).Result >= 0, "node name is empty");
-            Assert.IsFalse(pro.Create(new RawNote { Title = "a", CategoryId = 0 }, username).Result >= 0, "no this tag but create node");
+            Assert.IsFalse(pro.Create(null, null).Result >= 0);
+            Assert.IsFalse(pro.Create(new RawNote { Title = null }, username).Result >= 0, "note title is null");
+            Assert.IsFalse(pro.Create(new RawNote { Title = "" }, username).Result >= 0, "note title is empty");
+            Assert.IsFalse(pro.Create(new RawNote { Title = "a", CategoryId = 0 }, username).Result >= 0, "no this tag but create note");
+            Assert.IsFalse(pro.Update(0, null, null).Result >= 0);
+            Assert.IsFalse(pro.Update(0, null, username).Result >= 0);
+            Assert.IsFalse(pro.Update(0, new MutationNote { }, username).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, null).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, username).Result >= 0);
+            Assert.IsFalse(pro.Clear(null).Result);
         }
 
         private void CategoryBasic()
@@ -201,6 +215,17 @@ namespace Test.Data
 
         private void CategoryFailed()
         {
+            var pro = Repository.Categories;
+            string username = random.Choice(usernames);
+            Assert.IsFalse(pro.Create(null, null).Result >= 0);
+            Assert.IsFalse(pro.Create(new RawCategory { Name = null }, username).Result >= 0, "category name is null");
+            Assert.IsFalse(pro.Create(new RawCategory { Name = "" }, username).Result >= 0, "category name is empty");
+            Assert.IsFalse(pro.Update(0, null, null).Result >= 0);
+            Assert.IsFalse(pro.Update(0, null, username).Result >= 0);
+            Assert.IsFalse(pro.Update(0, new MutationCategory { }, username).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, null).Result >= 0);
+            Assert.IsFalse(pro.Delete(0, username).Result >= 0);
+            Assert.IsFalse(pro.Clear(null).Result);
         }
 
         public void NoteIndependent()
@@ -218,16 +243,20 @@ namespace Test.Data
         public void UserIndependent()
         {
             var provider = Repository.Users;
-            provider.Clear(null).Wait();
             Assert.IsFalse(provider.Query(null).Result.Any());
             foreach (var v in usernames)
             {
                 Assert.AreEqual(v, provider.Create(new RawUser { Id = v }, v).Result);
                 Assert.IsNotNull(provider.Get(v, v).Result);
+                Assert.IsNotNull(provider.Query(v, x => x.Id == v).Result);
                 Assert.AreEqual(v, provider.Update(v, new MutationUser(), v).Result);
                 Assert.AreEqual(v, provider.Delete(v, v).Result);
                 Assert.IsNull(provider.Get(v, v).Result);
             }
+
+            Assert.IsNotNull(provider.Create(new RawUser(), null).Result);
+            Assert.IsNull(provider.Delete(null, null).Result);
+            Assert.IsNull(provider.Update(null, new MutationUser(), null).Result);
         }
     }
 }

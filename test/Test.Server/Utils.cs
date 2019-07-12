@@ -26,6 +26,18 @@ namespace Test.Server
             Password = "pwd",
         };
 
+        public static readonly IdentityClientConfiguration identityClientConfiguration = new IdentityClientConfiguration
+        {
+            ClientId = "client",
+            ClientSecret = "secret",
+        };
+
+        public static readonly DBConfiguration dBConfiguration = new DBConfiguration
+        {
+            ConnectionString = "",
+            Type = DBType.MySql,
+        };
+
         public static void UseIdentityEnvironment(Action<MockIdentityWebApplicationFactory> action)
         {
             TestUser user = Utils.DefaultUser;

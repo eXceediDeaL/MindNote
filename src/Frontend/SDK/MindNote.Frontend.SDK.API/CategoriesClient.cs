@@ -27,7 +27,7 @@ namespace MindNote.Frontend.SDK.API
         static readonly string SGet = GraphQLStrings.CreateQuery(nameof(SGet), @"
 ($id: Int!) {
     category(id: $id) {
-        id, name, color
+        id, name, color, status
         user {
             id, name
         }
@@ -38,7 +38,7 @@ namespace MindNote.Frontend.SDK.API
     categories(id: $id, first: $first, last: $last, before: $before, after: $after, name: $name, color: $color, userId: $userId){
         totalCount
         nodes{
-            id, name, color
+            id, name, color, status
             user {
                 id, name
             }

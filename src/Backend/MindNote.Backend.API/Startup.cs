@@ -201,6 +201,8 @@ namespace MindNote.Backend.API
                 .UseVoyager("/graphql", "/ui/voyager");
 
             app.UseMvc();
+
+            InitializeDatabase(app.ApplicationServices).Wait();
         }
 
         public static async Task InitializeDatabase(IServiceProvider provider)
@@ -230,7 +232,6 @@ namespace MindNote.Backend.API
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             ConfigureApp(Configuration, app, env);
-            InitializeDatabase(app.ApplicationServices).Wait();
         }
     }
 }

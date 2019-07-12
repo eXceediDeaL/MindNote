@@ -19,13 +19,40 @@ namespace Test.Server.SDKs
     public class SDK
     {
         [TestMethod]
+        public void RawGraphQLClient()
+        {
+            Utils.UseApiEnvironment((_, api, token) =>
+            {
+                using (var baseClient = api.CreateClient())
+                {
+                    var client = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    Assert.ThrowsException<AggregateException>(() =>
+                    {
+                        client.Query(new GraphQL.Common.Request.GraphQLRequest
+                        {
+                            Query = "mutation"
+                        }).Wait();
+                    });
+                    Assert.ThrowsException<AggregateException>(() =>
+                    {
+                        client.Mutation(new GraphQL.Common.Request.GraphQLRequest
+                        {
+                            Query = "query"
+                        }).Wait();
+                    });
+                }
+            });
+        }
+
+        [TestMethod]
         public void Notes()
         {
             Utils.UseApiEnvironment((_, api, token) =>
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    INotesClient client = new NotesClient(new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token)));
+                    var graphqlClient = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    INotesClient client = new NotesClient(graphqlClient);
 
                     Assert.IsFalse(client.Query().Result.Nodes.Any());
                     Assert.IsNull(client.Get(0).Result);
@@ -34,6 +61,7 @@ namespace Test.Server.SDKs
                         var node = new RawNote { Title = "name" };
                         int id = client.Create(node).Result.Value;
                         Assert.AreEqual(node.Title, client.Query(id).Result.Nodes.First().Title);
+                        Assert.IsFalse(client.Query(id, "", "", 0, "").Result.Nodes.Any());
                         node.Content = "content";
                         Assert.IsTrue(client.Update(id, new MindNote.Data.Mutations.MutationNote
                         {
@@ -51,7 +79,8 @@ namespace Test.Server.SDKs
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    ICategoriesClient client = new CategoriesClient(new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token)));
+                    var graphqlClient = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    ICategoriesClient client = new CategoriesClient(graphqlClient);
 
                     Assert.IsFalse(client.Query().Result.Nodes.Any());
                     Assert.IsNull(client.Get(0).Result);
@@ -60,6 +89,7 @@ namespace Test.Server.SDKs
                         var tag = new RawCategory { Name = "tag", Color = "black" };
                         int id = client.Create(tag).Result.Value;
                         Assert.AreEqual(tag.Name, client.Query(id).Result.Nodes.First().Name);
+                        Assert.IsFalse(client.Query(id, "", "", "").Result.Nodes.Any());
                         Assert.AreEqual(tag.Color, client.Get(id).Result.Color);
                         tag.Color = "white";
                         Assert.IsTrue(client.Update(id, new MindNote.Data.Mutations.MutationCategory
@@ -79,7 +109,8 @@ namespace Test.Server.SDKs
             {
                 using (var baseClient = api.CreateClient())
                 {
-                    IUsersClient client = new UsersClient(new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token)));
+                    var graphqlClient = new GraphQLClient(baseClient, new MockGraphQLClientOptions(new Uri(baseClient.BaseAddress.ToString() + "graphql"), token));
+                    IUsersClient client = new UsersClient(graphqlClient);
 
                     // Assert.IsFalse(client.Query().Result.Any());
                     Assert.IsNull(client.Get("0").Result);

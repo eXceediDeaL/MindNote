@@ -15,8 +15,6 @@ namespace MindNote.Data.Providers.SqlServer
         private DataContext dataContext;
         private IDataRepository parent;
 
-        public const string DefaultTitle = "Untitled";
-
         public NoteRepository(DataContext dataContext, IDataRepository parent)
         {
             this.dataContext = dataContext;
@@ -57,10 +55,6 @@ namespace MindNote.Data.Providers.SqlServer
             }
 
             RawNote raw = data.Clone();
-            if (string.IsNullOrEmpty(raw.Title))
-            {
-                raw.Title = DefaultTitle;
-            }
             raw.CreationTime = raw.ModificationTime = DateTimeOffset.Now;
             raw.UserId = identity;
 
@@ -120,7 +114,11 @@ namespace MindNote.Data.Providers.SqlServer
                 return -1;
             }
 
-            mutation.Title?.Apply(s => raw.Title = string.IsNullOrEmpty(s) ? DefaultTitle : s);
+            mutation.Title?.Apply(s =>
+            {
+                if (!string.IsNullOrEmpty(s))
+                    raw.Title = s;
+            });
             mutation.Content?.Apply(s => raw.Content = s);
             mutation.CategoryId?.Apply(s => raw.CategoryId = s);
             mutation.Keywords?.Apply(s => raw.Keywords = TransformHelper.KeywordsToString(s));

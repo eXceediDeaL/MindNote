@@ -6,7 +6,7 @@ namespace MindNote.Data.Mutations
     {
         public Mutation() { }
 
-        public Mutation(T newValue)
+        public Mutation(T newValue) : this()
         {
             NewValue = newValue;
         }

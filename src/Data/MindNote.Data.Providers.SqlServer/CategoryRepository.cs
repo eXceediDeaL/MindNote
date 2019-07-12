@@ -13,8 +13,6 @@ namespace MindNote.Data.Providers.SqlServer
 {
     internal class CategoryRepository : ICategoryRepository
     {
-        public const string DefaultName = "Unnamed";
-
         private DataContext dataContext;
         private IDataRepository parent;
 
@@ -56,9 +54,10 @@ namespace MindNote.Data.Providers.SqlServer
             if (identity == null)
                 return -1;
 
+            if (string.IsNullOrEmpty(data.Name))
+                return -1;
+
             RawCategory raw = data.Clone();
-            if (string.IsNullOrEmpty(raw.Name))
-                raw.Name = DefaultName;
 
             raw.UserId = identity;
 
@@ -125,7 +124,11 @@ namespace MindNote.Data.Providers.SqlServer
                 return -1;
             }
 
-            mutation.Name?.Apply(s => raw.Name = string.IsNullOrEmpty(s) ? DefaultName : s);
+            mutation.Name?.Apply(s =>
+            {
+                if (!string.IsNullOrEmpty(s))
+                    raw.Name = s;
+            });
             mutation.Color?.Apply(s => raw.Color = s);
             mutation.Status?.Apply(s => raw.Status = s);
 

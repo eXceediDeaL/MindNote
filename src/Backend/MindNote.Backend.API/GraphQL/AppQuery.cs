@@ -40,27 +40,27 @@ namespace MindNote.Backend.API.GraphQL
             }
             if (name != null)
             {
-                query = query.Where(x => x.Name.Contains(name));
+                query = query.Where(item => item.Name != null && item.Name.Contains(name));
             }
             if (bio != null)
             {
-                query = query.Where(x => x.Bio.Contains(bio));
+                query = query.Where(item => item.Bio != null && item.Bio.Contains(bio));
             }
             if (email != null)
             {
-                query = query.Where(x => x.Email.Contains(email));
+                query = query.Where(item => item.Email != null && item.Email.Contains(email));
             }
             if (url != null)
             {
-                query = query.Where(x => x.Url.Contains(url));
+                query = query.Where(item => item.Url != null && item.Url.Contains(url));
             }
             if (company != null)
             {
-                query = query.Where(x => x.Company.Contains(company));
+                query = query.Where(item => item.Company != null && item.Company.Contains(company));
             }
             if (location != null)
             {
-                query = query.Where(x => x.Location.Contains(location));
+                query = query.Where(item => item.Location != null && item.Location.Contains(location));
             }
             return query;
         }
@@ -83,15 +83,15 @@ namespace MindNote.Backend.API.GraphQL
             }
             if (title != null)
             {
-                query = query.Where(item => item.Title.Contains(title));
+                query = query.Where(item => item.Title != null && item.Title.Contains(title));
             }
             if (content != null)
             {
-                query = query.Where(item => item.Content.Contains(content));
+                query = query.Where(item => item.Content != null && item.Content.Contains(content));
             }
             if (keyword != null)
             {
-                query = query.Where(item => item.Keywords.Contains(content));
+                query = query.Where(item => item.Keywords != null && item.Keywords.Contains(content));
             }
             if (categoryId.HasValue)
             {
@@ -118,11 +118,11 @@ namespace MindNote.Backend.API.GraphQL
             }
             if (name != null)
             {
-                query = query.Where(item => item.Name.Contains(name));
+                query = query.Where(item => item.Name != null && item.Name.Contains(name));
             }
             if (color != null)
             {
-                query = query.Where(item => item.Color.Contains(color));
+                query = query.Where(item => item.Color != null && item.Color.Contains(color));
             }
             return query;
         }
