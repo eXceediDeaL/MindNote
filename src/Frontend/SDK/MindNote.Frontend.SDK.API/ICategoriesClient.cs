@@ -15,7 +15,7 @@ namespace MindNote.Frontend.SDK.API
 
         Task<Category> Get(int id);
 
-        Task<PagingEnumerable<Category>> Query(int? id = null, string name = null, string color = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null);
+        Task<PagingEnumerable<Category>> Query(int? id = null, string name = null, string color = null, ItemClass? itemClass = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null);
 
         Task<int?> Update(int id, MutationCategory mutation);
     }

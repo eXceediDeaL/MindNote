@@ -82,11 +82,11 @@ namespace MindNote.Data.Providers.SqlServer
         {
             if(identity == null)
             {
-                return dataContext.Notes.Where(x => x.Status == ItemStatus.Public);
+                return dataContext.Notes.Where(x => x.Class != ItemClass.Private);
             }
             else
             {
-                return dataContext.Notes.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
+                return dataContext.Notes.Where(x => x.Class != ItemClass.Private || x.UserId == identity);
             }
         }
 
@@ -122,7 +122,7 @@ namespace MindNote.Data.Providers.SqlServer
             mutation.Content?.Apply(s => raw.Content = s);
             mutation.CategoryId?.Apply(s => raw.CategoryId = s);
             mutation.Keywords?.Apply(s => raw.Keywords = TransformHelper.KeywordsToString(s));
-            mutation.Status?.Apply(s => raw.Status = s);
+            mutation.Class?.Apply(s => raw.Class = s);
 
             raw.ModificationTime = DateTimeOffset.Now;
 

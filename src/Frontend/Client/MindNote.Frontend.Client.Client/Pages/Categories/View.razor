@@ -2,8 +2,8 @@
 @using MindNote.Frontend.Client.Shared
 @using System.Linq
 @using MindNote.Frontend.SDK.API.Models
-@inject CategoriesClient CategoryClient
-@inject NotesClient NoteClient
+@inject ICategoriesClient CategoryClient
+@inject INotesClient NoteClient
 @inject IUriHelper UriHelper
 
 @if (Current == null)
@@ -26,7 +26,7 @@ else
             {
                 <div class="d-flex flex-row-reverse flex-grow-1 align-items-center">
                     <button class="btn btn-outline-danger m-1" @onclick="@(async e => await OnDelete())"><i class="fa fa-trash"></i></button>
-                    <a href="/categories/@Id/edit" class="btn btn-outline-primary m-1"><i class="fa fa-edit"></i></a>
+                    <a href="categories/@Id/edit" class="btn btn-outline-primary m-1"><i class="fa fa-edit"></i></a>
                 </div>
             }
         </div>
@@ -35,7 +35,7 @@ else
         {
             <div>
                 <small>
-                    <a href="/account/@Current.Data.User.Id" style="color: #555;">
+                    <a href="users/@Current.Data.User.Id" style="color: #555;">
                         <UserDisplay Value="@Current.Data.User" />
                     </a>
                 </small>

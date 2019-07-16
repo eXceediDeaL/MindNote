@@ -1,7 +1,7 @@
 ﻿@page "/categories/{id:int}/edit"
 @attribute [Authorize]
 @using MindNote.Frontend.SDK.API.Models
-@inject CategoriesClient CategoryClient
+@inject ICategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">

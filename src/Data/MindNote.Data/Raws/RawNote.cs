@@ -22,7 +22,7 @@ namespace MindNote.Data.Raws
 
         public string UserId { get; set; }
 
-        public ItemStatus Status { get; set; }
+        public ItemClass Class { get; set; }
 
         public RawNote Clone() => (RawNote)MemberwiseClone();
     }

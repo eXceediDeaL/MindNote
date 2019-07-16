@@ -33,8 +33,8 @@ namespace MindNote.Frontend.SDK.API
     }
 }") + GraphQLStrings.NoteListItem;
         static readonly string SQuery = GraphQLStrings.CreateQuery(nameof(SQuery), @"
-($id: Int = null, $title: String = null, $content: String = null, $categoryId: Int = null, $keyword: String = null, $userId: String = null, $first: PaginationAmount = null, $last: PaginationAmount = null, $before: String = null, $after: String = null) {
-    notes(id: $id, first: $first, last: $last, before: $before, after: $after, title: $title, content: $content, categoryId: $categoryId, keyword: $keyword, userId: $userId) {
+($id: Int = null, $title: String = null, $content: String = null, $categoryId: Int = null, $keyword: String = null, $itemClass: ItemClass = null, $userId: String = null, $first: PaginationAmount = null, $last: PaginationAmount = null, $before: String = null, $after: String = null) {
+    notes(id: $id, first: $first, last: $last, before: $before, after: $after, title: $title, content: $content, categoryId: $categoryId, keyword: $keyword, itemClass: $itemClass, userId: $userId) {
         totalCount
         pageInfo {
             hasNextPage, hasPreviousPage, startCursor, endCursor
@@ -91,13 +91,13 @@ namespace MindNote.Frontend.SDK.API
             })).GetDataFieldAs<Note>("note");
         }
 
-        public async Task<PagingEnumerable<Note>> Query(int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null)
+        public async Task<PagingEnumerable<Note>> Query(int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, ItemClass? itemClass = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null)
         {
             return (await innerClient.Query(new GraphQL.Common.Request.GraphQLRequest
             {
                 Query = SQuery,
                 OperationName = nameof(SQuery),
-                Variables = new { id, first, last, before, after, title, content, categoryId, keyword, userId },
+                Variables = new { id, first, last, before, after, title, content, categoryId, keyword, itemClass, userId },
             })).GetDataFieldAs<PagingEnumerable<Note>>("notes");
         }
 

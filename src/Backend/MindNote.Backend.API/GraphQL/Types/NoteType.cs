@@ -19,7 +19,7 @@ namespace MindNote.Backend.API.GraphQL.Types
         {
             descriptor.Name("Note");
             descriptor.Field(x => x.Clone()).Ignore();
-            descriptor.Field(x => x.Status).Type<ItemStatusType>();
+            descriptor.Field(x => x.Class).Type<NonNullType<EnumType<ItemClass>>>();
             descriptor.Field(x => x.Id).Type<NonNullType<IdType>>();
             descriptor.Field(x => x.Title).Type<NonNullType<StringType>>();
             descriptor.Field(x => x.CategoryId).Ignore();

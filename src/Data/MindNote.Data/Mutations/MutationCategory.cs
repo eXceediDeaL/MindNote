@@ -8,6 +8,6 @@ namespace MindNote.Data.Mutations
 
         public Mutation<string> Color { get; set; }
 
-        public Mutation<ItemStatus> Status { get; set; }
+        public Mutation<ItemClass> Class { get; set; }
     }
 }

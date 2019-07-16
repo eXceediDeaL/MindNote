@@ -3,8 +3,8 @@
 @using MindNote.Frontend.Client.Shared
 @using MindNote.Frontend.SDK.API.Models
 @using System.Linq
-@inject NotesClient NoteClient
-@inject CategoriesClient CategoriesClient
+@inject INotesClient NoteClient
+@inject ICategoriesClient CategoriesClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">

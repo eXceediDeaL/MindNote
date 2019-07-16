@@ -1,6 +1,6 @@
 ﻿@page "/notes/{id:int}"
 @using MindNote.Frontend.Client.Shared
-@inject NotesClient NoteClient
+@inject INotesClient NoteClient
 @inject IUriHelper UriHelper
 
 @if (Current == null)
@@ -28,7 +28,7 @@ else
             </AuthorizeView>
         </div>
         <div class="mb-4">
-            <NoteMetadataDisplay Value="@Current" />
+            <NoteMetadataDisplay Value="@Current.Data" />
         </div>
         <MarkdownViewer Value="@Current.Data.Content" />
     }

@@ -1,5 +1,5 @@
 @using MindNote.Frontend.SDK.API.Models
-@inject NotesClient NotesClient
+@inject INotesClient NotesClient
 
 @if (ViewModel != null)
 {
@@ -21,7 +21,7 @@
             </div>
 
             <div class="card-subtitle mb-2">
-                <NoteMetadataDisplay Value="@ViewModel" />
+                <NoteMetadataDisplay Value="@ViewModel.Data" />
             </div>
 
             <p class="card-text mb-1">

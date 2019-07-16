@@ -92,11 +92,11 @@ namespace MindNote.Data.Providers.SqlServer
         {
             if (identity == null)
             {
-                return dataContext.Categories.Where(x => x.Status == ItemStatus.Public);
+                return dataContext.Categories.Where(x => x.Class != ItemClass.Private);
             }
             else
             {
-                return dataContext.Categories.Where(x => x.Status == ItemStatus.Public || x.UserId == identity);
+                return dataContext.Categories.Where(x => x.Class != ItemClass.Private || x.UserId == identity);
             }
         }
 
@@ -130,7 +130,7 @@ namespace MindNote.Data.Providers.SqlServer
                     raw.Name = s;
             });
             mutation.Color?.Apply(s => raw.Color = s);
-            mutation.Status?.Apply(s => raw.Status = s);
+            mutation.Class?.Apply(s => raw.Class = s);
 
             dataContext.Categories.Update(raw);
             await dataContext.SaveChangesAsync();

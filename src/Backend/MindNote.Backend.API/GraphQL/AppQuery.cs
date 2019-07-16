@@ -70,7 +70,7 @@ namespace MindNote.Backend.API.GraphQL
             return await repository.Users.Get(id, GetIdentity());
         }
 
-        public async Task<IQueryable<RawNote>> GetNotes([Service]IDataRepository repository, int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, string userId = null)
+        public async Task<IQueryable<RawNote>> GetNotes([Service]IDataRepository repository, int? id = null, string title = null, string content = null, int? categoryId = null, string keyword = null, ItemClass? itemClass = null, string userId = null)
         {
             var query = await repository.Notes.Query(GetIdentity());
             if (userId != null)
@@ -97,6 +97,10 @@ namespace MindNote.Backend.API.GraphQL
             {
                 query = query.Where(item => item.CategoryId == categoryId.Value);
             }
+            if (itemClass.HasValue)
+            {
+                query = query.Where(item => item.Class == itemClass.Value);
+            }
             return query;
         }
 
@@ -105,7 +109,7 @@ namespace MindNote.Backend.API.GraphQL
             return await repository.Notes.Get(id, GetIdentity());
         }
 
-        public async Task<IQueryable<RawCategory>> GetCategories([Service]IDataRepository repository, int? id = null, string name = null, string color = null, string userId = null)
+        public async Task<IQueryable<RawCategory>> GetCategories([Service]IDataRepository repository, int? id = null, string name = null, string color = null, ItemClass? itemClass = null, string userId = null)
         {
             var query = await repository.Categories.Query(GetIdentity());
             if (userId != null)
@@ -123,6 +127,10 @@ namespace MindNote.Backend.API.GraphQL
             if (color != null)
             {
                 query = query.Where(item => item.Color != null && item.Color.Contains(color));
+            }
+            if (itemClass.HasValue)
+            {
+                query = query.Where(item => item.Class == itemClass.Value);
             }
             return query;
         }

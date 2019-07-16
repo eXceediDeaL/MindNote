@@ -1,10 +1,10 @@
-﻿@page "/account"
-@page "/account/{id}"
+﻿@page "/users"
+@page "/users/{id}"
 
 @using MindNote.Frontend.SDK.API.Models
 @using System.Linq
-@inject UsersClient UserClient
-@inject NotesClient NoteClient
+@inject IUsersClient UserClient
+@inject INotesClient NoteClient
 @inject IUriHelper UriHelper
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -53,11 +53,25 @@ else
 }
 else
 {
-<PagingWaterfall Data="@Notes" Column="1" OnUpdatePage="@OnUpdateNotePage" OnNextPage="@OnNextNotePage" OnPreviousPage="@OnPreviousNotePage">
-    <ItemTemplate>
-        <NoteItemCard Data="@context" OnDelete="@OnDeleteNote"></NoteItemCard>
-    </ItemTemplate>
-</PagingWaterfall>
+    <PagingWaterfall Data="@Notes" Column="1" OnUpdatePage="@OnUpdateNotePage" OnNextPage="@OnNextNotePage" OnPreviousPage="@OnPreviousNotePage">
+        <ItemTemplate>
+            <div class="card border-0">
+                <div class="card-body">
+                    <div class="card-title d-flex flex-row mb-1">
+                        <h4>
+                            <a href="users/@Id/@context.Title" style="color:black">@context.Title</a>
+                        </h4>
+                    </div>
+                    <div class="card-subtitle mb-2">
+                        <NoteMetadataDisplay Value="@context" />
+                    </div>
+                    <p class="card-text mb-1">
+                        <TextClipper value="@context.Content" />
+                    </p>
+                </div>
+            </div>
+        </ItemTemplate>
+    </PagingWaterfall>
 }
 
 @code {
@@ -92,31 +106,28 @@ else
                 return;
             }
             Id = UserHelper.GetId(user);
+            UriHelper.NavigateTo($"users/{Id}");
         }
+
+        UserLayout.CurrentUserId = Id;
 
         Current = await UserClient.Get(Id);
         if (Current != null)
-            Notes = await NoteClient.Query(userId: Current.Id, first: Count);
-    }
-
-    private async Task OnDeleteNote(Note data)
-    {
-        await NoteClient.Delete(data.Id);
-        await OnUpdateNotePage();
+            Notes = await NoteClient.Query(itemClass: Data.Raws.ItemClass.Page, userId: Current.Id, first: Count);
     }
 
     private async Task OnUpdateNotePage()
     {
-        Notes = await NoteClient.Query(userId: Current.Id, after: Notes.PageInfo.StartCursor, first: Count);
+        Notes = await NoteClient.Query(itemClass: Data.Raws.ItemClass.Page, userId: Current.Id, after: Notes.PageInfo.StartCursor, first: Count);
     }
 
     private async Task OnPreviousNotePage()
     {
-        Notes = await NoteClient.Query(userId: Current.Id, before: Notes.PageInfo.StartCursor, last: Count);
+        Notes = await NoteClient.Query(itemClass: Data.Raws.ItemClass.Page, userId: Current.Id, before: Notes.PageInfo.StartCursor, last: Count);
     }
 
     private async Task OnNextNotePage()
     {
-        Notes = await NoteClient.Query(userId: Current.Id, after: Notes.PageInfo.EndCursor, first: Count);
+        Notes = await NoteClient.Query(itemClass: Data.Raws.ItemClass.Page, userId: Current.Id, after: Notes.PageInfo.EndCursor, first: Count);
     }
 }

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Pages\Account\Index.razor" />
+    <None Include="Pages\Users\Index.razor" />
     <None Include="Pages\Account\Login.razor" />
     <None Include="Pages\Account\Logout.razor" />
     <None Include="Pages\Account\Manage.razor" />

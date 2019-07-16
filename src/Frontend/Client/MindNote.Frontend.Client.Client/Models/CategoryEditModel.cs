@@ -13,7 +13,7 @@ namespace MindNote.Frontend.Client.Client.Models
         public string Name { get; set; }
 
         [Required]
-        public bool IsPublic { get; set; }
+        public ItemClass Class { get; set; }
 
         [Required]
         public string Color { get; set; }
@@ -24,7 +24,7 @@ namespace MindNote.Frontend.Client.Client.Models
         {
             Name = item.Name;
             Color = item.Color;
-            IsPublic = item.Status == ItemStatus.Public;
+            Class = item.Class;
         }
 
         public MutationCategory ToMutation()
@@ -33,7 +33,7 @@ namespace MindNote.Frontend.Client.Client.Models
             {
                 Name = new Mutation<string>(Name),
                 Color = new Mutation<string>(Color),
-                Status = new Mutation<ItemStatus>(IsPublic ? ItemStatus.Public : ItemStatus.Private),
+                Class = new Mutation<ItemClass>(Class),
             };
             return item;
         }

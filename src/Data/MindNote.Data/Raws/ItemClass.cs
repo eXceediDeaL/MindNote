@@ -1,8 +1,9 @@
 ﻿namespace MindNote.Data.Raws
 {
-    public enum ItemStatus
+    public enum ItemClass
     {
         Private,
         Public,
+        Page
     }
 }

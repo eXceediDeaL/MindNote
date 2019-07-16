@@ -1,7 +1,7 @@
 ﻿@page "/categories/new"
 @attribute [Authorize]
 @using MindNote.Data.Raws
-@inject CategoriesClient CategoryClient
+@inject ICategoriesClient CategoryClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -27,7 +27,7 @@ else
         {
             Name = Model.Name,
             Color = Model.Color,
-            Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
+            Class = Model.Class,
         };
         var id = await CategoryClient.Create(item);
         UriHelper.NavigateTo($"categories/{id}");

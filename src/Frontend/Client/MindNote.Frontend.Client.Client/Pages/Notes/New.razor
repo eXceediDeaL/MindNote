@@ -2,8 +2,8 @@
 @attribute [Authorize]
 @using MindNote.Frontend.SDK.API.Models
 @using MindNote.Data.Raws
-@inject CategoriesClient CategoryClient
-@inject NotesClient NoteClient
+@inject ICategoriesClient CategoryClient
+@inject INotesClient NoteClient
 @inject IUriHelper UriHelper
 
 <ul class="breadcrumb">
@@ -47,7 +47,7 @@ else
             Content = Model.Content,
             CategoryId = catId,
             Keywords = Model.Keywords,
-            Status = Model.IsPublic ? ItemStatus.Public : ItemStatus.Private,
+            Class = Model.Class,
         };
         var id = await NoteClient.Create(item);
         UriHelper.NavigateTo($"notes/{id}");

@@ -1,0 +1,47 @@
+﻿@page "/users/{id}/{title}"
+@using MindNote.Frontend.Client.Shared
+@inject INotesClient NoteClient
+@inject IUriHelper UriHelper
+
+@if (Current == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (Current.Data == null)
+    {
+        <p><em>Not found.</em></p>
+    }
+    else
+    {
+        <div class="d-flex flex-row">
+            <h1 class="display-4">@Current.Data.Title</h1>
+        </div>
+        <div class="mb-4">
+            <NoteMetadataDisplay Value="@Current.Data" />
+        </div>
+        <MarkdownViewer Value="@Current.Data.Content" />
+    }
+}
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    private string Id { get; set; }
+
+    [Parameter]
+    private string Title { get; set; }
+
+    NoteViewModel Current { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        UserLayout.CurrentUserId = Id;
+
+        var res = await NoteClient.Query(title: Title, userId: Id, itemClass: Data.Raws.ItemClass.Page, first: 1);
+        Current = new NoteViewModel { Data = res.Nodes.FirstOrDefault() };
+    }
+}

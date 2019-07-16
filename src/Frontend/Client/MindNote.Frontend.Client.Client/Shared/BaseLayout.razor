@@ -1,0 +1,10 @@
+﻿@inherits LayoutComponentBase
+
+@if (Settings.ApiServerUrl == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @Body
+}

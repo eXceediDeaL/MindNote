@@ -27,18 +27,18 @@ namespace MindNote.Frontend.SDK.API
         static readonly string SGet = GraphQLStrings.CreateQuery(nameof(SGet), @"
 ($id: Int!) {
     category(id: $id) {
-        id, name, color, status
+        id, name, color, class
         user {
             id, name
         }
     }
 }");
         static readonly string SQuery = GraphQLStrings.CreateQuery(nameof(SQuery), @"
-($id: Int = null, $name: String = null, $color: String = null, $userId: String = null, $first: PaginationAmount = null, $last: PaginationAmount = null, $before: String = null, $after: String = null) {
-    categories(id: $id, first: $first, last: $last, before: $before, after: $after, name: $name, color: $color, userId: $userId){
+($id: Int = null, $name: String = null, $color: String = null, $itemClass: ItemClass = null, $userId: String = null, $first: PaginationAmount = null, $last: PaginationAmount = null, $before: String = null, $after: String = null) {
+    categories(id: $id, first: $first, last: $last, before: $before, after: $after, name: $name, color: $color, itemClass: $itemClass, userId: $userId){
         totalCount
         nodes{
-            id, name, color, status
+            id, name, color, class
             user {
                 id, name
             }
@@ -92,13 +92,13 @@ namespace MindNote.Frontend.SDK.API
             })).GetDataFieldAs<Category>("category");
         }
 
-        public async Task<PagingEnumerable<Category>> Query(int? id = null, string name = null, string color = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null)
+        public async Task<PagingEnumerable<Category>> Query(int? id = null, string name = null, string color = null, ItemClass? itemClass = null, string userId = null, int? first = null, int? last = null, string before = null, string after = null)
         {
             return (await innerClient.Query(new GraphQL.Common.Request.GraphQLRequest
             {
                 Query = SQuery,
                 OperationName = nameof(SQuery),
-                Variables = new { id, first, last, after, before, name, color, userId },
+                Variables = new { id, first, last, after, before, name, color, itemClass, userId },
             })).GetDataFieldAs<PagingEnumerable<Category>>("categories");
         }
 

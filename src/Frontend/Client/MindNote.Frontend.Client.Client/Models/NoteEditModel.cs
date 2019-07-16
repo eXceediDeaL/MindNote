@@ -19,7 +19,7 @@ namespace MindNote.Frontend.Client.Client.Models
         public string Keywords { get; set; }
 
         [Required]
-        public bool IsPublic { get; set; }
+        public ItemClass Class { get; set; }
 
         public NoteEditModel(Note item)
         {
@@ -27,7 +27,7 @@ namespace MindNote.Frontend.Client.Client.Models
             Content = item.Content;
             CategoryId = item.Category?.Id.ToString();
             Keywords = item.Keywords == null ? "" : string.Join(";", item.Keywords);
-            IsPublic = item.Status == ItemStatus.Public;
+            Class = item.Class;
         }
 
         public NoteEditModel() { }
@@ -43,7 +43,7 @@ namespace MindNote.Frontend.Client.Client.Models
                 Content = new Mutation<string>(Content),
                 CategoryId = new Mutation<int?>(catId),
                 Keywords = new Mutation<string[]>(Keywords?.Split(';')),
-                Status = new Mutation<ItemStatus>(IsPublic ? ItemStatus.Public : ItemStatus.Private),
+                Class = new Mutation<ItemClass>(Class),
             };
             return item;
         }

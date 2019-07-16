@@ -1,3 +1,5 @@
+@using MindNote.Data.Raws
+
 <EditForm Model="@Model" OnValidSubmit="@OnSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -15,9 +17,14 @@
 
     <div class="input-group mt-2">
         <div class="input-group-prepend">
-            <span class="input-group-text">Public?</span>
+            <span class="input-group-text">Class</span>
         </div>
-        <InputCheckbox class="form-control" @bind-Value="@Model.IsPublic" />
+        <InputSelect class="form-control" @bind-Value="@Model.Class">
+            @foreach (var c in Enum.GetValues(typeof(ItemClass)))
+            {
+                <option value="@c">@Enum.GetName(typeof(ItemClass), c)</option>
+            }
+        </InputSelect>
     </div>
 
     <div class="input-group mt-2">

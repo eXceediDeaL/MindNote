@@ -89,7 +89,7 @@ namespace Test.Server.SDKs
                         var tag = new RawCategory { Name = "tag", Color = "black" };
                         int id = client.Create(tag).Result.Value;
                         Assert.AreEqual(tag.Name, client.Query(id).Result.Nodes.First().Name);
-                        Assert.IsFalse(client.Query(id, "", "", "").Result.Nodes.Any());
+                        Assert.IsFalse(client.Query(id, "", "", null, "").Result.Nodes.Any());
                         Assert.AreEqual(tag.Color, client.Get(id).Result.Color);
                         tag.Color = "white";
                         Assert.IsTrue(client.Update(id, new MindNote.Data.Mutations.MutationCategory

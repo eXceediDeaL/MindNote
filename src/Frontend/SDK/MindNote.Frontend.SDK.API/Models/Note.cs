@@ -23,6 +23,6 @@ namespace MindNote.Frontend.SDK.API.Models
 
         public User User { get; set; }
 
-        public ItemStatus Status { get; set; }
+        public ItemClass Class { get; set; }
     }
 }

@@ -31,15 +31,21 @@ namespace MindNote.Frontend.SDK.API
         static readonly string SGet = GraphQLStrings.CreateQuery(nameof(SGet), @"
 ($id: String) {
     user(id: $id){
-        id, name, bio, url, email, company, location
-        notes {
-            totalCount
-            nodes {
-                ..." + nameof(GraphQLStrings.NoteListItem) + @"
-            }
+         ..." + nameof(GraphQLStrings.UserListItem) + @"
+    }
+}") + GraphQLStrings.UserListItem;
+        static readonly string SQuery = GraphQLStrings.CreateQuery(nameof(SQuery), @"
+($id: Int = null, $name: String = null, $bio: String = null, $url: String = null, $email: String = null, $company: String = null, $location: String = null, $first: PaginationAmount = null, $last: PaginationAmount = null, $before: String = null, $after: String = null) {
+    users(id: $id, first: $first, last: $last, before: $before, after: $after, name: $name, bio: $bio, url: $url, email: $email, company: $company, location: $location) {
+        totalCount
+        pageInfo {
+            hasNextPage, hasPreviousPage, startCursor, endCursor
+        }
+        nodes {
+             ..." + nameof(GraphQLStrings.NoteListItem) + @"
         }
     }
-}") + GraphQLStrings.NoteListItem;
+}") + GraphQLStrings.UserListItem;
 
         private IGraphQLClient innerClient;
 
@@ -87,9 +93,14 @@ namespace MindNote.Frontend.SDK.API
             })).GetDataFieldAs<User>("user");
         }
 
-        public async Task<PagingEnumerable<Note>> Query(string id = null)
+        public async Task<PagingEnumerable<User>> Query(string id = null, string name = null, string bio = null, string url = null, string email = null, string company = null, string location = null)
         {
-            return null;
+            return (await innerClient.Query(new GraphQL.Common.Request.GraphQLRequest
+            {
+                Query = SQuery,
+                OperationName = nameof(SQuery),
+                Variables = new { id, name, bio, url, email, company, location },
+            })).GetDataFieldAs<PagingEnumerable<User>>("users");
         }
 
         public async Task<string> Update(string id, MutationUser mutation)

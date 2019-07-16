@@ -3,7 +3,7 @@
 
 <div class="sidebar">
     <div class="top-row pl-4 navbar navbar-dark">
-        <a class="navbar-brand" href="">MindNote Client</a>
+        <a class="navbar-brand" href="">MindNote User</a>
         <button class="navbar-toggler" @onclick="@ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -12,23 +12,18 @@
     <div class="@NavMenuCssClass" @onclick="@ToggleNavMenu">
         <ul class="nav flex-column">
             <li class="nav-item px-3">
-                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <a class="nav-link" href="users/@CurrentUserId">
                     <span class="fa fa-home" aria-hidden="true"></span> Home
-                </NavLink>
+                </a>
             </li>
             <li class="nav-item px-3">
-                <NavLink class="nav-link" href="notes">
-                    <span class="fa fa-list" aria-hidden="true"></span> Notes
-                </NavLink>
+                <a class="nav-link" href="users/@CurrentUserId/About">
+                    <span class="fa fa-user" aria-hidden="true"></span> About
+                </a>
             </li>
             <li class="nav-item px-3">
-                <NavLink class="nav-link" href="categories">
-                    <span class="fa fa-th" aria-hidden="true"></span> Categories
-                </NavLink>
-            </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="users">
-                    <span class="fa fa-users" aria-hidden="true"></span> Users
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="fa fa-chevron-left" aria-hidden="true"></span> MindNote
                 </NavLink>
             </li>
         </ul>
@@ -42,6 +37,8 @@
 </div>
 
 @code {
+    internal static string CurrentUserId { get; set; }
+
     bool collapseNavMenu = true;
 
     string NavMenuCssClass => collapseNavMenu ? "collapse" : null;

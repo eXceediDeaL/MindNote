@@ -4,7 +4,7 @@
     {
         public static readonly string NoteListItem = GraphQLStrings.CreateFragment(nameof(NoteListItem), "Note", @"
 {
-    id, title, content, creationTime, modificationTime, status, keywords
+    id, title, content, creationTime, modificationTime, class, keywords
     category {
         id, name, color
     }
@@ -12,6 +12,11 @@
         id, name
     }
 }");
+        public static readonly string UserListItem = GraphQLStrings.CreateFragment(nameof(UserListItem), "User", @"
+{
+    id, name, bio, url, email, company, location
+}");
+        
 
         public static string CreateMutation(string name, string content)
         {

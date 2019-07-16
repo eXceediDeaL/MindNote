@@ -11,8 +11,8 @@ namespace MindNote.Backend.API.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<RawCategory> descriptor)
         {
             descriptor.Name("Category");
+            descriptor.Field(x => x.Class).Type<NonNullType<EnumType<ItemClass>>>();
             descriptor.Field(x => x.Clone()).Ignore();
-            descriptor.Field(x => x.Status).Type<ItemStatusType>();
             descriptor.Field(x => x.Id).Type<NonNullType<IdType>>();
             descriptor.Field(x => x.Name).Type<NonNullType<StringType>>();
             descriptor.Field(x => x.UserId).Ignore();
