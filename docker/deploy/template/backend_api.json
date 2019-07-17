@@ -6,7 +6,7 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "{BackendIdenty}"
+        "Identity": "{BackendIdentity}"
     },
     "db": {
         "ConnectionString": "server=mndb;userid=root;pwd=MNdb_passw00d;port=3306;database=mndb;",

@@ -6,7 +6,7 @@
     },
     "AllowedHosts": "*",
     "server": {
-        "Identity": "{BackendIdenty}",
+        "Identity": "{BackendIdentity}",
         "Api": "{BackendApi}"
     },
     "identityClient": {

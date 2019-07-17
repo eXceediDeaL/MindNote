@@ -1,25 +1,36 @@
-if [ -z $BackendIdenty]; then
-    BackendIdenty="http://id.mindnote.com"
+if [ -z $BackendIdentity ]; then
+    BackendIdentity="http://id.mindnote.com"
 fi
-if [ -z $BackendApi]; then
+if [ -z $BackendApi ]; then
     BackendApi="http://api.mindnote.com"
 fi
-if [ -z $FrontendServer]; then
+if [ -z $FrontendServer ]; then
     FrontendServer="http://mindnote.com"
 fi
-if [ -z $FrontendClient]; then
+if [ -z $FrontendClient ]; then
     FrontendClient="http://client.mindnote.com"
 fi
 
-if [ -z $SecretFrontendServer]; then
+echo "Host names:"
+echo "  backend identity: $BackendIdentity"
+echo "  backend api     : $BackendApi"
+echo "  frontend server : $FrontendServer"
+echo "  frontend client : $FrontendClient"
+
+if [ -z $SecretFrontendServer ]; then
     SecretFrontendServer="secret"
 fi
-if [ -z $SecretBackendApi]; then
+if [ -z $SecretBackendApi ]; then
     SecretBackendApi="secret"
 fi
-if [ -z $SecretFrontendClient]; then
+if [ -z $SecretFrontendClient ]; then
     SecretFrontendClient="secret"
 fi
+
+echo "Secrets:"
+echo "  backend api     : $SecretBackendApi"
+echo "  frontend server : $SecretFrontendServer"
+echo "  frontend client : $SecretFrontendClient"
 
 echo "Encode secrets..."
 
@@ -38,11 +49,11 @@ cp -r template/* config/
 
 echo "Apply templates..."
 
-sed -i "s|{BackendIdenty}|$BackendIdenty|g" config/*.json
+sed -i "s|{BackendIdentity}|$BackendIdentity|g" config/*.json
 sed -i "s|{BackendApi}|$BackendApi|g" config/*.json
 sed -i "s|{FrontendServer}|$FrontendServer|g" config/*.json
 sed -i "s|{FrontendClient}|$FrontendClient|g" config/*.json
-sed -i "s|{BackendIdenty}|$(echo $BackendIdenty | cut -d "/" -f3)|g" config/*.conf
+sed -i "s|{BackendIdentity}|$(echo $BackendIdentity | cut -d "/" -f3)|g" config/*.conf
 sed -i "s|{BackendApi}|$(echo $BackendApi | cut -d "/" -f3)|g" config/*.conf
 sed -i "s|{FrontendServer}|$(echo $FrontendServer | cut -d "/" -f3)|g" config/*.conf
 sed -i "s|{FrontendClient}|$(echo $FrontendClient | cut -d "/" -f3)|g" config/*.conf

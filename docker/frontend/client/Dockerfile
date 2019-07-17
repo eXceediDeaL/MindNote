@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine AS runtime
+
 WORKDIR /source
 
 COPY *.sln .
@@ -9,19 +10,16 @@ RUN dotnet restore
 
 WORKDIR /source/src/Frontend/Client
 
-RUN cd ./MindNote.Frontend.Client.Server && dotnet publish -c Release -o /build
+RUN cd ./MindNote.Frontend.Client.Server && dotnet build
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine AS runtime
 RUN apk update \
         && apk upgrade \
         && apk add --no-cache bash \
         && rm -rf /var/cache/apk/*
 
-WORKDIR /app
-COPY --from=build /build ./
 COPY ./docker/wait-for-it.sh ./
 RUN chmod +x ./wait-for-it.sh
 
-EXPOSE 80/tcp
+EXPOSE 8150/tcp
 
-ENTRYPOINT ["dotnet", "MindNote.Frontend.Client.Server.dll"]
+ENTRYPOINT ["dotnet", "run", "-p", "./MindNote.Frontend.Client.Server"]
