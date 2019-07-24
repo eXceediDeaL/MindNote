@@ -19,7 +19,7 @@ services:
       - api
     volumes:
       - "./config/frontend_client.json:/app/appsettings.json"
-    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "run", "-p", "./MindNote.Frontend.Client.Server"]
+    entrypoint: ["./wait-for-it.sh", "api:80", "-t", "0", "--", "dotnet", "MindNote.Frontend.Client.Server.dll"]
   # host:
   #   image: stardustdl/mindnote:dev-host
   #   environment:
